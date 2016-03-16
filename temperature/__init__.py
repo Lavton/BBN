@@ -3,6 +3,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy
+import sys
 from scipy import integrate
 from scipy.misc import derivative
 
@@ -12,7 +13,7 @@ k_b = 1.38*10**(-16) # эрг/К
 
 def _s_beaut_integrand_f(x, y):
 	try:
-		res = (y**2)*(math.sqrt(y**2+x**2)+(y**2)/(3*math.sqrt(y**2+x**2)))*1/(math.exp(math.sqrt(y**2+x**2)+1))
+		res = (y**2)*(math.sqrt(y**2+x**2)+(y**2)/(3*math.sqrt(y**2+x**2)))*1/(math.exp(math.sqrt(y**2+x**2))+1)
 	except OverflowError:
 		res = 0.0
 	# print (res)
@@ -26,7 +27,7 @@ def S_beaut(x, max_y=np.inf):
 
 def _eps_beaut_integrand_f(x, y):
 	try:
-		res = y**2*math.sqrt(y**2+x**2)/(math.exp(y**2+x**2)+1)
+		res = y**2*math.sqrt(y**2+x**2)/(math.exp(math.sqrt(y**2+x**2))+1)
 	except OverflowError:
 		res = 0.0
 	return res
@@ -46,37 +47,28 @@ def tfromT(T):
 
 
 if __name__ == '__main__':
-	x = 1.0
 	t0 = tfromT(10**11)
+	if len(sys.argv)-1:
+		T = sys.argv[1]
+		T = eval(T)
+		print("{:.1E}: {:.4E}\n".format(T, tfromT(T)-t0))
+		exit()
 	Ts = np.logspace(math.log10(10**8), math.log10(10**11), num=100)
-	# y = np.logspace(math.log(0.1), math.log(10.))
-	# xs = np.logspace(math.log(0.1), math.log(100.), num=100)
+	ts = [tfromT(T)-t0 for T in Ts]
 	plt.rc('text', usetex=True)
 	plt.rc('font', family='serif')
 	plt.xscale('log')
 	plt.yscale('log')
 	plt.xlabel(r'\textbf{tempreture} (K)')
 	plt.ylabel(r'\textbf{time} (s)')
-	plt.plot(Ts, [0.994*(T/10**10)**(-2)-t0 for T in Ts], 
+	plt.plot(Ts, [0.994*(T/10**10)**(-2)-0.994*(10)**(-2) for T in Ts], 
 		linewidth=2.0, label=r't\to 0')
-	plt.plot(Ts, [1.78*(T/10**10)**(-2)-t0 for T in Ts], 
+	plt.plot(Ts, [1.78*(T/10**10)**(-2)-1.78*(10)**(-2) for T in Ts], 
 		linewidth=2.0, label=r't\to $\infty$')
-	plt.plot(Ts, [tfromT(T)-t0 for T in Ts], 
+	plt.plot(Ts, ts, 
 		'r--', label=r't(T) modeling result')
 	plt.legend()
 	plt.show()
-	print([0.994*(T/10**10)**(-2) for T in Ts])
-	# print(y)
-	# y = [1., 2., 10., 100., 500.]
-	# plt.plot(y, [_s_beaut_integrand_f(x,ys) for ys in y])
-	# print([S_beaut(x,ys) for ys in y])
-	# plt.plot(y, [S_beaut(x,ys) for ys in y])
-	# plt.show()
-	# print([S_beaut(x) for x in xs])
-	# print([epsilon(x) for x in xs])
-	# plt.plot(xs, [S_beaut(x) for x in xs])
-	# plt.show()
-	# plt.plot(xs, [epsilon(x) for x in xs])
-	# plt.show()
-	T = 10**10
-	print("{:.1E}: {:.4E}".format(T, tfromT(T)-t0))
+	with open("tempreture_data.dat", "w") as f:
+		for i in range(len(Ts)):
+			f.write("{:.1E}: {:.4E}\n".format(Ts[i], ts[i]))
