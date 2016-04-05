@@ -33,7 +33,6 @@ def _eps_beaut_integrand_f(x, z):
 	y = 1/z - 1
 	try:
 		res = ((y/z)**2)*math.sqrt(y**2+x**2)/(math.exp(math.sqrt(y**2+x**2))+1)
-		res = y**2*math.sqrt(y**2+x**2)/(math.exp(math.sqrt(y**2+x**2))+1)
 	except OverflowError:
 		res = 0.0
 	return res
