@@ -13,10 +13,10 @@ if __name__ == '__main__':
     if len(sys.argv)-1:
         T = sys.argv[1]
         T = eval(T)
-        print("{:.1E}: {:.4E}\n".format(T, tfromT(T)))
+        print("{:.1E}: {:.4E}\n".format(T, tfromT(T, units="K")))
         exit()
     Ts = np.logspace(math.log10(10**8), math.log10(10**11), num=100)
-    ts = [tfromT(T) for T in Ts]
+    ts = [tfromT(T, units="K") for T in Ts]
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
     plt.xscale('log')
