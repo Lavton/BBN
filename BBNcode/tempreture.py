@@ -6,11 +6,8 @@ r"""
 """
 
 import math
-import matplotlib as mpl
-import matplotlib.pyplot as plt
 import numpy as np
 import scipy
-import sys
 from constants import *
 from scipy import integrate
 from scipy.misc import derivative
@@ -120,6 +117,8 @@ def TnuFromT(T, *, units="eV"):
 
 if __name__ == '__main__':
     import sys
+    import matplotlib as mpl
+    import matplotlib.pyplot as plt
     if len(sys.argv)-1:
         T = sys.argv[1]
         T = eval(T)
