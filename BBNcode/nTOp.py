@@ -1,3 +1,8 @@
+r"""
+модуль для общёта скоростей реакций перехода
+протонов в нейтроны и обратно
+"""
+
 import numpy as np
 import math
 from constants import *
@@ -204,6 +209,8 @@ if __name__ == '__main__':
         # print("{:.1E}: {:.4E}\n".format(T, tfromT(T, units="K")))
         # exit()
     Ts = np.logspace(math.log10(10**8), math.log10(10**11), num=20)
+
+    # переход из нейтронов
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
     plt.xscale('log')
@@ -223,6 +230,8 @@ if __name__ == '__main__':
     plt.gca().invert_xaxis()
     plt.show()
 
+
+    # переход из протонов
     plt.cla()
     plt.clf()
     plt.rc('text', usetex=True)
@@ -245,7 +254,7 @@ if __name__ == '__main__':
     plt.show()
 
 
-
+    # сравнение скоростей
     plt.cla()
     plt.clf()
     plt.rc('text', usetex=True)
@@ -260,5 +269,21 @@ if __name__ == '__main__':
     plt.plot(Ts, [lambda_p__n(T, units="K") for T in Ts],
         linewidth=2.0, label=r'$\lambda_{p\to n}$')
     plt.legend()
+    plt.gca().invert_xaxis()
+    plt.show()
+
+
+    # асимптотика
+    plt.cla()
+    plt.clf()
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlabel(r'\textbf{tempreture} (K)')
+    # plt.ylabel(r'\textbf{\lambda} (c^{-1})')
+
+    plt.plot(Ts, [(lambda_p__n(T, units="K")/lambda_n__p(T, units="K"))/exp(-Q/(k_b*T)) for T in Ts], 
+        linewidth=2.0)
     plt.gca().invert_xaxis()
     plt.show()
