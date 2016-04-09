@@ -11,6 +11,43 @@ import scipy
 from constants import *
 from scipy import integrate
 from scipy.misc import derivative
+import functools
+
+sql_enabled = True
+# sql_enabled = False
+if sql_enabled:
+    import sqlite3
+    db = sqlite3.connect('cache.db')
+    cur = db.cursor()
+    cur.execute("CREATE TABLE IF NOT EXISTS Tempeture(tempeture REAL PRIMARY KEY, TnuFromT REAL NULL, tfromT REAL NULL);")
+    tem_num = {"tempreture": 0, "TnuFromT": 1, "tfromT": 2}
+
+def sql_tempreture_cache(func):
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        coef = 1.0
+        if kwargs.get("units", "") == "K":
+            coef = k_b
+        cached = cur.execute("SELECT * FROM Tempeture WHERE tempeture={arg};".format(arg=args[0]*coef))
+        res = cur.fetchone()
+        if res:
+            if res[tem_num[func.__name__]]:
+                return res[tem_num[func.__name__]]
+            else:
+                res = func(*args, **kwargs)
+                cur.execute("UPDATE Tempeture SET {sec_c}={sec_v} WHERE tempeture={tem};".
+                    format(sec_c=func.__name__, tem=args[0]*coef, sec_v=res))
+                db.commit()
+                return res
+
+        if not res:
+            res = func(*args, **kwargs)
+            cur.execute("INSERT INTO Tempeture (tempeture, {sec_c}) VALUES ({tem}, {sec_v});".
+                format(sec_c=func.__name__, tem=args[0]*coef, sec_v=res))
+            db.commit()
+            return res
+
+    return inner if sql_enabled else func
 
 def __s_beaut_integrand_f__(x, y):
     r"""
@@ -88,6 +125,7 @@ def __tfromT__(T):
 
 __t0__ = __tfromT__(k_b*10**11)
 
+@sql_tempreture_cache
 def tfromT(T, *, units="eV"):
     r"""
     зависимость времени от температуры. По умолчанию в эВ, 
@@ -100,7 +138,7 @@ def tfromT(T, *, units="eV"):
     return __tfromT__(T) - __t0__
 
 
-
+@sql_tempreture_cache
 def TnuFromT(T, *, units="eV"):
     r"""
     температура нейтрино. При T>>m_e равна температуре фотонов, 
@@ -126,6 +164,7 @@ if __name__ == '__main__':
         exit()
     Ts = np.logspace(math.log10(10**8), math.log10(10**11), num=100)
     ts = [tfromT(T, units="K") for T in Ts]
+    print("DONE")
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
     plt.xscale('log')

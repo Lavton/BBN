@@ -1,2 +1,5 @@
 BBNcode/__pycache__/
 BBNcode/tempreture_data.dat
+BBNcode/*.ipynb
+BBNcode/.ipynb_checkpoints/
+BBNcode/*.db
