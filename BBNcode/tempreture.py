@@ -13,9 +13,7 @@ from scipy import integrate
 from scipy.misc import derivative
 import functools
 
-sql_enabled = True
-# sql_enabled = False
-if sql_enabled:
+if sql_enabled: # если кеширование в БД есть
     import sqlite3
     db = sqlite3.connect('cache.db')
     cur = db.cursor()
@@ -23,24 +21,27 @@ if sql_enabled:
     tem_num = {"tempreture": 0, "TnuFromT": 1, "tfromT": 2}
 
 def sql_tempreture_cache(func):
+    """
+    кеширование температуры фотонов, нейтрино и времени
+    """
     @functools.wraps(func)
     def inner(*args, **kwargs):
         coef = 1.0
         if kwargs.get("units", "") == "K":
-            coef = k_b
+            coef = k_b # если температура была дана в Кельвинах, переводин в eV
         cached = cur.execute("SELECT * FROM Tempeture WHERE tempeture={arg};".format(arg=args[0]*coef))
-        res = cur.fetchone()
-        if res:
-            if res[tem_num[func.__name__]]:
+        res = cur.fetchone() # ищем результат в кеше
+        if res: # если нашли температуру
+            if res[tem_num[func.__name__]]: # если там есть и то, что нужно
                 return res[tem_num[func.__name__]]
-            else:
+            else: # если нет - апдейтим и вставляем
                 res = func(*args, **kwargs)
                 cur.execute("UPDATE Tempeture SET {sec_c}={sec_v} WHERE tempeture={tem};".
                     format(sec_c=func.__name__, tem=args[0]*coef, sec_v=res))
                 db.commit()
                 return res
 
-        if not res:
+        if not res: # не нашли - вставим
             res = func(*args, **kwargs)
             cur.execute("INSERT INTO Tempeture (tempeture, {sec_c}) VALUES ({tem}, {sec_v});".
                 format(sec_c=func.__name__, tem=args[0]*coef, sec_v=res))
