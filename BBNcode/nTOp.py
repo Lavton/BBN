@@ -255,9 +255,9 @@ if __name__ == '__main__':
     plt.plot(Ts, [__lamda_n__p_e_nu(T*k_b) for T in Ts], 
         linewidth=2.0, label=r'\lambda_{n\to p+e+\nu}')
     plt.plot(Ts, [__lamda_nu_n__p_e(T*k_b) for T in Ts], 
-        linewidth=2.0, label=r'\lambda_{n\to p+e+\nu}')
+        linewidth=2.0, label=r'\lambda_{n+\nu \to p+e}')
     plt.plot(Ts, [__lamda_e_n__p_nu(T*k_b) for T in Ts], 
-        linewidth=2.0, label=r'\lambda_{n\to p+e+\nu}')
+        linewidth=2.0, label=r'$\lambda_{n+e \to p+\nu }$')
     plt.plot(Ts, [lambda_n__p(T, units="K") for T in Ts],
         'r--', label=r'$\lambda_{n\to p}$')
     plt.legend()
@@ -287,7 +287,7 @@ if __name__ == '__main__':
     plt.gca().invert_xaxis()
     plt.show()
 
-
+    print ([(lambda_n__p(T, units="K"), T) for T in Ts])
     # сравнение скоростей
     plt.cla()
     plt.clf()
