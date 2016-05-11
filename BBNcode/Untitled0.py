@@ -1,3 +1,9 @@
+
+# coding: utf-8
+
+# In[19]:
+
+# %load __init__.py
 import numpy as np
 import math
 from tempreture import tfromT
@@ -12,29 +18,61 @@ import matplotlib.pyplot as plt
 
 _X_n_0 = 0.5
 _X_p_0 = 0.5
+_X_d_0 = 0.0
 
 # def g(y,x):
     # y0
 
-Ts = np.logspace(math.log10(10**8), math.log10(10**11), num=20)
+Ts = np.logspace(math.log10(10**11), math.log10(10**8), num=20)*k_b
 
-func = lambda X_n, T: (-lambda_n__p(T, units="K")*X_n+lambda_p__n(T, units="K")*(1-X_n))*(derivative(lambda t: tfromT(t, units="K"), T))
+func = lambda X_n, T: (-lambda_n__p(T)*X_n+lambda_p__n(T)*(1-X_n))*(
+    1/derivative(tfromT, T))
+
+
+# In[20]:
+
 X_n = integrate.odeint(func, _X_n_0, Ts)
+
+
+
+# In[30]:
+
+X_n
+
+
+# In[22]:
+
 X_p = 1 - X_n
 
+
+# In[31]:
+
+ts = list(map(tfromT, Ts))
+ts
+
+
+# In[34]:
+
+get_ipython().magic('matplotlib inline')
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.xscale('log')
 plt.yscale('log')
-plt.xlabel(r'\textbf{tempreture} (K)')
+plt.xlabel(r'\textbf{t} (s)')
 plt.ylabel(r'\textbf{X_n}')
 
-plt.plot(Ts, X_n, 
+plt.plot(ts, X_n, 
         linewidth=2.0, label=r'X_n')
 
-plt.plot(Ts, X_p, 
+plt.plot(ts, X_p, 
         linewidth=2.0, label=r'X_p')
 
 plt.legend()
-plt.gca().invert_xaxis()
+#plt.gca().invert_xaxis()
 plt.show()
+
+
+# In[ ]:
+
+
+
