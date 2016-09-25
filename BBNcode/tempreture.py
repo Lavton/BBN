@@ -173,13 +173,15 @@ if __name__ == '__main__':
     plt.xlabel(r'\textbf{time} (s)')
     plt.ylabel(r'\textbf{tempreture} (K)')
     plt.plot([0.994*(T/10**10)**(-2)-0.994*(10)**(-2) for T in Ts], Ts, 
-        linewidth=2.0, label=r't\to 0')
+        linewidth=2.0, label=r'$t \to 0$')
     plt.plot([1.78*(T/10**10)**(-2)-1.78*(10)**(-2) for T in Ts], Ts,
-        linewidth=2.0, label=r't\to $\infty$')
+        linewidth=2.0, label=r'$t \to \infty$')
     plt.plot(ts, Ts,
         'r--', label=r't(T) modeling result')
     plt.legend()
+    # time.sleep(2)
     plt.show()
+    # time.sleep(2)
     with open("tempreture_data.dat", "w") as f:
         for i in range(len(Ts)):
             f.write("{:.1E}: {:.4E}\n".format(Ts[i], ts[i]))

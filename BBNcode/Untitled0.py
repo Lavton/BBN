@@ -19,6 +19,7 @@ import matplotlib.pyplot as plt
 _X_n_0 = 0.5
 _X_p_0 = 0.5
 _X_d_0 = 0.0
+X_0 = np.array([_X_n_0, _X_p_0, _X_d_0])
 
 # def g(y,x):
     # y0
@@ -27,11 +28,19 @@ Ts = np.logspace(math.log10(10**11), math.log10(10**8), num=20)*k_b
 
 func = lambda X_n, T: (-lambda_n__p(T)*X_n+lambda_p__n(T)*(1-X_n))*(
     1/derivative(tfromT, T))
+def func(X, T):
+	return np.array([(-X[0]*lambda_n__p(T)+lambda_p__n(T)*X[1])*(
+    1/derivative(tfromT, T)),
+    (+X[0]*lambda_n__p(T)-lambda_p__n(T)*X[1])*(
+    1/derivative(tfromT, T)),
+    (X[0]*X[1]*p_n__g_d(T))*(
+    1/derivative(tfromT, T))])
+
 
 
 # In[20]:
 
-X_n = integrate.odeint(func, _X_n_0, Ts)
+X = integrate.odeint(func, X_0, Ts)
 
 
 

@@ -253,9 +253,9 @@ if __name__ == '__main__':
     plt.ylabel(r'\textbf{\lambda} (c^{-1})')
 
     plt.plot(Ts, [__lamda_n__p_e_nu(T*k_b) for T in Ts], 
-        linewidth=2.0, label=r'\lambda_{n\to p+e+\nu}')
+        linewidth=2.0, label=r'$\lambda_{n\to p+e+\nu}$')
     plt.plot(Ts, [__lamda_nu_n__p_e(T*k_b) for T in Ts], 
-        linewidth=2.0, label=r'\lambda_{n+\nu \to p+e}')
+        linewidth=2.0, label=r'$\lambda_{n+\nu \to p+e}$')
     plt.plot(Ts, [__lamda_e_n__p_nu(T*k_b) for T in Ts], 
         linewidth=2.0, label=r'$\lambda_{n+e \to p+\nu }$')
     plt.plot(Ts, [lambda_n__p(T, units="K") for T in Ts],
@@ -276,11 +276,11 @@ if __name__ == '__main__':
     plt.ylabel(r'\textbf{\lambda} (c^{-1})')
 
     plt.plot(Ts, [__lamda_p_e_nu__n(T*k_b) for T in Ts], 
-        linewidth=2.0, label=r'\lambda_{p+e+\nu\to n}')
+        linewidth=2.0, label=r'$\lambda_{p+e+\nu\to n}$')
     plt.plot(Ts, [__lamda_p_e__n_nu(T*k_b) for T in Ts], 
-        linewidth=2.0, label=r'\lambda_{p+e\to n+\nu}')
+        linewidth=2.0, label=r'$\lambda_{p+e\to n+\nu}$')
     plt.plot(Ts, [__lamda_p_nu__e_n(T*k_b) for T in Ts], 
-        linewidth=2.0, label=r'\lambda_{p+\nu \to e+n}')
+        linewidth=2.0, label=r'$\lambda_{p+\nu \to e+n}$')
     plt.plot(Ts, [lambda_p__n(T, units="K") for T in Ts],
         'r--', label=r'$\lambda_{p\to n}$')
     plt.legend()
