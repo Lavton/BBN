@@ -11,15 +11,13 @@ class Cacher(object):
             self.cur = self.db.cursor()
             self.cur.execute("CREATE TABLE IF NOT EXISTS TimeFromTempreture(value REAL NULL, tempeture REAL);")
             self.cur.execute("CREATE TABLE IF NOT EXISTS TempreNuFromTempreture(value REAL NULL, tempeture REAL);")
+            self.cur.execute("CREATE TABLE IF NOT EXISTS LambdaNPFromTempr(value REAL NULL, tempeture REAL);")
+            self.cur.execute("CREATE TABLE IF NOT EXISTS LambdaPNFromTempr(value REAL NULL, tempeture REAL);")
 
-            self._INNER_CACHE_SIZE_ = 100
-            self._inner_cache_ = collections.defaultdict(dict)
-            # self._num_of_exect
-        # if constants.sql_enabled:
-            # print("initialize")
-        # super(Cacher, self).__init__()
+        self._INNER_CACHE_SIZE_ = 100
+        self._inner_cache_ = collections.defaultdict(dict)
 
-    def sql_tempreture_cache(self, func):
+    def sql_base_cache(self, func):
         """
         кеширование температуры фотонов, нейтрино и времени
         """
@@ -29,16 +27,23 @@ class Cacher(object):
             coef = 1.0
             if kwargs.get("units", "") == "K":
                 coef = constants.k_b # если температура была дана в Кельвинах, переводин в eV
+            cached = self.cur.execute("SELECT * FROM {table} WHERE tempeture={arg};".format(
+                arg=args[0]*coef, table=tab_name)
+                )
             res = self.cur.fetchone() # ищем результат в кеше
             if res: # если нашли температуру
                 return res[0]
             if not res: # не нашли - вставим
                 res = func(*args, **kwargs)
-                exe_str = "INSERT INTO {table} (value, tempeture) VALUES ({valu}, {tem});".format(
-                    table=tab_name, tem=args[0]*coef, valu=res
-                )
-                self.cur.execute(exe_str)
-                self.db.commit()
+                self._inner_cache_[tab_name][args[0]*coef] = res
+                if len(self._inner_cache_[tab_name]) > self._INNER_CACHE_SIZE_:
+                    for tem, value in self._inner_cache_[tab_name].items():
+                        exe_str = "INSERT OR REPLACE INTO {table} (value, tempeture) VALUES ({valu}, {tem});".format(
+                            table=tab_name, tem=tem, valu=value
+                            )
+                        self.cur.execute(exe_str)
+                    self._inner_cache_[tab_name] = dict()
+                    self.db.commit()
                 return res
 
         return inner if constants.sql_enabled else func
@@ -46,14 +51,15 @@ class Cacher(object):
 
     def __del__(self):
         if constants.sql_enabled:
+            for tab_name, di in self._inner_cache_.items():
+                for tem, value in di.items():
+                    exe_str = "INSERT OR REPLACE INTO {table} (value, tempeture) VALUES ({valu}, {tem});".format(
+                        table=tab_name, tem=tem, valu=value
+                        )
+                    self.cur.execute(exe_str)
+            self.db.commit()
             self.db.close()
 
 
-# cacher = Cacher()
-# sql_tempreture_cache = cacher.sql_tempreture_cache
-# import sqlite3
-# import collections
-
-# db = sqlite3.connect('cache.db')
-# cur = db.cursor()
+cacher = Cacher()
 

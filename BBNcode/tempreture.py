@@ -13,8 +13,6 @@ from scipy import integrate
 from scipy.misc import derivative
 import Cacher
 
-cacher = Cacher.Cacher()
-
 
 def __s_beaut_integrand_f__(x, y):
     r"""
@@ -92,7 +90,7 @@ def __tfromT__(T):
 
 __t0__ = __tfromT__(k_b*10**11)
 
-@cacher.sql_tempreture_cache
+@Cacher.cacher.sql_base_cache
 def tfromT(T, *, units="eV"):
     r"""
     зависимость времени от температуры. По умолчанию в эВ, 
@@ -105,7 +103,7 @@ def tfromT(T, *, units="eV"):
     return __tfromT__(T) - __t0__
 
 
-@cacher.sql_tempreture_cache
+@Cacher.cacher.sql_base_cache
 def TnuFromT(T, *, units="eV"):
     r"""
     температура нейтрино. При T>>m_e равна температуре фотонов, 
@@ -128,8 +126,14 @@ if __name__ == '__main__':
         T = eval(T)
         print("{:.1E}: {:.4E}\n".format(T, tfromT(T, units="K")))
         exit()
-    Ts = np.logspace(math.log10(10**8), math.log10(10**11), num=100)
+    Ts = np.logspace(math.log10(10**8), math.log10(10**11), num=1000)
+    import datetime
+    a = datetime.datetime.now()
+
     ts = [tfromT(T, units="K") for T in Ts]
+
+    b = datetime.datetime.now()
+    print(b-a)
     print("DONE")
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')

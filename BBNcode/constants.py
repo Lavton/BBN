@@ -22,4 +22,6 @@ sql_enabled = sql_enabled if sql_enabled else False
 func_name_to_db_name = {
     "tfromT": "TimeFromTempreture",
     "TnuFromT": "TempreNuFromTempreture",
+    "lambda_n__p": "LambdaNPFromTempr",
+    "lambda_p__n": "LambdaPNFromTempr"
 }

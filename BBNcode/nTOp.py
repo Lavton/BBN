@@ -3,43 +3,13 @@ r"""
 протонов в нейтроны и обратно
 """
 
+import Cacher
 import numpy as np
 import math
 from constants import *
 from scipy import integrate
 from math import pi, sqrt, exp
 from tempreture import tfromT, TnuFromT
-import functools
-
-if sql_enabled: # если кеширование в БД есть
-    import sqlite3
-    db = sqlite3.connect('cache.db')
-    cur = db.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS Lambdas(tempeture REAL, speed REAL NULL, title VARCHAR(32) NULL);")
-
-
-def sql_lambda_cache(func):
-    """
-    кеширование скоростей протекания реакций
-    """
-    @functools.wraps(func)
-    def inner(*args, **kwargs):
-        coef = 1.0
-        if kwargs.get("units", "") == "K":
-            coef = k_b # если температура была дана в Кельвинах, переводин в eV
-        cached = cur.execute("SELECT speed FROM Lambdas WHERE tempeture={temp} AND title=\"{title}\";".format(temp=args[0]*coef, title=func.__name__))
-        res = cur.fetchone() # ищем результат в кеше
-        if res: # если нашли температуру
-            return res[0]
-
-        if not res: # не нашли - вставим
-            res = func(*args, **kwargs)
-            cur.execute("INSERT INTO Lambdas (tempeture, speed, title) VALUES ({temp}, {speed_v}, \"{title_v}\");".
-                format(title_v=func.__name__, temp=args[0]*coef, speed_v=res))
-            db.commit()
-            return res
-
-    return inner if sql_enabled else func
 
 
 __lambda0__ = 1.63616
@@ -133,7 +103,7 @@ def __lamda_e_n__p_nu(T, max_y=np.inf):
     return __consta__*integrate.quad(lambda eps: __under_int_lamda_e_n__p_nu(eps, __x__(T), __x_nu__(T), __q__()), 1.0, max_y)[0]
 
 
-@sql_lambda_cache
+@Cacher.cacher.sql_base_cache
 def lambda_n__p(T, *, units="eV"):
     r"""
     суммарная скорость перехода нейтронов в протоны, см 3.6а
@@ -216,7 +186,7 @@ def __lamda_p_nu__e_n(T, max_y=np.inf):
     return __consta__*integrate.quad(lambda eps: __under_int_lamda_p_nu__e_n(eps, __x__(T), __x_nu__(T), __q__()), 1.0, max_y)[0]
 
 
-@sql_lambda_cache
+@Cacher.cacher.sql_base_cache
 def lambda_p__n(T, *, units="eV"):
     r"""
     суммарная скорость перехода протонов в нейтроны, см 3.6б
