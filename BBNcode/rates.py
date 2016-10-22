@@ -1,7 +1,8 @@
 from constants import *
 
-
-def p_n__g_d(T, *, units="eV"):
+def p_n__g_d(T, units="eV"):
+    """Experimental computation and obsevational analysis of primordial nucleosynthesis, 
+    sj 1993, M.S.Smith and L.H. Wawano 227"""
     if units=="eV":
         T = T/k_b
     T /= 10**9
@@ -18,3 +19,19 @@ def p_n__g_d(T, *, units="eV"):
 
 if __name__ == '__main__':
     p_n__g_d(1.)
+    import matplotlib as mpl
+    import numpy as np
+    import math
+    import matplotlib.pyplot as plt
+    plt.xscale('log')
+    plt.yscale('log')
+
+    # Ts = np.logspace(math.log10(10**-4), math.log10(10**2), num=200)
+    # Ts *= 10**6
+    Ts = np.logspace(math.log10(10**8), math.log10(10**11), num=200)*k_b
+
+    # Ts = Ts*k_b/(10**6)
+    plt.plot(Ts/10**6, [p_n__g_d(T)*10**4 for T in Ts], 
+        linewidth=2.0, label=r'$\lambda_{n\to p+e+\nu}$')
+    plt.show()
+

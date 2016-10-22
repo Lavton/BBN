@@ -43,8 +43,10 @@ def sql_tempreture_cache(func):
 
         if not res: # не нашли - вставим
             res = func(*args, **kwargs)
-            cur.execute("INSERT INTO Tempeture (tempeture, {sec_c}) VALUES ({tem}, {sec_v});".
-                format(sec_c=func.__name__, tem=args[0]*coef, sec_v=res))
+            exe_str = "INSERT INTO Tempeture (tempeture, {sec_c}) VALUES ({tem}, {sec_v});".
+                format(sec_c=func.__name__, tem=args[0]*coef, sec_v=res)
+            print(exe_str)
+            cur.execute()
             db.commit()
             return res
 
