@@ -11,46 +11,10 @@ import scipy
 from constants import *
 from scipy import integrate
 from scipy.misc import derivative
-import functools
+import Cacher
 
-if sql_enabled: # если кеширование в БД есть
-    import sqlite3
-    db = sqlite3.connect('cache.db')
-    cur = db.cursor()
-    cur.execute("CREATE TABLE IF NOT EXISTS Tempeture(tempeture REAL PRIMARY KEY, TnuFromT REAL NULL, tfromT REAL NULL);")
-    tem_num = {"tempreture": 0, "TnuFromT": 1, "tfromT": 2}
+cacher = Cacher.Cacher()
 
-def sql_tempreture_cache(func):
-    """
-    кеширование температуры фотонов, нейтрино и времени
-    """
-    @functools.wraps(func)
-    def inner(*args, **kwargs):
-        coef = 1.0
-        if kwargs.get("units", "") == "K":
-            coef = k_b # если температура была дана в Кельвинах, переводин в eV
-        cached = cur.execute("SELECT * FROM Tempeture WHERE tempeture={arg};".format(arg=args[0]*coef))
-        res = cur.fetchone() # ищем результат в кеше
-        if res: # если нашли температуру
-            if res[tem_num[func.__name__]]: # если там есть и то, что нужно
-                return res[tem_num[func.__name__]]
-            else: # если нет - апдейтим и вставляем
-                res = func(*args, **kwargs)
-                cur.execute("UPDATE Tempeture SET {sec_c}={sec_v} WHERE tempeture={tem};".
-                    format(sec_c=func.__name__, tem=args[0]*coef, sec_v=res))
-                db.commit()
-                return res
-
-        if not res: # не нашли - вставим
-            res = func(*args, **kwargs)
-            exe_str = "INSERT INTO Tempeture (tempeture, {sec_c}) VALUES ({tem}, {sec_v});".
-                format(sec_c=func.__name__, tem=args[0]*coef, sec_v=res)
-            print(exe_str)
-            cur.execute()
-            db.commit()
-            return res
-
-    return inner if sql_enabled else func
 
 def __s_beaut_integrand_f__(x, y):
     r"""
@@ -128,7 +92,7 @@ def __tfromT__(T):
 
 __t0__ = __tfromT__(k_b*10**11)
 
-@sql_tempreture_cache
+@cacher.sql_tempreture_cache
 def tfromT(T, *, units="eV"):
     r"""
     зависимость времени от температуры. По умолчанию в эВ, 
@@ -141,7 +105,7 @@ def tfromT(T, *, units="eV"):
     return __tfromT__(T) - __t0__
 
 
-@sql_tempreture_cache
+@cacher.sql_tempreture_cache
 def TnuFromT(T, *, units="eV"):
     r"""
     температура нейтрино. При T>>m_e равна температуре фотонов, 
@@ -153,7 +117,6 @@ def TnuFromT(T, *, units="eV"):
     if units=="K":
         Tu = k_b*T
     return (4*__S_beaut__(m_e/T)/11.0)**(1/3)*Tu
-
 
 
 if __name__ == '__main__':
@@ -183,7 +146,7 @@ if __name__ == '__main__':
     plt.legend()
     # time.sleep(2)
     plt.show()
-    # time.sleep(2)
+    time.sleep(2)
     with open("tempreture_data.dat", "w") as f:
         for i in range(len(Ts)):
             f.write("{:.1E}: {:.4E}\n".format(Ts[i], ts[i]))

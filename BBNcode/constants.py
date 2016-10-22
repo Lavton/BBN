@@ -18,3 +18,8 @@ t_n = 880 # в с, время жизни нейтрона
 # технические константы
 sql_enabled = True # разрешить ли кеширование в БД
 sql_enabled = sql_enabled if sql_enabled else False
+
+func_name_to_db_name = {
+    "tfromT": "TimeFromTempreture",
+    "TnuFromT": "TempreNuFromTempreture",
+}
