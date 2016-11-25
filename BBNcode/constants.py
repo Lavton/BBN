@@ -1,3 +1,4 @@
+import numpy
 """fundamental constants"""
 
 ergToEV = 6.2415 * 10**11 # перевод из эргов в электроны вольны
@@ -28,3 +29,34 @@ func_name_to_db_name = {
     "lambda_n__p": "LambdaNPFromTempr",
     "lambda_p__n": "LambdaPNFromTempr"
 }
+
+#########################################################
+##### преобразования в размерную величину ###############
+
+def less_tempreture(T, units="eV"):
+    T_ = T
+    if type(T) is numpy.ndarray:
+        T_ = T.copy()
+    if units=="K":
+        T_ = k_b * T_
+    return T_ / m_n
+
+def to_norm_tempreture(T, units="eV"):
+    T_ = T
+    if type(T) is numpy.ndarray:
+        T_ = T.copy()
+    if units=="K":
+        T_ = T_ / k_b
+    return T_ * m_n
+
+def less_time(t):
+    t_ = t
+    if type(t) is numpy.ndarray:
+        t_ = t.copy()
+    return t_ / t_n
+
+def to_norm_time(t):
+    t_ = t
+    if type(t) is numpy.ndarray:
+        t_ = t.copy()
+    return t_ * t_n

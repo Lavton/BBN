@@ -25,8 +25,8 @@ class Cacher(object):
         def inner(*args, **kwargs):
             tab_name = constants.func_name_to_db_name[func.__name__]
             coef = 1.0
-            if kwargs.get("units", "") == "K":
-                coef = constants.k_b # если температура была дана в Кельвинах, переводин в eV
+            # if kwargs.get("units", "") == "K":
+                # coef = constants.k_b # если температура была дана в Кельвинах, переводин в eV
             cached = self.cur.execute("SELECT * FROM {table} WHERE tempeture={arg};".format(
                 arg=args[0]*coef, table=tab_name)
                 )

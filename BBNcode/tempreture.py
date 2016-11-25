@@ -4,7 +4,7 @@ r"""
 Переводное издание 2013 года.
 Глава 3.1
 """
-
+import constants
 import math
 import numpy as np
 import scipy
@@ -85,10 +85,12 @@ def __tfromT__(T):
     $$
     """
     t_e = 4.3694
-    integ = t_e*scipy.integrate.quad(__under_int__, 0, m_e/(T))[0]
-    return integ
+    T_ = constants.to_norm_tempreture(T) / constants.m_e
+    integ = t_e*scipy.integrate.quad(__under_int__, 0, 1/T_)[0]
 
-__t0__ = __tfromT__(k_b*10**11)
+    return constants.less_time(integ)
+
+__t0__ = __tfromT__(constants.less_tempreture(10**11, units="K"))
 
 @Cacher.cacher.sql_base_cache
 def tfromT(T, *, units="eV"):
@@ -126,11 +128,11 @@ if __name__ == '__main__':
         T = eval(T)
         print("{:.1E}: {:.4E}\n".format(T, tfromT(T, units="K")))
         exit()
-    Ts = np.logspace(math.log10(10**8), math.log10(10**11), num=1000)
+    Ts = constants.less_tempreture(np.logspace(math.log10(10**8), math.log10(10**11), num=1000), units="K")
     import datetime
     a = datetime.datetime.now()
 
-    ts = [tfromT(T, units="K") for T in Ts]
+    ts = np.array([tfromT(T) for T in Ts])
 
     b = datetime.datetime.now()
     print(b-a)
@@ -141,16 +143,15 @@ if __name__ == '__main__':
     plt.yscale('log')
     plt.xlabel(r'\textbf{time} (s)')
     plt.ylabel(r'\textbf{tempreture} (K)')
-    plt.plot([0.994*(T/10**10)**(-2)-0.994*(10)**(-2) for T in Ts], Ts, 
+    plt.plot([0.994*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-0.994*(10)**(-2) for T in Ts], constants.to_norm_tempreture(Ts), 
         linewidth=2.0, label=r'$t \to 0$')
-    plt.plot([1.78*(T/10**10)**(-2)-1.78*(10)**(-2) for T in Ts], Ts,
+    plt.plot([1.78*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-1.78*(10)**(-2) for T in Ts], constants.to_norm_tempreture(Ts),
         linewidth=2.0, label=r'$t \to \infty$')
-    plt.plot(ts, Ts,
+    plt.plot(constants.to_norm_time(ts), constants.to_norm_tempreture(Ts),
         'r--', label=r't(T) modeling result')
     plt.legend()
     # time.sleep(2)
     plt.show()
-    time.sleep(2)
     with open("tempreture_data.dat", "w") as f:
         for i in range(len(Ts)):
             f.write("{:.1E}: {:.4E}\n".format(Ts[i], ts[i]))
