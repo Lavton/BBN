@@ -1,15 +1,16 @@
 import constants
 import functools
+import collections
 # sql_enabled, func_name_to_db_name
 class Cacher(object):
     """docstring for Cacher"""
     def __init__(self):
         if constants.sql_enabled: # если кеширование в БД есть
             import sqlite3
-            import collections
             self.db = sqlite3.connect('cache.db')
             self.cur = self.db.cursor()
             self.cur.execute("CREATE TABLE IF NOT EXISTS TimeFromTempreture(value REAL NULL, tempeture REAL);")
+            self.cur.execute("CREATE TABLE IF NOT EXISTS DerriviateTdtFromTempreture(value REAL NULL, tempeture REAL);")
             self.cur.execute("CREATE TABLE IF NOT EXISTS TempreNuFromTempreture(value REAL NULL, tempeture REAL);")
             self.cur.execute("CREATE TABLE IF NOT EXISTS LambdaNPFromTempr(value REAL NULL, tempeture REAL);")
             self.cur.execute("CREATE TABLE IF NOT EXISTS LambdaPNFromTempr(value REAL NULL, tempeture REAL);")

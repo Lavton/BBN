@@ -27,7 +27,8 @@ func_name_to_db_name = {
     "tfromT": "TimeFromTempreture",
     "TnuFromT": "TempreNuFromTempreture",
     "lambda_n__p": "LambdaNPFromTempr",
-    "lambda_p__n": "LambdaPNFromTempr"
+    "lambda_p__n": "LambdaPNFromTempr",
+    "derriviate_T_from_t": "DerriviateTdtFromTempreture"
 }
 
 #########################################################

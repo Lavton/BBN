@@ -26,7 +26,6 @@ def __s_beaut_integrand_f__(x, y):
         res = (y**2)*(math.sqrt(y**2+x**2)+(y**2)/(3*math.sqrt(y**2+x**2)))*1/(math.exp(math.sqrt(y**2+x**2))+1)
     except OverflowError:
         res = 0.0
-    # print (res)
     return res
 
 def __S_beaut__(x, max_y=np.inf):
@@ -93,20 +92,18 @@ def __tfromT__(T):
 __t0__ = __tfromT__(constants.less_tempreture(10**11, units="K"))
 
 @Cacher.cacher.sql_base_cache
-def tfromT(T, *, units="eV"):
+def tfromT(T):
     r"""
     зависимость времени от температуры. По умолчанию в эВ, 
        доступные единицы
        eV, K
     нормировка на 10**11 K
     """
-    if units=="K":
-        T = k_b*T
     return __tfromT__(T) - __t0__
 
 
 @Cacher.cacher.sql_base_cache
-def TnuFromT(T, *, units="eV"):
+def TnuFromT(T):
     r"""
     температура нейтрино. При T>>m_e равна температуре фотонов, 
     при T<<m_e T/T_{\nu}=(11/4)^(1/3)
@@ -114,10 +111,19 @@ def TnuFromT(T, *, units="eV"):
     T_\nu=(4/11)^{1/3}TS^{1/3}(m_e/T)
     """
     Tu = T
-    if units=="K":
-        Tu = k_b*T
-    return (4*__S_beaut__(m_e/T)/11.0)**(1/3)*Tu
+    T_ = constants.to_norm_tempreture(T) / constants.m_e
+    return (4*__S_beaut__(T_)/11.0)**(1/3)*T
 
+@Cacher.cacher.sql_base_cache
+def derriviate_T_from_t(T):
+    T_ = T
+    if type(T) is np.ndarray:
+        T_ = np.copy(T)
+        for i in range(len(T_)):
+            T_[i] = 1.0/derivative(tfromT, T_[i])
+    else:
+        T_ = 1.0/derivative(tfromT, T_)
+    return T_
 
 if __name__ == '__main__':
     import sys
@@ -128,7 +134,7 @@ if __name__ == '__main__':
         T = eval(T)
         print("{:.1E}: {:.4E}\n".format(T, tfromT(T, units="K")))
         exit()
-    Ts = constants.less_tempreture(np.logspace(math.log10(10**8), math.log10(10**11), num=1000), units="K")
+    Ts = constants.less_tempreture(np.logspace(math.log10(10**7), math.log10(10**11), num=20), units="K")
     import datetime
     a = datetime.datetime.now()
 
@@ -137,21 +143,46 @@ if __name__ == '__main__':
     b = datetime.datetime.now()
     print(b-a)
     print("DONE")
+
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
     plt.xscale('log')
     plt.yscale('log')
     plt.xlabel(r'\textbf{time} (s)')
     plt.ylabel(r'\textbf{tempreture} (K)')
-    plt.plot([0.994*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-0.994*(10)**(-2) for T in Ts], constants.to_norm_tempreture(Ts), 
+    print(constants.to_norm_tempreture(Ts, units="K"))
+    plt.plot([0.994*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-0.994*(10)**(-2) for T in Ts], constants.to_norm_tempreture(Ts, units="K"), 
         linewidth=2.0, label=r'$t \to 0$')
-    plt.plot([1.78*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-1.78*(10)**(-2) for T in Ts], constants.to_norm_tempreture(Ts),
+    plt.plot([1.78*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-1.78*(10)**(-2) for T in Ts], constants.to_norm_tempreture(Ts, units="K"),
         linewidth=2.0, label=r'$t \to \infty$')
-    plt.plot(constants.to_norm_time(ts), constants.to_norm_tempreture(Ts),
+    plt.plot(constants.to_norm_time(ts), constants.to_norm_tempreture(Ts, units="K"),
         'r--', label=r't(T) modeling result')
     plt.legend()
-    # time.sleep(2)
     plt.show()
+
+    plt.cla()
+    plt.clf()
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlabel(r'\textbf{time} (s)')
+    plt.ylabel(r'\textbf{tempreture} (K)')
+    for t in Ts:
+        print("T = {:.2E}".format( constants.to_norm_tempreture(t, units="K")))
+    plt.plot(-derriviate_T_from_t(Ts), Ts,
+        'r--', label=r'dT/dt modeling result')
+    # f1 = lambda T: 0.994*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-0.994*(10)**(-2)
+    # plt.plot([-1/derivative(f1, T) for T in Ts], constants.to_norm_tempreture(Ts, units="K"), 
+        # linewidth=2.0, label=r'$t \to 0$')
+    # f2 = lambda T: 1.78*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-1.78*(10)**(-2)
+    # plt.plot([-1/derivative(f2, T) for T in Ts], constants.to_norm_tempreture(Ts, units="K"),
+        # linewidth=2.0, label=r'$t \to \infty$')
+
+
+    plt.legend()
+    plt.show()
+
     with open("tempreture_data.dat", "w") as f:
         for i in range(len(Ts)):
             f.write("{:.1E}: {:.4E}\n".format(Ts[i], ts[i]))
