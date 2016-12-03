@@ -114,8 +114,9 @@ def TnuFromT(T):
     T_ = constants.to_norm_tempreture(T) / constants.m_e
     return (4*__S_beaut__(T_)/11.0)**(1/3)*T
 
-@Cacher.cacher.sql_base_cache
+# @Cacher.cacher.sql_base_cache
 def derriviate_T_from_t(T):
+    return 1.
     T_ = T
     if type(T) is np.ndarray:
         T_ = np.copy(T)
