@@ -135,7 +135,7 @@ if __name__ == '__main__':
         T = eval(T)
         print("{:.1E}: {:.4E}\n".format(T, tfromT(T, units="K")))
         exit()
-    Ts = constants.less_tempreture(np.logspace(math.log10(10**7), math.log10(10**11), num=20), units="K")
+    Ts = constants.less_tempreture(np.logspace(math.log10(10**7), math.log10(10**11), num=200), units="K")
     import datetime
     a = datetime.datetime.now()
 
@@ -149,16 +149,19 @@ if __name__ == '__main__':
     plt.rc('font', family='serif')
     plt.xscale('log')
     plt.yscale('log')
+    plt.ylim([1e8, 0.99*1e10])
+    plt.xlim([1, 1e4])
     plt.xlabel(r'\textbf{time} (s)')
     plt.ylabel(r'\textbf{tempreture} (K)')
     print(constants.to_norm_tempreture(Ts, units="K"))
-    plt.plot([0.994*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-0.994*(10)**(-2) for T in Ts], constants.to_norm_tempreture(Ts, units="K"), 
-        linewidth=2.0, label=r'$t \to 0$')
-    plt.plot([1.78*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-1.78*(10)**(-2) for T in Ts], constants.to_norm_tempreture(Ts, units="K"),
-        linewidth=2.0, label=r'$t \to \infty$')
     plt.plot(constants.to_norm_time(ts), constants.to_norm_tempreture(Ts, units="K"),
-        'r--', label=r't(T) modeling result')
-    plt.legend()
+        'r', linewidth=2.0, label=r't(T) modeling result')
+    plt.plot([0.994*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-0.994*(10)**(-2) for T in Ts], constants.to_norm_tempreture(Ts, units="K"), 
+        linewidth=1.0, label=r'$t \to 0$')
+    plt.plot([1.78*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-1.78*(10)**(-2) for T in Ts], constants.to_norm_tempreture(Ts, units="K"),
+        linewidth=1.0, label=r'$t \to \infty$')
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+           ncol=3, mode="expand", borderaxespad=0.)
     plt.show()
 
     plt.cla()
