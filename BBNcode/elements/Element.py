@@ -17,13 +17,32 @@ class Element():
 n = Element("n", 0.5)
 H_1 = Element("H_1", 0.5)
 
-n.ode_elem = lambda X, T: {
-    n.str_view: -nTOp.lambda_n__p(T) * X[n.str_view]
+n.ode_elem = {
+    n.str_view : (lambda X, T: -nTOp.lambda_n__p(T) * X[0])
 }
 
-H_1.ode_elem = lambda X, T: {
-    n.str_view: lambda_p__n(T) * X[H_1.str_view],
-    H_1.str_view: lambda_n__p(T) * X[n.str_view] - lambda_p__n(T) * X[H_1.str_view]
+
+H_1.ode_elem = {
+    n.str_view: (lambda X, T: lambda_p__n(T) * X[1]),
+    H_1.str_view: (lambda X, T: lambda_n__p(T) * X[0] - lambda_p__n(T) * X[1])
+}
+
+
+n.jacob = {
+    n.str_view: {
+        n.str_view: (lambda X, T: -nTOp.lambda_n__p(T))
+    }
+}
+
+
+H_1.jacob = {
+    n.str_view: {
+        H_1.str_view: (lambda X, T: +nTOp.lambda_p__n(T))
+    },
+    H_1.str_view: {
+        n.str_view: (lambda X, T: +nTOp.lambda_n__p(T)),
+        H_1.str_view: (lambda X, T: -nTOp.lambda_p__n(T))
+    }
 }
 
 if __name__ == '__main__':
