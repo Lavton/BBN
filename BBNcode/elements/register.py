@@ -52,7 +52,7 @@ class Registrator():
             for j in range(len(self.jacob_funcs[i])):
                 self.jacob_funcs[i][j] = lambda X, T: sum(map(lambda f: f(X, T), self.jacob_funcs[i][j]))
 
-    def ode_int(X, T):
+    def sode_int(X, T):
         """
         к этому моменту 
         self.ode_funcs = [
