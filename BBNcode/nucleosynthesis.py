@@ -21,9 +21,7 @@ Ts = -Ts
 
 def ode_int(X, T):
     T = -T
-    print("X = {}".format(repr(X)))
     dx = elements.registrator.sode_int(X=X, T=T)
-    print("AAAAAAAA")
     dX = np.array(dx) * derriviate_T_from_t(T)
     T = -T
     return dX

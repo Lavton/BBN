@@ -23,8 +23,8 @@ n.ode_elem = {
 
 
 H_1.ode_elem = {
-    n.str_view: (lambda X, T: lambda_p__n(T) * X[1]),
-    H_1.str_view: (lambda X, T: lambda_n__p(T) * X[0] - lambda_p__n(T) * X[1])
+    n.str_view: (lambda X, T: nTOp.lambda_p__n(T) * X[1]),
+    H_1.str_view: (lambda X, T: nTOp.lambda_n__p(T) * X[0] - nTOp.lambda_p__n(T) * X[1])
 }
 
 
