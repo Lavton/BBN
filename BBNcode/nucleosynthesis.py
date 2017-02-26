@@ -42,9 +42,7 @@ def ode_(T, X):
 
 def jacob(T,X):
     T = -T
-    X_n, X_p, X_d = X
-    return [
-        [-lambda_n__p(T) * derriviate_T_from_t(T), +lambda_p__n(T) * derriviate_T_from_t(T), 0],
-        [+lambda_n__p(T) * derriviate_T_from_t(T), -lambda_p__n(T) * derriviate_T_from_t(T), 0],
-        [0, 0, 0]
-    ]
+    j = np.array(elements.registrator.jacob(X, T)) * derriviate_T_from_t(T)
+
+    T = -T
+    return j
