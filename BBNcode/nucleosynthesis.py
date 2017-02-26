@@ -21,15 +21,9 @@ Ts = -Ts
 
 def ode_int(X, T):
     T = -T
-    # X_n, X_p, X_d = X
-    # dX_n = (-lambda_n__p(T)*X_n+lambda_p__n(T)*(X_p)) * derriviate_T_from_t(T)
-    # dX_p = (lambda_n__p(T)*X_n-lambda_p__n(T)*(X_p))  * derriviate_T_from_t(T)
-    # dX_d = 0
     dX = np.array(elements.registrator.ode_int(X, T)) * derriviate_T_from_t(T)
     T = -T
     return dX
-    # return [dX_n, dX_p, dX_d]
-    # 
 
 num = 0
 def ode_(T, X):
@@ -46,3 +40,41 @@ def jacob(T,X):
 
     T = -T
     return j
+
+
+odes = integrate.ode(ode_, jac=jacob)
+odes.set_integrator('vode', method="bdf", nsteps=800)
+odes.set_initial_value(X_0, Ts[0])
+X_ans = X_0.reshape((1,-1))
+Tres=[Ts[0]]
+i = 0
+while odes.successful() and odes.t < Ts[-1]:
+    dt = Ts[i+1]-Ts[i]
+    solu = np.array(list(odes.integrate(odes.t+dt))).reshape((1,-1))
+    print(solu)
+    i+=1
+    X_ans = np.append(X_ans, solu, axis=0)
+    Tres.append(odes.t+dt)
+
+
+ts = [constants.to_norm_time(t) for t in  map(tfromT, -np.array(Tres))]
+# %matplotlib inline
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+plt.xscale('log')
+plt.yscale('log')
+plt.xlabel(r'\textbf{t} (s)')
+plt.ylabel(r'\textbf{X_n}, \textbf{X_p}')
+plt.ylim([1e-7, 3])
+
+plt.plot(ts, X_ans[:,1], 
+        linewidth=2.0, label=r'X_p')
+plt.plot(ts, X_ans[:,0], 
+        linewidth=2.0, label=r'X_n')
+
+
+# plt.legend()
+plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+           ncol=2, mode="expand", borderaxespad=0.)
+#plt.gca().invert_xaxis()
+plt.show()
