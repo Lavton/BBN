@@ -53,20 +53,35 @@ class Registrator():
                 self.jacob_funcs[i][j] = lambda X, T: sum(map(lambda f: f(X, T), self.jacob_funcs[i][j]))
 
     def ode_int(X, T):
-
-        # dX = defaultdict(lambda: 0)
-        # X_new = defaultdict(lambda: 0)
+        """
+        к этому моменту 
+        self.ode_funcs = [
+        lambda X, T: ... ,
+        lambda X, T: ... ,
+        lambda X, T: ... ,
+        ]
+        """
         dX = []
-        X_new = []
-        # for i in range(len(self.elements)):
-            # X_new.a = X[i]
-        for element in self.elements:
-            for equ in element.ode_elem(X, T)
-                dX[element.str_view] += equ
-        f_dX = []
-        for i in range(len(self.elements)):
-            f_dX.append(dX[self.elements[i]])
-        return f_dX
+        for ode_f in self.ode_funcs:
+            dX.append(ode_f(X))
+        return dX
+
+    def jacob(X, T):
+        """
+        к этому моменту 
+        self.jacob_funcs = [
+        [lambda X, T: ... , lambda X, T: ... ,],
+        [lambda X, T: ... , lambda X, T: ... ,],
+        [lambda X, T: ... , lambda X, T: ... ,],
+        ]
+        """
+        res_jacob = []
+        for j in self.jacob_funcs:
+            jacob_row = []
+            for J in j:
+                jacob_row.append(J(X, T))
+            res_jacob.append(jacob_row)
+        return res_jacob
 
 registrator = Registrator()
 registrator.registrate(el.n)
