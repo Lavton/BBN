@@ -64,15 +64,8 @@ plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.xscale('log')
 plt.yscale('log')
-plt.xlabel(r'\textbf{t} (s)')
-plt.ylabel(r'\textbf{X_n}, \textbf{X_p}')
-plt.ylim([1e-7, 3])
-
-plt.plot(ts, X_ans[:,1], 
-        linewidth=2.0, label=r'X_p')
-plt.plot(ts, X_ans[:,0], 
-        linewidth=2.0, label=r'X_n')
-
+plt.xlabel(r'$\textbf{t} (s)$')
+elements.registrator.calc_plot(plt, ts, X_ans, 2)
 
 # plt.legend()
 plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,

@@ -8,14 +8,12 @@ class Element():
         self.X_0 = X_0
         self.str_view = str_view
         self.X_c = X_0
-        
-    def ode_elem(T):
-        return {self.str_view: -nTOp.lambda_n__p(T)*self.X_c}
-        # self.X_c 
-
+        self.ode_elem = {}
+        self.jacob = {}    
 
 n = Element("n", 0.5)
 H_1 = Element("H_1", 0.5)
+H_2 = Element("H_2", 0.0)
 
 n.ode_elem = {
     n.str_view : (lambda X, T: -nTOp.lambda_n__p(T) * X[0])
