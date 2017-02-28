@@ -1,3 +1,7 @@
+"""
+"Влияние тяжёлых изотопов гелия на процессы первичного нуклеосинтеза"
+"""
+
 import numpy as np
 import math
 from tempreture import tfromT, derriviate_T_from_t

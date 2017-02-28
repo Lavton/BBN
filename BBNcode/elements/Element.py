@@ -43,6 +43,14 @@ H_1.jacob = {
     }
 }
 
+H_2.ode_elem = {
+    
+}
+
+H_2.jacob = {
+    
+}
+
 if __name__ == '__main__':
     h_1 = H_1()
     print(h_1.X_c)
