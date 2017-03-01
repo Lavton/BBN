@@ -81,14 +81,13 @@ class Registrator():
     def calc_plot(self, plt, ts, X_ans, num_of_el=0):
         if not num_of_el:
             num_of_el = len(self.elements)
-        ylabel = r'${}$'.format(", ".join([
-            (r"\textbf{X_"+self.elements[i].str_view+"}") for i in range(num_of_el)
-            ]))
-        plt.ylabel(ylabel)
-        plt.ylim([1e-7, 3])
+        # ylabel = r'${}$'.format(", ".join([
+            # (r"\textbf{X_"+self.elements[i].str_view+"}") for i in range(num_of_el)
+            # ]))
+
         for i in range(num_of_el):
             plt.plot(ts, X_ans[:,i], 
-            linewidth=2.0, label=r'X_'+self.elements[i].str_view)
+            linewidth=2.0, label="$"+self.elements[i].str_view+"$")
 
 
 registrator = Registrator()

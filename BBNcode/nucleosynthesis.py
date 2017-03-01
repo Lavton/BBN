@@ -61,7 +61,11 @@ while odes.successful() and odes.t < Ts[-1]:
     X_ans = np.append(X_ans, solu, axis=0)
     Tres.append(odes.t+dt)
 
-
+print("TRES = ", -np.array(Tres))
+T9 = constants.to_norm_tempreture(-np.array(Tres), units="T9")
+for i in range(len(Tres)):
+    X_ans[i][2] = 1.440*(10**-5)*(T9[i]**(3./2))*constants.nu_n*math.exp(25.815/T9[i])*X_ans[i][0]*X_ans[i][1]
+    # print(X_ans[i])
 ts = [constants.to_norm_time(t) for t in  map(tfromT, -np.array(Tres))]
 # %matplotlib inline
 plt.rc('text', usetex=True)
@@ -69,7 +73,10 @@ plt.rc('font', family='serif')
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel(r'$\textbf{t} (s)$')
-elements.registrator.calc_plot(plt, ts, X_ans, 2)
+ylabel = r"\textbf{X}"
+plt.ylabel(ylabel)
+plt.ylim([1e-14, 3])
+elements.registrator.calc_plot(plt, ts, X_ans)
 
 # plt.legend()
 plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
