@@ -58,14 +58,12 @@ while odes.successful() and odes.t < Ts[-1]:
     solu = np.array(list(odes.integrate(odes.t+dt))).reshape((1,-1))
     print(solu)
     i+=1
-    X_ans = np.append(X_ans, solu, axis=0)
     Tres.append(odes.t+dt)
+    for element in elements.registrator.elements:
+        if element.equilibrium:
+            solu = element.equilibrium(solu, Tres[-1])
+    X_ans = np.append(X_ans, solu, axis=0)
 
-print("TRES = ", -np.array(Tres))
-T9 = constants.to_norm_tempreture(-np.array(Tres), units="T9")
-for i in range(len(Tres)):
-    X_ans[i][2] = 1.440*(10**-5)*(T9[i]**(3./2))*constants.nu_n*math.exp(25.815/T9[i])*X_ans[i][0]*X_ans[i][1]
-    # print(X_ans[i])
 ts = [constants.to_norm_time(t) for t in  map(tfromT, -np.array(Tres))]
 # %matplotlib inline
 plt.rc('text', usetex=True)
@@ -73,6 +71,7 @@ plt.rc('font', family='serif')
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel(r'$\textbf{t} (s)$')
+plt.xlim([1e-2,1e3])
 ylabel = r"\textbf{X}"
 plt.ylabel(ylabel)
 plt.ylim([1e-14, 3])

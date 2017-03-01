@@ -17,8 +17,6 @@ class Registrator():
 
     def registrate(self, element):
         self.X_0.append(element.X_0)
-        # for i in range(len(self.elements)):
-            # self.ode_form[i] 
         self.elements.append(element)
         self.rev_element_list[element.str_view] = len(self.elements) - 1
 
@@ -26,16 +24,9 @@ class Registrator():
         self.ode_funcs = []
         for i in range(len(self.elements)):
             element = self.elements[i]
-            # ode_func = []
             self.ode_funcs.append([])
             for key, value in element.ode_elem.items():
                 self.ode_funcs[self.rev_element_list[key]].append(value)
-            # self.X_0.append(element.X_0)
-        # for i in range(len(self.ode_funcs)):
-            # res = lambda X, T: sum(map(lambda f: f(X, T), self.ode_funcs[i]))
-            # self.ode_funcs[i] = res
-
-        # exit()
 
         self.jacob_funcs = [[[lambda X, T: 0] for _ in self.elements] for _ in self.elements]
         for i in range(len(self.elements)):
@@ -43,17 +34,14 @@ class Registrator():
             for key, value in element.jacob.items():
                 for k, v in value.items():
                     self.jacob_funcs[self.rev_element_list[key]][self.rev_element_list[k]].append(v)
-        # for i in range(len(self.jacob_funcs)):
-            # for j in range(len(self.jacob_funcs[i])):
-                # self.jacob_funcs[i][j] = lambda X, T: sum(map(lambda f: f(X, T), self.jacob_funcs[i][j]))
 
     def sode_int(self, X, T):
         """
         к этому моменту 
         self.ode_funcs = [
-        lambda X, T: ... ,
-        lambda X, T: ... ,
-        lambda X, T: ... ,
+        [lambda X, T: ... ,lambda X, T: ... ,lambda X, T: ... ,],
+        [lambda X, T: ... ,lambda X, T: ... ,lambda X, T: ... ,],
+        [lambda X, T: ... ,lambda X, T: ... ,lambda X, T: ... ,]
         ]
         """
         dX = []
@@ -65,9 +53,9 @@ class Registrator():
         """
         к этому моменту 
         self.jacob_funcs = [
-        [lambda X, T: ... , lambda X, T: ... ,],
-        [lambda X, T: ... , lambda X, T: ... ,],
-        [lambda X, T: ... , lambda X, T: ... ,],
+        [lambda X, T: [lambda X,T:],[] , lambda X, T: [lambda X,T:],[] ,],
+        [lambda X, T: [lambda X,T:],[] , lambda X, T: [lambda X,T:],[] ,],
+        [lambda X, T: [lambda X,T:],[] , lambda X, T: [lambda X,T:],[] ,],
         ]
         """
         res_jacob = []
@@ -81,9 +69,6 @@ class Registrator():
     def calc_plot(self, plt, ts, X_ans, num_of_el=0):
         if not num_of_el:
             num_of_el = len(self.elements)
-        # ylabel = r'${}$'.format(", ".join([
-            # (r"\textbf{X_"+self.elements[i].str_view+"}") for i in range(num_of_el)
-            # ]))
 
         for i in range(num_of_el):
             plt.plot(ts, X_ans[:,i], 
