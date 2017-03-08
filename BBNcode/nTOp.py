@@ -28,7 +28,7 @@ def __q__():
 def __eps__(E_e):
     return E_e/m_e
 
-__consta__ = (1/(constants.less_tempreture(t_n)*__lambda0__))
+__consta__ = (1/(constants.less_time(t_n)*__lambda0__))
 
 def __under_int_lamda_n__p_e_nu(eps, x, x_nu, q):
     r"""

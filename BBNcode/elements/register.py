@@ -3,6 +3,9 @@ import os
 from collections import defaultdict
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)))
 import elements.Element as el
+from elements.n import n 
+from elements.H_1 import H_1
+from elements.H_2 import H_2
 
 
 
@@ -45,8 +48,9 @@ class Registrator():
         ]
         """
         dX = []
-        for ode_f in self.ode_funcs:
-            dX.append(sum(map(lambda f: f(X, T), ode_f)))
+        for i in range(len(self.elements)):
+            ode_f = self.ode_funcs[i]
+            dX.append(sum(map(lambda f: f(X, T), ode_f)) * self.elements[i].A)
         return dX
 
     def jacob(self, X, T):
@@ -59,10 +63,11 @@ class Registrator():
         ]
         """
         res_jacob = []
-        for j in self.jacob_funcs:
+        for i in range(len(self.elements)):
+            j = self.jacob_funcs[i]
             jacob_row = []
             for J in j:
-                jacob_row.append(sum(map(lambda f: f(X, T), J)))
+                jacob_row.append(sum(map(lambda f: f(X, T), J)) * self.elements[i].A)
             res_jacob.append(jacob_row)
         return res_jacob
 
@@ -76,9 +81,9 @@ class Registrator():
 
 
 registrator = Registrator()
-registrator.registrate(el.n)
-registrator.registrate(el.H_1)
-registrator.registrate(el.H_2)
+registrator.registrate(n)
+registrator.registrate(H_1)
+registrator.registrate(H_2)
 
 registrator.finish_registration()
 

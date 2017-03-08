@@ -60,7 +60,7 @@ while odes.successful() and odes.t < Ts[-1]:
     i+=1
     Tres.append(odes.t+dt)
     for element in elements.registrator.elements:
-        if element.equilibrium:
+        if element.equilibrium and -Tres[-1] > element.tr_T:
             solu = element.equilibrium(solu, Tres[-1])
     X_ans = np.append(X_ans, solu, axis=0)
 
