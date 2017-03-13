@@ -2,7 +2,6 @@
 import constants
 import math
 import nTOp
-# from elements.H_2 import H_2_forw_rate, H_2_equ, H_2_backward_rate
 
 class Element():
     """elements"""
@@ -15,7 +14,7 @@ class Element():
         self.A = 1
         self.jacob = {}    
         self.equilibrium = None
-
+        self.is_ode_state = False # = in equilibrium
 
 
 if __name__ == '__main__':

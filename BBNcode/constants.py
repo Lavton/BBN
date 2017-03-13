@@ -1,7 +1,7 @@
 import numpy
 """fundamental constants"""
 
-ergToEV = 6.2415 * 10**11 # перевод из эргов в электроны вольны
+ergToEV = 6.2415 * 10**11 # перевод из эргов в электроны вольты
 eVToErg = 1.6 * 10**(-12) # перевод из электрон-вольтов в эрги
 m_e = 511000 # в эВ
 k_b = 1.38 * 10**(-16) * ergToEV # эВ/К
@@ -47,6 +47,8 @@ def to_norm_tempreture(T, units="eV"):
         T_ = T.copy()
 
     T_ *= m_n
+    if units=="MeV":
+        T_ /= 10**6
     if units=="K":
         T_ = T_ / k_b
     if units=="T9":

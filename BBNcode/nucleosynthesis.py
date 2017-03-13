@@ -56,12 +56,24 @@ i = 0
 while odes.successful() and odes.t < Ts[-1]:
     dt = Ts[i+1]-Ts[i]
     solu = np.array(list(odes.integrate(odes.t+dt))).reshape((1,-1))
-    print(solu)
+    odes._y[-1] = 1e-12
     i+=1
     Tres.append(odes.t+dt)
     for element in elements.registrator.elements:
-        if element.equilibrium and -Tres[-1] > element.tr_T:
-            solu = element.equilibrium(solu, Tres[-1])
+        if element.equilibrium:
+            if -Tres[-1] > element.tr_T:
+                solu = element.equilibrium(solu, Tres[-1])
+            else:
+                if not element.is_ode_state:
+                    element.is_ode_state = True
+                    solu = element.equilibrium(solu, Tres[-1])
+                    odes = integrate.ode(ode_, jac=jacob)
+                    odes.set_integrator('vode', method="bdf", nsteps=800)
+                    odes.set_initial_value(solu[0], Tres[-1])
+                    print("Here", solu[0])
+
+
+    print(solu, "i = {}/{}".format(i, len(Ts)))
     X_ans = np.append(X_ans, solu, axis=0)
 
 ts = [constants.to_norm_time(t) for t in  map(tfromT, -np.array(Tres))]

@@ -84,6 +84,7 @@ registrator = Registrator()
 registrator.registrate(n)
 registrator.registrate(H_1)
 registrator.registrate(H_2)
+# registrator.registrate(el.Element("sss", 0))
 
 registrator.finish_registration()
 
