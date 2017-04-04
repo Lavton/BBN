@@ -13,7 +13,8 @@ def __proton_mass_density__(T):
     return (m_p/5.60958835719e+32) * __photon_density__(T) * nu_n
 
 def rat_scale(T):
-    return __proton_mass_density__(T) # * constants.N_a
+    return __proton_mass_density__(T)   # * constants.N_a
+    # return __photon_density__(T) * nu_n * constants.N_a
 
 def p_n__g_d(T):
     """Experimental computation and obsevational analysis of primordial nucleosynthesis, 
