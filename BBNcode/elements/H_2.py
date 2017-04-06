@@ -1,3 +1,7 @@
+"""
+дейтерий, или $^{2}H$
+"""
+
 if __name__ == '__main__':
     import sys
     import os
@@ -16,6 +20,9 @@ H_2.mass_excess = constants.less_tempreture(2161062.7, units="eV")
 H_2.tr_T = constants.less_tempreture(6*10**10, units="K")
 
 def H_2_forw_rate(T):
+    """
+    Smith et all
+    """
     T9 = constants.to_norm_tempreture(T, units="T9")
     base_rate = 4.742 * 10**4 * (
         + 1. 
@@ -26,38 +33,18 @@ def H_2_forw_rate(T):
         - 2.80*1e-4 * T9**(5./2)
         )
     ro_b = univ_func.rat_scale(T)
-    # ro_b = constants.nu_n
     return base_rate * ro_b/(constants.less_time(1)) if T < H_2.tr_T else 0
-    # return 0
 
 def H_2_backward_rate(T):
+    """Wagoner, 1966"""
     T9 = constants.to_norm_tempreture(T, units="T9")
     forw = H_2_forw_rate(T) / constants.to_norm_time(1)
-    # back = forw / (1.440*(10**-5)*(T9**(3./2))*univ_func.__proton_mass_density__(T)*math.exp(H_2.mass_excess/T))
-    # back = 4.71e9 * (T9**(3./2))*math.exp(H_2.mass_excess/T)*forw/univ_func.__proton_mass_density__(T)
-    # from publcode_bbn
     E = constants.to_norm_tempreture(T, units="MeV")
     back = forw * math.exp(-H_2.mass_excess/T)
-    # back = (7.31638*10**(-20)
-    #     + 2.35455*10**(-20)*E**(1./2)
-    #     - 1.55683*10**(-18)*E
-    #     + 5.9351*10**(-18)*E**(3./2)
-    #     - 9.25443*10*(-18)*E**2
-    #     + 6.6732*10**(-18)*E**(5./2)
-    #     - 1.82393*10**(-18)*E**3
-    #     )
     ro_b = univ_func.rat_scale(T)
-    # # ro_b = constants.nu_n
-    # back = math.exp(-H_2.mass_excess/T) # otladka
-    back = 4.68*10**9 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-H_2.mass_excess/T)
 
-    rho_b = univ_func.__proton_mass_density__(T)
-    l = 4.68*10**9 * forw * (rho_b**(-1)) * T9**(3./2) * math.exp(-H_2.mass_excess/T)
-        #l = math.exp(-25.82/T9) # otladka
-    # return l/constants.less_time(1)
-    back = l
+    back = 4.68*10**9 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-H_2.mass_excess/T)
     return (back /(constants.less_time(1))) if T < H_2.tr_T else 0
-    # return 0
 
 
 def H_2_equ(X, T):

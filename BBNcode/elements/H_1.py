@@ -1,3 +1,5 @@
+"""протон, или $^{1}H$"""
+
 import constants
 import math
 import nTOp

@@ -1,3 +1,7 @@
+"""
+объединение всех элементов
+"""
+
 import sys
 import os
 from collections import defaultdict
@@ -10,7 +14,6 @@ from elements.H_2 import H_2
 
 
 class Registrator():
-    """docstring for Registrator"""
     def __init__(self):
         self.X_0 = []
         self.elements = []
@@ -84,7 +87,6 @@ registrator = Registrator()
 registrator.registrate(n)
 registrator.registrate(H_1)
 registrator.registrate(H_2)
-# registrator.registrate(el.Element("sss", 0))
 
 registrator.finish_registration()
 

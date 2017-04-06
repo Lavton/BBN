@@ -15,15 +15,24 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import elements.register as elements
 
-
+# начальные массовые доли элементов берём из elements
 X_0 = np.array(elements.X_0)
 
 print(X_0)
 
+# обезразмеренный диапазон температур
 Ts = constants.less_tempreture(np.logspace(math.log10(10**11), math.log10(10**9), num=40), units="K")
+# переводим в отрицательную шкалу, чтобы Ts[i] > Ts[i-1]
 Ts = -Ts
 
 def ode_int(X, T):
+    """
+    вычисляем следующий шаг для интегрирования
+    X - значения массовых долей элементов на предыдущем шаге, T - температура
+
+    тут выполняем технические части. Логика - в @see elements.registrator.sode_int
+    вовзвращаем изменения элементов
+    """
     T = -T
     dx = elements.registrator.sode_int(X=X, T=T)
     dX = np.array(dx) * derriviate_T_from_t(T)
@@ -32,6 +41,9 @@ def ode_int(X, T):
 
 num = 0
 def ode_(T, X):
+    """
+    то же, что @see ode_int, только входные параметры T и X поменены местами
+    """
     global num
     if num % 100 == 0:
         print(num)
@@ -40,19 +52,24 @@ def ode_(T, X):
 
 
 def jacob(T,X):
+    """
+    вычисляем Якобиан уравнения. Логика спрятана в @elements.registrator.jacob
+    """
     T = -T
     j = np.array(elements.registrator.jacob(X, T)) * derriviate_T_from_t(T)
 
     T = -T
     return j
 
-
+# инициируем программу для решение дифура
 odes = integrate.ode(ode_, jac=jacob)
 odes.set_integrator('vode', method="bdf", nsteps=2000)
 odes.set_initial_value(X_0, Ts[0])
 X_ans = X_0.reshape((1,-1))
 Tres=[Ts[0]]
 i = 0
+
+# выполняем шаги
 while odes.successful() and odes.t < Ts[-1]:
     dt = Ts[i+1]-Ts[i]
     solu = np.array(list(odes.integrate(odes.t+dt))).reshape((1,-1))
@@ -60,6 +77,8 @@ while odes.successful() and odes.t < Ts[-1]:
     i+=1
     Tres.append(odes.t+dt)
     for element in elements.registrator.elements:
+        # во избежание численных ошибок, концентрация элементов изначально считается из
+        # закона равновесия, и лишь потом входит в полноценный диффур
         if element.equilibrium:
             if -Tres[-1] > element.tr_T:
                 solu = element.equilibrium(solu, Tres[-1])
@@ -76,8 +95,10 @@ while odes.successful() and odes.t < Ts[-1]:
     print(solu, "i = {}/{}".format(i, len(Ts)))
     X_ans = np.append(X_ans, solu, axis=0)
 
+# время
 ts = [constants.to_norm_time(t) for t in  map(tfromT, -np.array(Tres))]
-# %matplotlib inline
+
+# рисуем всё, что можно :)
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.xscale('log')
@@ -98,8 +119,6 @@ plt.yscale('log')
 plt.xlabel(r'\textbf{tempreture} (MeV)')
 plt.ylabel(r'\textbf{\lambda}')
 
-# plt.legend()
 plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
            ncol=2, mode="expand", borderaxespad=0.)
-#plt.gca().invert_xaxis()
 plt.show()

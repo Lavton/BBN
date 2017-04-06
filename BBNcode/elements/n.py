@@ -1,3 +1,7 @@
+"""
+нейтроны
+"""
+
 import constants
 import math
 import nTOp

@@ -1,10 +1,12 @@
-# import elements.n as n
 import constants
 import math
 import nTOp
 
 class Element():
-    """elements"""
+    """
+    Общий класс для всех элементов.
+    у каждого есть начальное значение, строковое представление, массовое число и функции самого подсчёта
+    """
 
     def __init__(self, str_view, X_0):
         self.X_0 = X_0

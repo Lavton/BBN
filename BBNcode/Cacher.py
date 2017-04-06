@@ -3,7 +3,9 @@ import functools
 import collections
 # sql_enabled, func_name_to_db_name
 class Cacher(object):
-    """docstring for Cacher"""
+    """
+    кешируем в sqlite то, что можем
+    """
     def __init__(self):
         if constants.sql_enabled: # если кеширование в БД есть
             import sqlite3
