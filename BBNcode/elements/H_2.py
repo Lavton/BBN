@@ -7,7 +7,7 @@ import constants
 import math
 from elements.Element import Element
 
-import rates
+import univ_func
 
 H_2 = Element("H_2", 0.0)
 H_2.A = 2
@@ -25,7 +25,7 @@ def H_2_forw_rate(T):
         + 8.471*1e-3 * T9**2
         - 2.80*1e-4 * T9**(5./2)
         )
-    ro_b = rates.rat_scale(T)
+    ro_b = univ_func.rat_scale(T)
     # ro_b = constants.nu_n
     return base_rate * ro_b/(constants.less_time(1)) if T < H_2.tr_T else 0
     # return 0
@@ -33,8 +33,8 @@ def H_2_forw_rate(T):
 def H_2_backward_rate(T):
     T9 = constants.to_norm_tempreture(T, units="T9")
     forw = H_2_forw_rate(T) / constants.to_norm_time(1)
-    # back = forw / (1.440*(10**-5)*(T9**(3./2))*rates.__proton_mass_density__(T)*math.exp(H_2.mass_excess/T))
-    # back = 4.71e9 * (T9**(3./2))*math.exp(H_2.mass_excess/T)*forw/rates.__proton_mass_density__(T)
+    # back = forw / (1.440*(10**-5)*(T9**(3./2))*univ_func.__proton_mass_density__(T)*math.exp(H_2.mass_excess/T))
+    # back = 4.71e9 * (T9**(3./2))*math.exp(H_2.mass_excess/T)*forw/univ_func.__proton_mass_density__(T)
     # from publcode_bbn
     E = constants.to_norm_tempreture(T, units="MeV")
     back = forw * math.exp(-H_2.mass_excess/T)
@@ -46,12 +46,12 @@ def H_2_backward_rate(T):
     #     + 6.6732*10**(-18)*E**(5./2)
     #     - 1.82393*10**(-18)*E**3
     #     )
-    ro_b = rates.rat_scale(T)
+    ro_b = univ_func.rat_scale(T)
     # # ro_b = constants.nu_n
     # back = math.exp(-H_2.mass_excess/T) # otladka
     back = 4.68*10**9 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-H_2.mass_excess/T)
 
-    rho_b = rates.__proton_mass_density__(T)
+    rho_b = univ_func.__proton_mass_density__(T)
     l = 4.68*10**9 * forw * (rho_b**(-1)) * T9**(3./2) * math.exp(-H_2.mass_excess/T)
         #l = math.exp(-25.82/T9) # otladka
     # return l/constants.less_time(1)
@@ -107,7 +107,7 @@ if __name__ == '__main__':
     plt.xscale('log')
     plt.yscale('log')
     plt.xlabel(r'\textbf{tempreture} (MeV)')
-    plt.ylabel(r'\textbf{\rates}')
+    plt.ylabel(r'\textbf{\univ_func}')
 
     plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_2_forw_rate(T) for T in Ts], 
         linewidth=2.0, label=r'$H^2_{forw}$')
@@ -143,13 +143,13 @@ if __name__ == '__main__':
     ########## смотрим Wagoner, 1966 для сравнения ###########
     def pn(T):
         coef = 2.5*10**4
-        rho_b = rates.__proton_mass_density__(T)
+        rho_b = univ_func.__proton_mass_density__(T)
         return rho_b*coef / (constants.less_time(1))
 
     def lambda_d(T):
         T9 = constants.to_norm_tempreture(T, "T9")
         _pn_ = pn(T) / constants.to_norm_time(1)
-        rho_b = rates.__proton_mass_density__(T)
+        rho_b = univ_func.__proton_mass_density__(T)
         l = 4.68*10**9 * _pn_ * (rho_b**(-1)) * T9**(3./2) * math.exp(-25.82/T9)
         #l = math.exp(-25.82/T9) # otladka
         return l/constants.less_time(1)
