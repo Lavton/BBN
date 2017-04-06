@@ -48,7 +48,7 @@ def jacob(T,X):
 
 
 odes = integrate.ode(ode_, jac=jacob)
-odes.set_integrator('vode', method="bdf", nsteps=800)
+odes.set_integrator('vode', method="bdf", nsteps=2000)
 odes.set_initial_value(X_0, Ts[0])
 X_ans = X_0.reshape((1,-1))
 Tres=[Ts[0]]
@@ -88,6 +88,15 @@ ylabel = r"\textbf{X}"
 plt.ylabel(ylabel)
 plt.ylim([1e-14, 3])
 elements.registrator.calc_plot(plt, ts, X_ans)
+from elements.H_2 import H_2
+plt.axvline(x=constants.to_norm_time(tfromT(H_2.tr_T)))
+
+plt.rc('text', usetex=True)
+plt.rc('font', family='serif')
+plt.xscale('log')
+plt.yscale('log')
+plt.xlabel(r'\textbf{tempreture} (MeV)')
+plt.ylabel(r'\textbf{\lambda}')
 
 # plt.legend()
 plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,

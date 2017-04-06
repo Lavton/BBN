@@ -13,7 +13,7 @@ H_2 = Element("H_2", 0.0)
 H_2.A = 2
 # from Audi et all, 2003
 H_2.mass_excess = constants.less_tempreture(2161062.7, units="eV")
-H_2.tr_T = constants.less_tempreture(5*10**10, units="K")
+H_2.tr_T = constants.less_tempreture(6*10**10, units="K")
 
 def H_2_forw_rate(T):
     T9 = constants.to_norm_tempreture(T, units="T9")
@@ -49,7 +49,13 @@ def H_2_backward_rate(T):
     ro_b = rates.rat_scale(T)
     # # ro_b = constants.nu_n
     # back = math.exp(-H_2.mass_excess/T) # otladka
-    4.68*10**9 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-H_2.mass_excess/T)
+    back = 4.68*10**9 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-H_2.mass_excess/T)
+
+    rho_b = rates.__proton_mass_density__(T)
+    l = 4.68*10**9 * forw * (rho_b**(-1)) * T9**(3./2) * math.exp(-H_2.mass_excess/T)
+        #l = math.exp(-25.82/T9) # otladka
+    # return l/constants.less_time(1)
+    back = l
     return (back /(constants.less_time(1))) if T < H_2.tr_T else 0
     # return 0
 
@@ -145,12 +151,12 @@ if __name__ == '__main__':
         _pn_ = pn(T) / constants.to_norm_time(1)
         rho_b = rates.__proton_mass_density__(T)
         l = 4.68*10**9 * _pn_ * (rho_b**(-1)) * T9**(3./2) * math.exp(-25.82/T9)
-        l = math.exp(-25.82/T9) # otladka
+        #l = math.exp(-25.82/T9) # otladka
         return l/constants.less_time(1)
 
     plt.cla()
     plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [pn(T) for T in Ts],
-        linewidth=1.0, label=r'$1.8\cdot H^2_{forw}(Wag)$')
+        linewidth=1.0, label=r'$H^2_{forw}(Wag)$')
     plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_2_forw_rate(T) for T in Ts], 
         linewidth=2.0, label=r'$H^2_{forw}$')
     plt.legend()
