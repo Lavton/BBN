@@ -21,7 +21,7 @@ X_0 = np.array(elements.X_0)
 print(X_0)
 
 # обезразмеренный диапазон температур
-Ts = constants.less_tempreture(np.logspace(math.log10(10**11), math.log10(10**9), num=40), units="K")
+Ts = constants.less_tempreture(np.logspace(math.log10(10**11), math.log10(10**9), num=80), units="K")
 # переводим в отрицательную шкалу, чтобы Ts[i] > Ts[i-1]
 Ts = -Ts
 
@@ -62,38 +62,77 @@ def jacob(T,X):
     return j
 
 # инициируем программу для решение дифура
-odes = integrate.ode(ode_, jac=jacob)
-odes.set_integrator('vode', method="bdf", nsteps=2000)
-odes.set_initial_value(X_0, Ts[0])
+def iter_process(X_0, T0, Ts, i, X_ans, Tres):
+    # выполняем шаги
+    odes = integrate.ode(ode_, jac=jacob)
+    odes.set_integrator('vode', method="bdf", max_step=1)
+    odes.set_initial_value(X_0, T0)
+    while odes.successful() and odes.t < Ts[-2]:
+        dt = Ts[i+1]-Ts[i]
+        step_solu = odes.integrate(odes.t+dt)
+        print(i)
+        solu = np.array(list(step_solu)).reshape((1,-1))
+        i+=1
+        Tres.append(odes.t+dt)
+        flag_was_eq = False
+        for element in elements.registrator.elements:
+            # во избежание численных ошибок, концентрация элементов изначально считается из
+            # закона равновесия, и лишь потом входит в полноценный диффур
+            if element.equilibrium:
+                if -Tres[-1] > element.tr_T:
+                    solu = element.equilibrium(solu, Tres[-1])
+                else:
+                    if not element.is_ode_state:
+                        element.is_ode_state = True
+                        flag_was_eq = True
+                        # solu = element.equilibrium(solu, Tres[-1])
+                        # odes = integrate.ode(ode_, jac=jacob)
+                        # odes.set_integrator('vode', method="bdf", nsteps=800)
+                        # odes.set_initial_value(solu[0], Tres[-1])
+                        # print("Here", solu[0])
+        print(solu, "i = {}/{}".format(i, len(Ts)), Tres[-1])
+        X_ans = np.append(X_ans, solu, axis=0)
+        if flag_was_eq:
+            print("here")
+            return (i, X_ans, Tres)
+    return(-1, X_ans, Tres)
+
+# odes = integrate.ode(ode_, jac=jacob)
+# odes.set_integrator('vode', method="bdf", nsteps=2000)
+# odes.set_initial_value(X_0, Ts[0])
 X_ans = X_0.reshape((1,-1))
-Tres=[Ts[0]]
 i = 0
+Tres=[Ts[i]]
+
+while i != -1:
+    X_0 = X_ans[-1]
+    i, X_ans, Tres = iter_process(X_0, Ts[i], Ts, i, X_ans, Tres)
 
 # выполняем шаги
-while odes.successful() and odes.t < Ts[-1]:
-    dt = Ts[i+1]-Ts[i]
-    solu = np.array(list(odes.integrate(odes.t+dt))).reshape((1,-1))
-    odes._y[-1] = 1e-12
-    i+=1
-    Tres.append(odes.t+dt)
-    for element in elements.registrator.elements:
-        # во избежание численных ошибок, концентрация элементов изначально считается из
-        # закона равновесия, и лишь потом входит в полноценный диффур
-        if element.equilibrium:
-            if -Tres[-1] > element.tr_T:
-                solu = element.equilibrium(solu, Tres[-1])
-            else:
-                if not element.is_ode_state:
-                    element.is_ode_state = True
-                    solu = element.equilibrium(solu, Tres[-1])
-                    odes = integrate.ode(ode_, jac=jacob)
-                    odes.set_integrator('vode', method="bdf", nsteps=800)
-                    odes.set_initial_value(solu[0], Tres[-1])
-                    print("Here", solu[0])
+# while odes.successful() and odes.t < Ts[-1]:
+#     dt = Ts[i+1]-Ts[i]
+#     solu = np.array(list(odes.integrate(odes.t+dt))).reshape((1,-1))
+#     odes._y[-1] = 1e-12
+#     i+=1
+#     Tres.append(odes.t+dt)
+#     for element in elements.registrator.elements:
+#         # во избежание численных ошибок, концентрация элементов изначально считается из
+#         # закона равновесия, и лишь потом входит в полноценный диффур
+#         if element.equilibrium:
+#             if -Tres[-1] > element.tr_T:
+#                 solu = element.equilibrium(solu, Tres[-1])
+#             else:
+#                 if not element.is_ode_state:
+#                     element.is_ode_state = True
+#                     solu = element.equilibrium(solu, Tres[-1])
+#                     odes = integrate.ode(ode_, jac=jacob)
+#                     odes.set_integrator('vode', method="bdf", nsteps=800)
+#                     odes.set_initial_value(solu[0], Tres[-1])
+#                     print("Here", solu[0])
 
 
-    print(solu, "i = {}/{}".format(i, len(Ts)))
-    X_ans = np.append(X_ans, solu, axis=0)
+#     print(solu, "i = {}/{}".format(i, len(Ts)))
+#     X_ans = np.append(X_ans, solu, axis=0)
 
 # время
 ts = [constants.to_norm_time(t) for t in  map(tfromT, -np.array(Tres))]
