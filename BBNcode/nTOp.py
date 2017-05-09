@@ -204,67 +204,67 @@ if __name__ == '__main__':
         # exit()
     Ts = constants.less_tempreture(np.logspace(math.log10(10**8), math.log10(10**11), num=200), units="K")
 
-    # переход из нейтронов
-    plt.rc('text', usetex=True)
-    plt.rc('font', family='serif')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.xlabel(r'\textbf{tempreture} (K)')
-    plt.ylabel(r'\textbf{\lambda}')
+    # # переход из нейтронов
+    # plt.rc('text', usetex=True)
+    # plt.rc('font', family='serif')
+    # plt.xscale('log')
+    # plt.yscale('log')
+    # plt.xlabel(r'\textbf{tempreture} (K)')
+    # plt.ylabel(r'\textbf{\lambda}')
 
-    plt.plot(Ts, [__lamda_n__p_e_nu(T) for T in Ts], 
-        linewidth=2.0, label=r'$\lambda_{n\to p+e+\nu}$')
-    plt.plot(Ts, [__lamda_nu_n__p_e(T) for T in Ts], 
-        linewidth=2.0, label=r'$\lambda_{n+\nu \to p+e}$')
-    plt.plot(Ts, [__lamda_e_n__p_nu(T) for T in Ts], 
-        linewidth=2.0, label=r'$\lambda_{n+e \to p+\nu }$')
-    plt.plot(Ts, [lambda_n__p(T) for T in Ts],
-        'r--', label=r'$\lambda_{n\to p}$')
-    plt.legend()
-    plt.gca().invert_xaxis()
-    plt.show()
+    # plt.plot(Ts, [__lamda_n__p_e_nu(T) for T in Ts], 
+    #     linewidth=2.0, label=r'$\lambda_{n\to p+e+\nu}$')
+    # plt.plot(Ts, [__lamda_nu_n__p_e(T) for T in Ts], 
+    #     linewidth=2.0, label=r'$\lambda_{n+\nu \to p+e}$')
+    # plt.plot(Ts, [__lamda_e_n__p_nu(T) for T in Ts], 
+    #     linewidth=2.0, label=r'$\lambda_{n+e \to p+\nu }$')
+    # plt.plot(Ts, [lambda_n__p(T) for T in Ts],
+    #     'r--', label=r'$\lambda_{n\to p}$')
+    # plt.legend()
+    # plt.gca().invert_xaxis()
+    # plt.show()
 
 
-    # # переход из протонов
-    plt.cla()
-    plt.clf()
-    plt.rc('text', usetex=True)
-    plt.rc('font', family='serif')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.xlabel(r'\textbf{tempreture} (K)')
-    plt.ylabel(r'\textbf{\lambda}')
+    # # # переход из протонов
+    # plt.cla()
+    # plt.clf()
+    # plt.rc('text', usetex=True)
+    # plt.rc('font', family='serif')
+    # plt.xscale('log')
+    # plt.yscale('log')
+    # plt.xlabel(r'\textbf{tempreture} (K)')
+    # plt.ylabel(r'\textbf{\lambda}')
 
-    plt.plot(Ts, [__lamda_p_e_nu__n(T) for T in Ts], 
-        linewidth=2.0, label=r'$\lambda_{p+e+\nu\to n}$')
-    plt.plot(Ts, [__lamda_p_e__n_nu(T) for T in Ts], 
-        linewidth=2.0, label=r'$\lambda_{p+e\to n+\nu}$')
-    plt.plot(Ts, [__lamda_p_nu__e_n(T) for T in Ts], 
-        linewidth=2.0, label=r'$\lambda_{p+\nu \to e+n}$')
-    plt.plot(Ts, [lambda_p__n(T) for T in Ts],
-        'r--', label=r'$\lambda_{p\to n}$')
-    plt.legend()
-    plt.gca().invert_xaxis()
-    plt.show()
+    # plt.plot(constants.to_norm_tempreture(Ts, units="K"), [__lamda_p_e_nu__n(T) for T in Ts], 
+    #     linewidth=2.0, label=r'$\lambda_{p+e+\nu\to n}$')
+    # plt.plot(constants.to_norm_tempreture(Ts, units="K"), [__lamda_p_e__n_nu(T) for T in Ts], 
+    #     linewidth=2.0, label=r'$\lambda_{p+e\to n+\nu}$')
+    # plt.plot(constants.to_norm_tempreture(Ts, units="K"), [__lamda_p_nu__e_n(T) for T in Ts], 
+    #     linewidth=2.0, label=r'$\lambda_{p+\nu \to e+n}$')
+    # plt.plot(constants.to_norm_tempreture(Ts, units="K"), [lambda_p__n(T) for T in Ts],
+    #     'r--', label=r'$\lambda_{p\to n}$')
+    # plt.legend()
+    # plt.gca().invert_xaxis()
+    # plt.show()
 
-    print ([(lambda_n__p(T), T) for T in Ts])
-    # сравнение скоростей
-    plt.cla()
-    plt.clf()
-    plt.rc('text', usetex=True)
-    plt.rc('font', family='serif')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.xlabel(r'\textbf{tempreture} (K)')
-    plt.ylabel(r'\textbf{\lambda}')
+    # print ([(lambda_n__p(T), T) for T in Ts])
+    # # сравнение скоростей
+    # plt.cla()
+    # plt.clf()
+    # plt.rc('text', usetex=True)
+    # plt.rc('font', family='serif')
+    # plt.xscale('log')
+    # plt.yscale('log')
+    # plt.xlabel(r'\textbf{tempreture} (K)')
+    # plt.ylabel(r'\textbf{\lambda}')
 
-    plt.plot(Ts, [lambda_n__p(T) for T in Ts], 
-        linewidth=2.0, label=r'$\lambda_{n\to p}$')
-    plt.plot(Ts, [lambda_p__n(T) for T in Ts],
-        linewidth=2.0, label=r'$\lambda_{p\to n}$')
-    plt.legend()
-    plt.gca().invert_xaxis()
-    plt.show()
+    # plt.plot(constants.to_norm_tempreture(Ts, units="K"), [lambda_n__p(T) for T in Ts], 
+    #     linewidth=2.0, label=r'$\lambda_{n\to p}$')
+    # plt.plot(constants.to_norm_tempreture(Ts, units="K"), [lambda_p__n(T) for T in Ts],
+    #     linewidth=2.0, label=r'$\lambda_{p\to n}$')
+    # plt.legend()
+    # plt.gca().invert_xaxis()
+    # plt.show()
 
 
     # асимптотика
@@ -273,11 +273,42 @@ if __name__ == '__main__':
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
     plt.xscale('log')
-    plt.yscale('log')
+    # plt.ylim([-3, 20])
+    # plt.yscale('log')
     plt.xlabel(r'\textbf{tempreture} (K)')
     # plt.ylabel(r'\textbf{\lambda}')
 
-    plt.plot(Ts, [(lambda_p__n(T)/lambda_n__p(T))/exp(-Q/constants.to_norm_tempreture(T)) for T in Ts], 
-        linewidth=2.0)
+    # plt.plot(constants.to_norm_tempreture(Ts, units="K"), [(lambda_p__n(T)/lambda_n__p(T))/exp(-constants.less_tempreture(Q)/T) for T in Ts], 
+    #     linewidth=2.0)
+    # plt.plot(constants.to_norm_tempreture(Ts, units="K"), [(lambda_p__n(T)/lambda_n__p(T)) for T in Ts], 
+    #     linewidth=2.0)
+    # plt.plot(constants.to_norm_tempreture(Ts, units="K"), [-constants.less_tempreture(Q, units="eV")/T for T in Ts], 
+    #     linewidth=2.0)
+    # plt.plot(constants.to_norm_tempreture(Ts, units="K"), [(lambda_p__n(T)/lambda_n__p(T))/exp(-constants.less_tempreture(Q, units="eV")/T) for T in Ts], 
+    #     linewidth=2.0)
+    ls = [(lambda_p__n(T)/lambda_n__p(T)) for T in Ts]
+    l1s = [(lambda_p__n(T)) for T in Ts]
+    l2s = [(lambda_n__p(T)) for T in Ts]
+    eqs = [exp(-constants.less_tempreture(Q, units="eV")/T) for T in Ts]
+    Is = [i for i in range(len(Ts))]
+    dis = [ls[i]/eqs[i] for i in range(len(Ts))]
+    tms = [__x_nu__(T) for T in Ts]
+    import pickle 
+    with open("/tmp/new_result.pickle", "wb") as f:
+        pickle.dump((Is, constants.to_norm_tempreture(Ts, units="K"), l1s, l2s, ls, 
+            eqs, dis, tms),f)
+    for i in range(len(ls)):
+        print("i {} la {} exp {}: {}".format(i, ls[i], eqs[i], ls[i]/ eqs[i]))
+
+    plt.plot(Ts, ls, 
+        linewidth=2.0, label="lamdas")
+    plt.plot(Ts, eqs, 
+        linewidth=2.0, label="Q/k")
+    plt.plot(Ts, dis, label="div")
+    plt.legend()
+
     plt.gca().invert_xaxis()
     plt.show()
+
+    # print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    # print([(lambda_p__n(T)/lambda_n__p(T))/exp(-constants.less_tempreture(Q)/T) for T in Ts])

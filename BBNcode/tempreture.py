@@ -112,7 +112,7 @@ def TnuFromT(T):
     """
     Tu = T
     T_ = constants.to_norm_tempreture(T) / constants.m_e
-    return (4*__S_beaut__(T_)/11.0)**(1/3)*T
+    return (4*__S_beaut__(1/T_)/11.0)**(1/3)*T
 
 # @Cacher.cacher.sql_base_cache
 def derriviate_T_from_t(T):
@@ -144,7 +144,36 @@ if __name__ == '__main__':
     b = datetime.datetime.now()
     print(b-a)
     print("DONE")
+    Is = [i for i in range(len(Ts))]
+    tms = [(TnuFromT(T)) for T in Ts]
+    import pickle 
+    with open("/tmp/new_result.pickle", "wb") as f:
+        pickle.dump((Is, tms),f)
+    
+    import _t_tnu_vein
+    Ts_ = []
+    Tnus_ = []
+    tu = []
+    for (T_, Xn_) in _t_tnu_vein.t_tnu.items():
+        tu.append((T_, Xn_))
 
+    tu = sorted(tu, reverse=True)
+    tu
+    for (T_, Xn_) in tu:
+        Ts_.append(T_)
+        Tnus_.append(Xn_)
+        
+    plt.xscale('log')
+    # plt.ylim([-2, 4])
+    # plt.yscale('log')
+    plt.plot(Ts_, Tnus_)
+    plt.plot(constants.to_norm_tempreture(Ts, units="K"), [T/TnuFromT(T) for T in Ts], 
+            linewidth=2.0, label=r'X_n')
+    plt.show()
+    tu
+
+    plt.cla()
+    plt.clf()
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
     plt.xscale('log')
@@ -168,14 +197,33 @@ if __name__ == '__main__':
     plt.clf()
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
-    plt.xscale('log')
-    plt.yscale('log')
+    # plt.xscale('log')
+    # plt.yscale('log')
+    # plt.ylim([1e8, 0.99*1e10])
+    # plt.xlim([1, 1e4])
     plt.xlabel(r'\textbf{time} (s)')
     plt.ylabel(r'\textbf{tempreture} (K)')
-    for t in Ts:
-        print("T = {:.2E}".format( constants.to_norm_tempreture(t, units="K")))
-    plt.plot(-derriviate_T_from_t(Ts), Ts,
-        'r--', label=r'dT/dt modeling result')
+    print(constants.to_norm_tempreture(Ts, units="K"))
+    plt.plot(Ts, [derriviate_T_from_t(T) for T in Ts],
+        'r', linewidth=2.0, label=r'derriv')
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+           ncol=3, mode="expand", borderaxespad=0.)
+    plt.show()
+    print([1/derriviate_T_from_t(T) for T in Ts])
+
+
+    # plt.cla()
+    # plt.clf()
+    # plt.rc('text', usetex=True)
+    # plt.rc('font', family='serif')
+    # plt.xscale('log')
+    # plt.yscale('log')
+    # plt.xlabel(r'\textbf{time} (s)')
+    # plt.ylabel(r'\textbf{tempreture} (K)')
+    # for t in Ts:
+    #     print("T = {:.2E}".format( constants.to_norm_tempreture(t, units="K")))
+    # plt.plot(-derriviate_T_from_t(Ts), Ts,
+    #     'r--', label=r'dT/dt modeling result')
     # f1 = lambda T: 0.994*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-0.994*(10)**(-2)
     # plt.plot([-1/derivative(f1, T) for T in Ts], constants.to_norm_tempreture(Ts, units="K"), 
         # linewidth=2.0, label=r'$t \to 0$')
@@ -184,8 +232,8 @@ if __name__ == '__main__':
         # linewidth=2.0, label=r'$t \to \infty$')
 
 
-    plt.legend()
-    plt.show()
+    # plt.legend()
+    # plt.show()
 
     with open("tempreture_data.dat", "w") as f:
         for i in range(len(Ts)):

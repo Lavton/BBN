@@ -65,7 +65,8 @@ def jacob(T,X):
 def iter_process(X_0, T0, Ts, i, X_ans, Tres):
     # выполняем шаги
     odes = integrate.ode(ode_, jac=jacob)
-    odes.set_integrator('vode', method="bdf", max_step=1)
+    # odes = integrate.ode(ode_)
+    odes.set_integrator('vode', method="bdf", nsteps=800)
     odes.set_initial_value(X_0, T0)
     while odes.successful() and odes.t < Ts[-2]:
         dt = Ts[i+1]-Ts[i]
@@ -79,12 +80,14 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
             # во избежание численных ошибок, концентрация элементов изначально считается из
             # закона равновесия, и лишь потом входит в полноценный диффур
             if element.equilibrium:
-                if -Tres[-1] > element.tr_T:
-                    solu = element.equilibrium(solu, Tres[-1])
-                else:
-                    if not element.is_ode_state:
-                        element.is_ode_state = True
-                        flag_was_eq = True
+                solu = element.equilibrium(solu, Tres[-1])
+
+                # if -Tres[-1] > element.tr_T:
+                #     solu = element.equilibrium(solu, Tres[-1])
+                # else:
+                #     if not element.is_ode_state:
+                #         element.is_ode_state = True
+                #         flag_was_eq = True
                         # solu = element.equilibrium(solu, Tres[-1])
                         # odes = integrate.ode(ode_, jac=jacob)
                         # odes.set_integrator('vode', method="bdf", nsteps=800)
@@ -107,32 +110,6 @@ Tres=[Ts[i]]
 while i != -1:
     X_0 = X_ans[-1]
     i, X_ans, Tres = iter_process(X_0, Ts[i], Ts, i, X_ans, Tres)
-
-# выполняем шаги
-# while odes.successful() and odes.t < Ts[-1]:
-#     dt = Ts[i+1]-Ts[i]
-#     solu = np.array(list(odes.integrate(odes.t+dt))).reshape((1,-1))
-#     odes._y[-1] = 1e-12
-#     i+=1
-#     Tres.append(odes.t+dt)
-#     for element in elements.registrator.elements:
-#         # во избежание численных ошибок, концентрация элементов изначально считается из
-#         # закона равновесия, и лишь потом входит в полноценный диффур
-#         if element.equilibrium:
-#             if -Tres[-1] > element.tr_T:
-#                 solu = element.equilibrium(solu, Tres[-1])
-#             else:
-#                 if not element.is_ode_state:
-#                     element.is_ode_state = True
-#                     solu = element.equilibrium(solu, Tres[-1])
-#                     odes = integrate.ode(ode_, jac=jacob)
-#                     odes.set_integrator('vode', method="bdf", nsteps=800)
-#                     odes.set_initial_value(solu[0], Tres[-1])
-#                     print("Here", solu[0])
-
-
-#     print(solu, "i = {}/{}".format(i, len(Ts)))
-#     X_ans = np.append(X_ans, solu, axis=0)
 
 # время
 ts = [constants.to_norm_time(t) for t in  map(tfromT, -np.array(Tres))]
