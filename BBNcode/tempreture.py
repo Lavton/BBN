@@ -90,7 +90,6 @@ def __tfromT__(T):
     return constants.less_time(integ)
 
 __t0__ = __tfromT__(constants.less_tempreture(10**11, units="K"))
-
 @Cacher.cacher.sql_base_cache
 def tfromT(T):
     r"""
@@ -101,6 +100,33 @@ def tfromT(T):
     """
     return __tfromT__(T) - __t0__
 
+@Cacher.cacher.sql_base_cache
+def Tfromt(t):
+    T0 = constants.less_tempreture(10**11, units="K")
+    Tn = constants.less_tempreture(10**6, units="K")
+    c_Tm = lambda Tn, T0: (math.sqrt(2./(Tn**(-2)+T0**(-2))))
+    # Tm = (T0+Tn)/2
+    Tm = c_Tm(Tn, T0)
+    t0 = tfromT(T0)
+    tn = tfromT(Tn)
+    tm = tfromT(Tm)
+    # for _ in range(10):
+    i = 0
+    # print("YEEEE",t0, t)
+    if t <= t0:
+        return T0
+    while abs(t-tm)/t > 0.002:
+        if tm >= t >= t0:
+            Tn = Tm
+            tn = tfromT(Tn)
+        elif tm < t <= tn:
+            T0 = Tm 
+            t0 = tfromT(T0)
+        # Tm = (T0+Tn)/2
+        Tm = c_Tm(Tn, T0)
+        tm = tfromT(Tm)
+    print(tm, t)
+    return Tm
 
 @Cacher.cacher.sql_base_cache
 def TnuFromT(T):
@@ -185,6 +211,9 @@ if __name__ == '__main__':
     print(constants.to_norm_tempreture(Ts, units="K"))
     plt.plot(constants.to_norm_time(ts), constants.to_norm_tempreture(Ts, units="K"),
         'r', linewidth=2.0, label=r't(T) modeling result')
+    plt.plot(constants.to_norm_time(ts), constants.to_norm_tempreture(np.array([Tfromt(t) for t in ts]), units="K"),
+        'b', linewidth=2.0, label=r't(T) modeling result new')
+
     plt.plot([0.994*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-0.994*(10)**(-2) for T in Ts], constants.to_norm_tempreture(Ts, units="K"), 
         linewidth=1.0, label=r'$t \to 0$')
     plt.plot([1.78*(constants.to_norm_tempreture(T, units="K")/10**10)**(-2)-1.78*(10)**(-2) for T in Ts], constants.to_norm_tempreture(Ts, units="K"),
@@ -193,23 +222,23 @@ if __name__ == '__main__':
            ncol=3, mode="expand", borderaxespad=0.)
     plt.show()
 
-    plt.cla()
-    plt.clf()
-    plt.rc('text', usetex=True)
-    plt.rc('font', family='serif')
-    # plt.xscale('log')
-    # plt.yscale('log')
-    # plt.ylim([1e8, 0.99*1e10])
-    # plt.xlim([1, 1e4])
-    plt.xlabel(r'\textbf{time} (s)')
-    plt.ylabel(r'\textbf{tempreture} (K)')
-    print(constants.to_norm_tempreture(Ts, units="K"))
-    plt.plot(Ts, [derriviate_T_from_t(T) for T in Ts],
-        'r', linewidth=2.0, label=r'derriv')
-    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-           ncol=3, mode="expand", borderaxespad=0.)
-    plt.show()
-    print([1/derriviate_T_from_t(T) for T in Ts])
+    # plt.cla()
+    # plt.clf()
+    # plt.rc('text', usetex=True)
+    # plt.rc('font', family='serif')
+    # # plt.xscale('log')
+    # # plt.yscale('log')
+    # # plt.ylim([1e8, 0.99*1e10])
+    # # plt.xlim([1, 1e4])
+    # plt.xlabel(r'\textbf{time} (s)')
+    # plt.ylabel(r'\textbf{tempreture} (K)')
+    # print(constants.to_norm_tempreture(Ts, units="K"))
+    # plt.plot(Ts, [derriviate_T_from_t(T) for T in Ts],
+    #     'r', linewidth=2.0, label=r'derriv')
+    # plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+    #        ncol=3, mode="expand", borderaxespad=0.)
+    # plt.show()
+    # print([1/derriviate_T_from_t(T) for T in Ts])
 
 
     # plt.cla()

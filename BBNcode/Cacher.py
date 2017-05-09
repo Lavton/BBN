@@ -12,6 +12,7 @@ class Cacher(object):
             self.db = sqlite3.connect('cache.db')
             self.cur = self.db.cursor()
             self.cur.execute("CREATE TABLE IF NOT EXISTS TimeFromTempreture(value REAL NULL, tempeture REAL);")
+            self.cur.execute("CREATE TABLE IF NOT EXISTS TempretureFromTime(value REAL NULL, tempeture REAL);")
             self.cur.execute("CREATE TABLE IF NOT EXISTS DerriviateTdtFromTempreture(value REAL NULL, tempeture REAL);")
             self.cur.execute("CREATE TABLE IF NOT EXISTS TempreNuFromTempreture(value REAL NULL, tempeture REAL);")
             self.cur.execute("CREATE TABLE IF NOT EXISTS LambdaNPFromTempr(value REAL NULL, tempeture REAL);")
