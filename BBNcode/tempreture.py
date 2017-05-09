@@ -115,7 +115,7 @@ def Tfromt(t):
     # print("YEEEE",t0, t)
     if t <= t0:
         return T0
-    while abs(t-tm)/t > 0.002:
+    while abs(t-tm)/t > 0.001:
         if tm >= t >= t0:
             Tn = Tm
             tn = tfromT(Tn)

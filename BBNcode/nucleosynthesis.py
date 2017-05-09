@@ -21,7 +21,7 @@ X_0 = np.array(elements.X_0)
 print(X_0)
 
 # обезразмеренный диапазон температур
-Ts = constants.less_tempreture(np.logspace(math.log10(9.8*10**10), math.log10(10**7), num=80), units="K")
+Ts = constants.less_tempreture(np.logspace(math.log10(9.8*10**10), math.log10(10**7), num=160), units="K")
 # переводим в отрицательную шкалу, чтобы Ts[i] > Ts[i-1]
 ts = np.array([tfromT(T) for T in Ts])
 print(ts)
@@ -68,9 +68,9 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
     # выполняем шаги
     odes = integrate.ode(ode_, jac=jacob)
     # odes = integrate.ode(ode_)
-    odes.set_integrator('vode', method="bdf", with_jacobian=True, nsteps=5000, 
+    odes.set_integrator('vode', method="bdf", with_jacobian=True, nsteps=8000, 
         # min_step=1e-5, 
-        rtol=1e-4, atol=1e-5)
+        rtol=1e-4, atol=1e-6)
     odes.set_initial_value(X_0, T0)
     while odes.successful() and odes.t < Ts[-2]:
         dt = Ts[i+1]-Ts[i]
@@ -84,10 +84,10 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
             # во избежание численных ошибок, концентрация элементов изначально считается из
             # закона равновесия, и лишь потом входит в полноценный диффур
             if element.equilibrium:
-                solu = element.equilibrium(solu, Tres[-1])
+                solu = element.equilibrium(solu, Tfromt(Tres[-1]))
 
-                # if -Tres[-1] > element.tr_T:
-                #     solu = element.equilibrium(solu, Tres[-1])
+                # if Tres[-1] < element.tr_T:
+                    # solu = element.equilibrium(solu, Tres[-1])
                 # else:
                 #     if not element.is_ode_state:
                 #         element.is_ode_state = True
@@ -144,12 +144,10 @@ for (T_, Xn_) in tu:
     Ts_.append(T_)
     Tnus_.append(Xn_)
     
-# plt.xscale('log')
-# plt.ylim([-2, 4])
-# plt.yscale('log')
 plt.plot([tfromT(constants.less_tempreture(T, units="K")) for T in Ts_], Tnus_, label="AAAAA")
-print([constants.less_time(tfromT(T)) for T in Ts_])
-# plt.show()
+
+for t in Tres:
+  plt.axvline(x=t, linewidth=0.1)  
 ##################
 # from elements.H_2 import H_2
 # plt.axvline(x=constants.to_norm_time(tfromT(H_2.tr_T)))
