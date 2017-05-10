@@ -77,15 +77,23 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
     if Tres[-1] >= 10:
         ten_flag = True
         rtoi = 1e-8
+    max_step = 1.0
+    th_flag = False
+    if Tres[-1] >= 200:
+        th_flag = True
+        max_step = 0.0
     odes.set_integrator('vode', method="bdf", with_jacobian=True, nsteps=8000, 
         # min_step=1e-5, 
         rtol=rtoi, 
+        max_step=max_step
         # atol=1e-9
         )
     odes.set_initial_value(X_0, T0)
     while odes.successful() and odes.t < Ts[-2]:
         if Tres[-1] >= 10 and (not ten_flag):
             # ten_flag = False
+            return (i, X_ans, Tres)
+        if Tres[-1] >= 200 and (not th_flag):
             return (i, X_ans, Tres)
         dt = Ts[i+1]-Ts[i]
         step_solu = odes.integrate(odes.t+dt)
@@ -98,7 +106,8 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
             # во избежание численных ошибок, концентрация элементов изначально считается из
             # закона равновесия, и лишь потом входит в полноценный диффур
             if element.equilibrium:
-                solu = element.equilibrium(solu, Tfromt(Tres[-1]))
+                pass
+                # solu = element.equilibrium(solu, Tfromt(Tres[-1]))
 
                 # if Tres[-1] < element.tr_T:
                     # solu = element.equilibrium(solu, Tres[-1])
@@ -162,7 +171,7 @@ for (T_, Xn_) in tu:
     Ts_.append(T_)
     Tnus_.append(Xn_)
     
-plt.plot([tfromT(constants.less_tempreture(T, units="K")) for T in Ts_], Tnus_, label="AAAAA")
+plt.plot([tfromT(constants.less_tempreture(T, units="K")) for T in Ts_], Tnus_, label="tabular result")
 
 for t in Tres:
   plt.axvline(x=t, linewidth=0.1)  

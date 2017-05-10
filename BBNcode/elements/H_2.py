@@ -33,6 +33,7 @@ def H_2_forw_rate(T):
         - 2.80*1e-4 * T9**(5./2)
         )
     ro_b = univ_func.rat_scale(T)
+    base_rate = 0
     return base_rate * ro_b/(constants.less_time(1)) if T < H_2.tr_T else 0
 
 def H_2_backward_rate(T):

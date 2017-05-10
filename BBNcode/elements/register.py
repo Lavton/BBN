@@ -88,7 +88,7 @@ class Registrator():
 registrator = Registrator()
 registrator.registrate(n)
 registrator.registrate(H_1)
-# registrator.registrate(H_2)
+registrator.registrate(H_2)
 
 registrator.finish_registration()
 
