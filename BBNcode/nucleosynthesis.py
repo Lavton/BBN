@@ -21,10 +21,14 @@ X_0 = np.array(elements.X_0)
 print(X_0)
 
 # обезразмеренный диапазон температур
-Ts = constants.less_tempreture(np.logspace(math.log10(9.8*10**10), math.log10(10**7), num=160), units="K")
+grid = np.logspace(math.log10(9.8*10**10), math.log10(10**7), num=160)
+grid2 = grid
+# grid2 = np.array(sorted(list(set(list(np.logspace(math.log10(grid[100]), math.log10(10**7), num=50))+list(grid))), reverse=True))
+Ts = constants.less_tempreture(grid2, units="K")
 # переводим в отрицательную шкалу, чтобы Ts[i] > Ts[i-1]
 ts = np.array([tfromT(T) for T in Ts])
 print(ts)
+# exit()
 # Ts = -Ts
 
 def ode_int(X, t):
@@ -68,11 +72,21 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
     # выполняем шаги
     odes = integrate.ode(ode_, jac=jacob)
     # odes = integrate.ode(ode_)
+    rtoi = 1e-5
+    ten_flag = False
+    if Tres[-1] >= 10:
+        ten_flag = True
+        rtoi = 1e-8
     odes.set_integrator('vode', method="bdf", with_jacobian=True, nsteps=8000, 
         # min_step=1e-5, 
-        rtol=1e-4, atol=1e-6)
+        rtol=rtoi, 
+        # atol=1e-9
+        )
     odes.set_initial_value(X_0, T0)
     while odes.successful() and odes.t < Ts[-2]:
+        if Tres[-1] >= 10 and (not ten_flag):
+            # ten_flag = False
+            return (i, X_ans, Tres)
         dt = Ts[i+1]-Ts[i]
         step_solu = odes.integrate(odes.t+dt)
         print(i)
@@ -114,12 +128,16 @@ Tres = [ts[i]]
 
 while i != -1:
     X_0 = X_ans[-1]
+    # print(ts[i])
     i, X_ans, Tres = iter_process(X_0, ts[i], ts, i, X_ans, Tres)
 
 # время
 # ts = [constants.to_norm_time(t) for t in  map(tfromT, -np.array(Tres))]
 
 # рисуем всё, что можно :)
+import time
+time.sleep(1)
+my_xn = list(X_ans[:,0])
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.xscale('log')
@@ -128,7 +146,7 @@ plt.xlabel(r'$\textbf{t} (s)$')
 plt.xlim([1e-2,1e3])
 ylabel = r"\textbf{X}"
 plt.ylabel(ylabel)
-# plt.ylim([1e-14, 3])
+plt.ylim([1e-30, 3])
 elements.registrator.calc_plot(plt, Tres, X_ans)
 ###################
 import elements._xn_modeling_wai
@@ -162,3 +180,11 @@ plt.ylabel(r'\textbf{\lambda}')
 plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
            ncol=2, mode="expand", borderaxespad=0.)
 plt.show()
+# time.sleep(1)
+for k in range(len(Tres)):
+    if k:
+        if my_xn[k] >= my_xn[k-1]:
+            print("AAAAAAAAAA")
+    print(Tres[k], my_xn[k])
+
+print(my_xn)

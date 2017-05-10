@@ -54,6 +54,8 @@ class Registrator():
         for i in range(len(self.elements)):
             ode_f = self.ode_funcs[i]
             dX.append(sum(map(lambda f: f(X, T), ode_f)) * self.elements[i].A)
+            # if X[i] < abs(dX[-1]) and dX[-1] < 0:
+                # dX[-1] = X[i]
         return dX
 
     def jacob(self, X, T):
