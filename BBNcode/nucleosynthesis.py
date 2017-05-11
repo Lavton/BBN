@@ -67,34 +67,77 @@ def jacob(t, X):
     # T = -T
     return j
 
+ode_params = [
+    [-1.0, {
+    "rtoi": 1e-6,
+    "max_step": 1.0,
+    "min_step": 1e-10,
+    "visit_flag": False
+    }], 
+    [0.004, {
+    "rtoi": 1e-7,
+    "visit_flag": False
+    }],
+    [10, {
+    "rtoi": 1e-9,
+    "visit_flag": False
+    }],
+    [300, {
+    "max_step": 0.0,
+    "visit_flag": False
+    }]
+]
+
 # инициируем программу для решение дифура
 def iter_process(X_0, T0, Ts, i, X_ans, Tres):
     # выполняем шаги
     odes = integrate.ode(ode_, jac=jacob)
-    # odes = integrate.ode(ode_)
-    rtoi = 1e-5
-    ten_flag = False
-    if Tres[-1] >= 10:
-        ten_flag = True
-        rtoi = 1e-8
+    rtoi = 1e-6
     max_step = 1.0
-    th_flag = False
-    if Tres[-1] >= 200:
-        th_flag = True
-        max_step = 0.0
+    min_step = 1e-10
+    last_step = 0.0
+    for param_set in ode_params:
+        if Tres[-1] >= param_set[0]:
+            if "rtoi" in param_set[1]:
+                rtoi = param_set[1]["rtoi"]
+            if "max_step" in param_set[1]:
+                max_step = param_set[1]["max_step"]
+            if "min_step" in param_set[1]:
+                min_step = param_set[1]["min_step"]
+            last_step = Tres[-1]
+    # one_h = False
+    # if Tres[-1] >= 0.004:
+    #     one_h = True
+    #     rtoi = 1e-7
+    #     # max_step = 0.001
+    # ten_flag = False
+    # if Tres[-1] >= 10:
+    #     ten_flag = True
+    #     rtoi = 1e-9
+    # th_flag = False
+    # if Tres[-1] >= 300:
+    #     th_flag = True
+    #     max_step = 0.0
+    #     # rtoi = 1e-9
     odes.set_integrator('vode', method="bdf", with_jacobian=True, nsteps=8000, 
-        # min_step=1e-5, 
+        min_step=min_step, 
         rtol=rtoi, 
         max_step=max_step
         # atol=1e-9
         )
     odes.set_initial_value(X_0, T0)
     while odes.successful() and odes.t < Ts[-2]:
-        if Tres[-1] >= 10 and (not ten_flag):
-            # ten_flag = False
-            return (i, X_ans, Tres)
-        if Tres[-1] >= 200 and (not th_flag):
-            return (i, X_ans, Tres)
+        for param_set in ode_params:
+            if Tres[-1] >= param_set[0]:
+                if param_set[0] >= last_step:
+                    return (i, X_ans, Tres)
+        # if Tres[-1] >= 10 and (not ten_flag):
+        #     # ten_flag = False
+        #     return (i, X_ans, Tres)
+        # if Tres[-1] >= 300 and (not th_flag):
+        #     return (i, X_ans, Tres)
+        # if Tres[-1] >= 0.004 and (not one_h):
+        #     return (i, X_ans, Tres)
         dt = Ts[i+1]-Ts[i]
         step_solu = odes.integrate(odes.t+dt)
         print(i)
@@ -106,15 +149,15 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
             # во избежание численных ошибок, концентрация элементов изначально считается из
             # закона равновесия, и лишь потом входит в полноценный диффур
             if element.equilibrium:
-                pass
+                # pass
                 # solu = element.equilibrium(solu, Tfromt(Tres[-1]))
-
-                # if Tres[-1] < element.tr_T:
-                    # solu = element.equilibrium(solu, Tres[-1])
-                # else:
-                #     if not element.is_ode_state:
-                #         element.is_ode_state = True
-                #         flag_was_eq = True
+                if Tres[-1] < element.tr_t:
+                    solu = element.equilibrium(solu, Tfromt(Tres[-1]))
+                else:
+                    if not element.is_ode_state:
+                        element.is_ode_state = True
+                        flag_was_eq = True
+                        solu = element.equilibrium(solu, Tfromt(Tres[-1]))
                         # solu = element.equilibrium(solu, Tres[-1])
                         # odes = integrate.ode(ode_, jac=jacob)
                         # odes.set_integrator('vode', method="bdf", nsteps=800)
@@ -146,13 +189,13 @@ while i != -1:
 # рисуем всё, что можно :)
 import time
 time.sleep(1)
-my_xn = list(X_ans[:,0])
+my_xn = list(X_ans[:,2])
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel(r'$\textbf{t} (s)$')
-plt.xlim([1e-2,1e3])
+plt.xlim([1e-4,1e3])
 ylabel = r"\textbf{X}"
 plt.ylabel(ylabel)
 plt.ylim([1e-30, 3])
@@ -176,8 +219,8 @@ plt.plot([tfromT(constants.less_tempreture(T, units="K")) for T in Ts_], Tnus_, 
 for t in Tres:
   plt.axvline(x=t, linewidth=0.1)  
 ##################
-# from elements.H_2 import H_2
-# plt.axvline(x=constants.to_norm_time(tfromT(H_2.tr_T)))
+from elements.H_2 import H_2
+plt.axvline(x=H_2.tr_t)
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
@@ -192,8 +235,8 @@ plt.show()
 # time.sleep(1)
 for k in range(len(Tres)):
     if k:
-        if my_xn[k] >= my_xn[k-1]:
+        if my_xn[k] <= my_xn[k-1]:
             print("AAAAAAAAAA")
     print(Tres[k], my_xn[k])
 
-print(my_xn)
+# print(my_xn)

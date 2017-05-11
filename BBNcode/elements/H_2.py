@@ -9,6 +9,7 @@ if __name__ == '__main__':
 
 import constants
 import math
+import tempreture
 from elements.Element import Element
 
 import univ_func
@@ -17,7 +18,11 @@ H_2 = Element("H_2", 0.0)
 H_2.A = 2
 # from Audi et all, 2003
 H_2.mass_excess = constants.less_tempreture(2161062.7, units="eV")
-H_2.tr_T = constants.less_tempreture(6*10**10, units="K")
+H_2.tr_T = constants.less_tempreture(6.8*10**9, units="K")
+H_2.tr_t = tempreture.tfromT(H_2.tr_T)
+print(H_2.tr_t)
+# exit()
+
 
 def H_2_forw_rate(T):
     """
@@ -33,7 +38,7 @@ def H_2_forw_rate(T):
         - 2.80*1e-4 * T9**(5./2)
         )
     ro_b = univ_func.rat_scale(T)
-    base_rate = 0
+    # base_rate = 0
     return base_rate * ro_b/(constants.less_time(1)) if T < H_2.tr_T else 0
 
 def H_2_backward_rate(T):
@@ -49,8 +54,12 @@ def H_2_backward_rate(T):
 
 
 def H_2_equ(X, T):
-    T9 = constants.to_norm_tempreture(-T, units="T9")
-    X_n = 1.440*(10**-5)*(T9**(3./2))*constants.nu_n*math.exp(25.815/T9)*X[0][0]*X[0][1]
+    T9 = constants.to_norm_tempreture(T, units="T9")
+    # print('IN EQ', T9)
+    try:
+        X_n = 1.440*(10**-5)*(T9**(3./2))*constants.nu_n*math.exp(25.815/T9)*X[0][0]*X[0][1]
+    except OverflowError as e:
+        X_n = 0
     X[0][2] = X_n
     return X
 
