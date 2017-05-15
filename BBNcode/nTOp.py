@@ -293,12 +293,12 @@ if __name__ == '__main__':
     Is = [i for i in range(len(Ts))]
     dis = [ls[i]/eqs[i] for i in range(len(Ts))]
     tms = [__x_nu__(T) for T in Ts]
-    import pickle 
-    with open("/tmp/new_result.pickle", "wb") as f:
-        pickle.dump((Is, constants.to_norm_tempreture(Ts, units="K"), l1s, l2s, ls, 
-            eqs, dis, tms),f)
-    for i in range(len(ls)):
-        print("i {} la {} exp {}: {}".format(i, ls[i], eqs[i], ls[i]/ eqs[i]))
+    # import pickle 
+    # with open("/tmp/new_result.pickle", "wb") as f:
+        # pickle.dump((Is, constants.to_norm_tempreture(Ts, units="K"), l1s, l2s, ls, 
+            # eqs, dis, tms),f)
+    # for i in range(len(ls)):
+        # print("i {} la {} exp {}: {}".format(i, ls[i], eqs[i], ls[i]/ eqs[i]))
 
     plt.plot(Ts, ls, 
         linewidth=2.0, label="lamdas")

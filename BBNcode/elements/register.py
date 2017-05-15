@@ -7,6 +7,7 @@ import os
 from collections import defaultdict
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)))
 import elements.Element as el
+import nTOp
 from elements.n import n 
 from elements.H_1 import H_1
 from elements.H_2 import H_2
@@ -93,3 +94,39 @@ registrator.registrate(H_2)
 registrator.finish_registration()
 
 X_0 = registrator.X_0
+
+if __name__ == '__main__':
+    import numpy as np
+    import math
+    import constants
+    import nTOp
+    from tempreture import tfromT
+    import matplotlib as mpl
+    import matplotlib.pyplot as plt
+    grid = np.logspace(math.log10(9.8*10**10), math.log10(10**7), num=160)
+    grid2 = grid
+    # grid2 = np.array(sorted(list(set(list(np.logspace(math.log10(grid[100]), math.log10(10**7), num=50))+list(grid))), reverse=True))
+    Ts = constants.less_tempreture(grid2, units="K")
+    # переводим в отрицательную шкалу, чтобы Ts[i] > Ts[i-1]
+    ts = np.array([tfromT(T) for T in Ts])
+    plt.cla()
+    plt.clf()
+    plt.rc('text', usetex=True)
+    plt.rc('font', family='serif')
+    plt.xscale('log')
+    plt.yscale('log')
+    plt.xlabel(r'\textbf{tempreture}')
+    plt.ylabel(r'\textbf{\lambda}')
+
+    plt.plot(ts, [nTOp.lambda_n__p(T) for T in Ts], 
+        linewidth=2.0, label=r'$\lambda_{n\to p}$')
+    plt.plot(ts, [nTOp.lambda_p__n(T) for T in Ts],
+        linewidth=2.0, label=r'$\lambda_{p\to n}$')
+    import elements.H_2 as eH2
+    plt.plot(ts, [eH2.H_2_forw_rate(T) for T in Ts],
+        linewidth=2.0, label=r'$p,n \to d,\gamma$')
+    plt.plot(ts, [eH2.H_2_backward_rate(T) for T in Ts],
+        linewidth=2.0, label=r'$\lambda_{d\to p,n}$')
+    plt.legend()
+    # plt.gca().invert_xaxis()
+    plt.show()

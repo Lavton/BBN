@@ -18,7 +18,7 @@ H_2 = Element("H_2", 0.0)
 H_2.A = 2
 # from Audi et all, 2003
 H_2.mass_excess = constants.less_tempreture(2161062.7, units="eV")
-H_2.tr_T = constants.less_tempreture(6.8*10**9, units="K")
+H_2.tr_T = constants.less_tempreture(2*10**9, units="K")
 H_2.tr_t = tempreture.tfromT(H_2.tr_T)
 print(H_2.tr_t)
 # exit()

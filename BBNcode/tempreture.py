@@ -125,7 +125,7 @@ def Tfromt(t):
         # Tm = (T0+Tn)/2
         Tm = c_Tm(Tn, T0)
         tm = tfromT(Tm)
-    print(tm, t)
+    print(t)
     return Tm
 
 @Cacher.cacher.sql_base_cache

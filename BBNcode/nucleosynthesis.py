@@ -21,7 +21,7 @@ X_0 = np.array(elements.X_0)
 print(X_0)
 
 # обезразмеренный диапазон температур
-grid = np.logspace(math.log10(9.8*10**10), math.log10(10**7), num=160)
+grid = np.logspace(math.log10(9.8*10**10), math.log10(10**7), num=320)
 grid2 = grid
 # grid2 = np.array(sorted(list(set(list(np.logspace(math.log10(grid[100]), math.log10(10**7), num=50))+list(grid))), reverse=True))
 Ts = constants.less_tempreture(grid2, units="K")
@@ -72,19 +72,37 @@ ode_params = [
     "rtoi": 1e-6,
     "max_step": 1.0,
     "min_step": 1e-10,
-    "visit_flag": False
     }], 
     [0.004, {
     "rtoi": 1e-7,
-    "visit_flag": False
+    }],
+    [0.02, {
+    "rtoi": 1e-8,
+    "max_step": 0.003,
+    }],
+    [0.025, {
+    "rtoi": 1e-6,
+    "max_step": 0.006,
+    "min_step": 0.0
+    }],
+    [0.048, {
+    "rtoi": 1e-6,
+    "max_step": 0.2,
+    "min_step": 0.0
+    }],
+    [0.055,{
+    "rtoi": 1e-9,
+    }],
+    [0.069,{
+    "rtoi": 1e-7,
+    "min_step": 1e-8
     }],
     [10, {
     "rtoi": 1e-9,
-    "visit_flag": False
+    "max_step": 1.0
     }],
     [300, {
     "max_step": 0.0,
-    "visit_flag": False
     }]
 ]
 
@@ -104,21 +122,8 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
                 max_step = param_set[1]["max_step"]
             if "min_step" in param_set[1]:
                 min_step = param_set[1]["min_step"]
-            last_step = Tres[-1]
-    # one_h = False
-    # if Tres[-1] >= 0.004:
-    #     one_h = True
-    #     rtoi = 1e-7
-    #     # max_step = 0.001
-    # ten_flag = False
-    # if Tres[-1] >= 10:
-    #     ten_flag = True
-    #     rtoi = 1e-9
-    # th_flag = False
-    # if Tres[-1] >= 300:
-    #     th_flag = True
-    #     max_step = 0.0
-    #     # rtoi = 1e-9
+    last_step = Tres[-1]
+    print("start", Tres[-1])
     odes.set_integrator('vode', method="bdf", with_jacobian=True, nsteps=8000, 
         min_step=min_step, 
         rtol=rtoi, 
@@ -131,13 +136,14 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
             if Tres[-1] >= param_set[0]:
                 if param_set[0] >= last_step:
                     return (i, X_ans, Tres)
-        # if Tres[-1] >= 10 and (not ten_flag):
-        #     # ten_flag = False
-        #     return (i, X_ans, Tres)
-        # if Tres[-1] >= 300 and (not th_flag):
-        #     return (i, X_ans, Tres)
-        # if Tres[-1] >= 0.004 and (not one_h):
-        #     return (i, X_ans, Tres)
+        for element in elements.registrator.elements:
+            # во избежание численных ошибок, концентрация элементов изначально считается из
+            # закона равновесия, и лишь потом входит в полноценный диффур
+            if element.equilibrium:
+                if Tres[-1] >= element.tr_t:
+                    if element.tr_t >= last_step:
+                        return (i, X_ans, Tres)
+
         dt = Ts[i+1]-Ts[i]
         step_solu = odes.integrate(odes.t+dt)
         print(i)
@@ -149,20 +155,10 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
             # во избежание численных ошибок, концентрация элементов изначально считается из
             # закона равновесия, и лишь потом входит в полноценный диффур
             if element.equilibrium:
-                # pass
-                # solu = element.equilibrium(solu, Tfromt(Tres[-1]))
-                if Tres[-1] < element.tr_t:
-                    solu = element.equilibrium(solu, Tfromt(Tres[-1]))
+                if Tres[-2] >= element.tr_t >= last_step:
+                    pass
                 else:
-                    if not element.is_ode_state:
-                        element.is_ode_state = True
-                        flag_was_eq = True
-                        solu = element.equilibrium(solu, Tfromt(Tres[-1]))
-                        # solu = element.equilibrium(solu, Tres[-1])
-                        # odes = integrate.ode(ode_, jac=jacob)
-                        # odes.set_integrator('vode', method="bdf", nsteps=800)
-                        # odes.set_initial_value(solu[0], Tres[-1])
-                        # print("Here", solu[0])
+                    solu = element.equilibrium(solu, Tfromt(odes.t))
         print(solu, "i = {}/{}".format(i, len(Ts)), Tres[-1])
         X_ans = np.append(X_ans, solu, axis=0)
         if flag_was_eq:
@@ -216,12 +212,13 @@ for (T_, Xn_) in tu:
     
 plt.plot([tfromT(constants.less_tempreture(T, units="K")) for T in Ts_], Tnus_, label="tabular result")
 
+
 for t in Tres:
   plt.axvline(x=t, linewidth=0.1)  
 ##################
 from elements.H_2 import H_2
 plt.axvline(x=H_2.tr_t)
-
+plt.plot(Tres, [H_2.equilibrium([[X_ans[i][0], X_ans[i][1], 0]], Tfromt(Tres[i]))[0][2] for i in range(len(Tres))])
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.xscale('log')
@@ -233,10 +230,10 @@ plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
            ncol=2, mode="expand", borderaxespad=0.)
 plt.show()
 # time.sleep(1)
-for k in range(len(Tres)):
-    if k:
-        if my_xn[k] <= my_xn[k-1]:
-            print("AAAAAAAAAA")
-    print(Tres[k], my_xn[k])
+# for k in range(len(Tres)):
+#     if k:
+#         if my_xn[k] <= my_xn[k-1]:
+#             print("AAAAAAAAAA")
+#     print(Tres[k], my_xn[k])
 
 # print(my_xn)
