@@ -3,6 +3,7 @@
 """
 
 import numpy as np
+import time
 import math
 from tempreture import tfromT, Tfromt, derriviate_T_from_t
 from nTOp import lambda_n__p, lambda_p__n
@@ -15,6 +16,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import elements.register as elements
 
+start_time = time.time()
 # начальные массовые доли элементов берём из elements
 X_0 = np.array(elements.X_0)
 
@@ -76,32 +78,50 @@ ode_params = [
     [0.004, {
     "rtoi": 1e-7,
     }],
-    [0.02, {
-    "rtoi": 1e-8,
-    "max_step": 0.003,
+    [0.014, {
+    "rtoi": 1e-11,
+    "max_step": 0.0005
+    ,
     }],
-    [0.025, {
-    "rtoi": 1e-6,
-    "max_step": 0.006,
+    [0.02, {
+    "atoi": 1e-9,
+    "rtoi": 1e-11,
+    "max_step": 0.0001,
     "min_step": 0.0
     }],
-    [0.048, {
+    [0.038, {
+    "atoi": 1e-12,
+    "max_step": 0.002,
+    }],
+    [0.052, {
     "rtoi": 1e-6,
     "max_step": 0.2,
     "min_step": 0.0
     }],
     [0.055,{
     "rtoi": 1e-9,
+    "max_step": 0.002,
+    "atoi": 1e-8,
     }],
-    [0.069,{
+    [0.080,{
     "rtoi": 1e-7,
-    "min_step": 1e-8
+    # "min_step": 1e-8,
+    "max_step": 0.03,
+    }],
+    [0.2, {
+    "rtoi": 1e-8,
+    "atoi": 1e-10,
+    }],
+    [0.31, {
+    "rtoi": 1e-11,
+    "atoi": 1e-12,
+    "max_step": 0.01
     }],
     [10, {
     "rtoi": 1e-9,
-    "max_step": 1.0
+    "max_step": 0.0
     }],
-    [300, {
+    [100, {
     "max_step": 0.0,
     }]
 ]
@@ -111,6 +131,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
     # выполняем шаги
     odes = integrate.ode(ode_, jac=jacob)
     rtoi = 1e-6
+    atoi = 1e-12
     max_step = 1.0
     min_step = 1e-10
     last_step = 0.0
@@ -122,13 +143,15 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
                 max_step = param_set[1]["max_step"]
             if "min_step" in param_set[1]:
                 min_step = param_set[1]["min_step"]
+            if "atoi" in param_set[1]:
+                atoi = param_set[1]["atoi"]
     last_step = Tres[-1]
     print("start", Tres[-1])
     odes.set_integrator('vode', method="bdf", with_jacobian=True, nsteps=8000, 
         min_step=min_step, 
         rtol=rtoi, 
-        max_step=max_step
-        # atol=1e-9
+        max_step=max_step,
+        atol=atoi
         )
     odes.set_initial_value(X_0, T0)
     while odes.successful() and odes.t < Ts[-2]:
@@ -183,7 +206,6 @@ while i != -1:
 # ts = [constants.to_norm_time(t) for t in  map(tfromT, -np.array(Tres))]
 
 # рисуем всё, что можно :)
-import time
 time.sleep(1)
 my_xn = list(X_ans[:,2])
 plt.rc('text', usetex=True)
@@ -194,7 +216,7 @@ plt.xlabel(r'$\textbf{t} (s)$')
 plt.xlim([1e-4,1e3])
 ylabel = r"\textbf{X}"
 plt.ylabel(ylabel)
-plt.ylim([1e-30, 3])
+plt.ylim([1e-30, 1000])
 elements.registrator.calc_plot(plt, Tres, X_ans)
 ###################
 import elements._xn_modeling_wai
@@ -228,6 +250,8 @@ plt.ylabel(r'\textbf{\lambda}')
 
 plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
            ncol=2, mode="expand", borderaxespad=0.)
+
+print("TIME WORKS", (time.time() - start_time)/60)
 plt.show()
 # time.sleep(1)
 # for k in range(len(Tres)):

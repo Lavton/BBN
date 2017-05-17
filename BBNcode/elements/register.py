@@ -115,6 +115,7 @@ if __name__ == '__main__':
     plt.rc('font', family='serif')
     plt.xscale('log')
     plt.yscale('log')
+    plt.xlim([1e-5,1e10])
     plt.xlabel(r'\textbf{tempreture}')
     plt.ylabel(r'\textbf{\lambda}')
 
@@ -124,9 +125,9 @@ if __name__ == '__main__':
         linewidth=2.0, label=r'$\lambda_{p\to n}$')
     import elements.H_2 as eH2
     plt.plot(ts, [eH2.H_2_forw_rate(T) for T in Ts],
-        linewidth=2.0, label=r'$p,n \to d,\gamma$')
+        linewidth=1.0, label=r'$p,n \to d,\gamma$')
     plt.plot(ts, [eH2.H_2_backward_rate(T) for T in Ts],
-        linewidth=2.0, label=r'$\lambda_{d\to p,n}$')
+        linewidth=1.0, label=r'$\lambda_{d\to p,n}$')
     plt.legend()
     # plt.gca().invert_xaxis()
     plt.show()

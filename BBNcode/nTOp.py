@@ -202,7 +202,12 @@ if __name__ == '__main__':
         T = eval(T)
         # print("{:.1E}: {:.4E}\n".format(T, tfromT(T, units="K")))
         # exit()
-    Ts = constants.less_tempreture(np.logspace(math.log10(10**8), math.log10(10**11), num=200), units="K")
+    grid = np.logspace(math.log10(9.8*10**10), math.log10(10**7), num=160)
+    grid2 = grid
+    # grid2 = np.array(sorted(list(set(list(np.logspace(math.log10(grid[100]), math.log10(10**7), num=50))+list(grid))), reverse=True))
+    Ts = constants.less_tempreture(grid2, units="K")
+    # переводим в отрицательную шкалу, чтобы Ts[i] > Ts[i-1]
+    ts = np.array([tfromT(T) for T in Ts])
 
     # # переход из нейтронов
     # plt.rc('text', usetex=True)
@@ -291,7 +296,7 @@ if __name__ == '__main__':
     l2s = [(lambda_n__p(T)) for T in Ts]
     eqs = [exp(-constants.less_tempreture(Q, units="eV")/T) for T in Ts]
     Is = [i for i in range(len(Ts))]
-    dis = [ls[i]/eqs[i] for i in range(len(Ts))]
+    # dis = [ls[i]/eqs[i] for i in range(len(Ts))]
     tms = [__x_nu__(T) for T in Ts]
     # import pickle 
     # with open("/tmp/new_result.pickle", "wb") as f:
@@ -299,15 +304,20 @@ if __name__ == '__main__':
             # eqs, dis, tms),f)
     # for i in range(len(ls)):
         # print("i {} la {} exp {}: {}".format(i, ls[i], eqs[i], ls[i]/ eqs[i]))
-
-    plt.plot(Ts, ls, 
-        linewidth=2.0, label="lamdas")
-    plt.plot(Ts, eqs, 
-        linewidth=2.0, label="Q/k")
-    plt.plot(Ts, dis, label="div")
+    # plt.xlim([1e-5,1e3])
+    plt.yscale("log")
+    plt.plot(ts, l1s, 
+        linewidth=2.0, label="lamdasPN")
+    plt.plot(ts, l2s, 
+        linewidth=2.0, label="lamdasNP")
+    # plt.plot(ts, ls, 
+        # linewidth=2.0, label="lamdas")
+    # plt.plot(ts, eqs, 
+        # linewidth=2.0, label="Q/k")
+    # plt.plot(ts, dis, label="div")
     plt.legend()
 
-    plt.gca().invert_xaxis()
+    # plt.gca().invert_xaxis()
     plt.show()
 
     # print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
