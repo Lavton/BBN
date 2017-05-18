@@ -29,17 +29,25 @@ class Registrator():
 
     def finish_registration(self):
         self.ode_funcs = []
+        print("F_reg")
+        print("ode func")
         for i in range(len(self.elements)):
             element = self.elements[i]
+            print("-element", i, element.str_view)
             self.ode_funcs.append([])
             for key, value in element.ode_elem.items():
+                print("--",key,value)
                 self.ode_funcs[self.rev_element_list[key]].append(value)
 
         self.jacob_funcs = [[[lambda X, T: 0] for _ in self.elements] for _ in self.elements]
+        print("jacob")
         for i in range(len(self.elements)):
             element = self.elements[i]
+            print("-element", i, element.str_view)
             for key, value in element.jacob.items():
+                print("--", key)
                 for k, v in value.items():
+                    print("---",k,v)
                     self.jacob_funcs[self.rev_element_list[key]][self.rev_element_list[k]].append(v)
 
     def sode_int(self, X, T):
@@ -76,6 +84,7 @@ class Registrator():
             for J in j:
                 jacob_row.append(sum(map(lambda f: f(X, T), J)) * self.elements[i].A)
             res_jacob.append(jacob_row)
+
         return res_jacob
 
     def calc_plot(self, plt, ts, X_ans, num_of_el=0):
@@ -88,14 +97,70 @@ class Registrator():
 
 
 registrator = Registrator()
+# print("n")
 registrator.registrate(n)
+# print("H_1")
 registrator.registrate(H_1)
+# print("H_2")
 registrator.registrate(H_2)
-
 registrator.finish_registration()
+
 X_0 = registrator.X_0
 
 if __name__ == '__main__':
+    def check_jacob():
+        from scipy.misc import derivative
+        from tempreture import Tfromt
+        X = [0.3, 0.3, 0.3]
+        t = 0.04
+        T = Tfromt(t)
+        import numpy as np
+        jaaaa = np.array(registrator.jacob(X, T))
+        odeeee = registrator.sode_int(X, T)
+        print(jaaaa)
+        print(odeeee)
+
+        def approx_jacobian(x,func,epsilon,*args):
+            from numpy import asfarray, zeros
+            """Approximate the Jacobian matrix of callable function func
+
+               * Parameters
+                 x       - The state vector at which the Jacobian matrix is
+        desired
+                 func    - A vector-valued function of the form f(x,*args)
+                 epsilon - The peturbation used to determine the partial derivatives
+                 *args   - Additional arguments passed to func
+
+               * Returns
+                 An array of dimensions (lenf, lenx) where lenf is the length
+                 of the outputs of func, and lenx is the number of
+
+               * Notes
+                 The approximation is done using forward differences
+
+            """
+            x0 = asfarray(x)
+            f0 = func(*((x0,)+args))
+            jac = zeros([len(x0),len(f0)])
+            dx = zeros(len(x0))
+            for i in range(len(x0)):
+               dx[i] = epsilon
+               jac[i] = (func(*((x0+dx,)+args)) - f0)/epsilon
+               dx[i] = 0.0
+            return jac.transpose()
+
+        # for i in range(len(odeeee)):
+            # for j in range(len(X)):
+                # print(derivative())
+        X = np.array(X)
+        ap_j = approx_jacobian(X, lambda X: np.array(registrator.sode_int(X,T)), 1e-9)
+        print(ap_j)
+
+        for i in range(len(jaaaa)):
+            print([(jaaaa[i][j] - ap_j[i][j]) for j in range(len(jaaaa[i]))])
+        exit()
+
+    check_jacob()
     import numpy as np
     import math
     import constants
