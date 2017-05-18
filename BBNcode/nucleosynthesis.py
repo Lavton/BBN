@@ -15,6 +15,8 @@ import constants
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import elements.register as elements
+import datetime
+now_title = datetime.datetime.now().isoformat()
 
 start_time = time.time()
 # начальные массовые доли элементов берём из elements
@@ -115,7 +117,7 @@ ode_params = [
     [0.31, {
     "rtoi": 1e-11,
     "atoi": 1e-12,
-    "max_step": 0.01
+    "max_step": 0.003
     }],
     [10, {
     "rtoi": 1e-9,
@@ -165,6 +167,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
             if element.equilibrium:
                 if Tres[-1] >= element.tr_t:
                     if element.tr_t >= last_step:
+                        print("element", element.str_view)
                         return (i, X_ans, Tres)
 
         dt = Ts[i+1]-Ts[i]
@@ -182,7 +185,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
                     pass
                 else:
                     solu = element.equilibrium(solu, Tfromt(odes.t))
-        print(solu, "i = {}/{}".format(i, len(Ts)), Tres[-1])
+        print(solu, "i = {}/{}".format(i, len(Ts)), Tres[-1], "raz", sum(solu[0]) - 1)
         X_ans = np.append(X_ans, solu, axis=0)
         if flag_was_eq:
             print("here")
@@ -250,8 +253,14 @@ plt.ylabel(r'\textbf{\lambda}')
 
 plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
            ncol=2, mode="expand", borderaxespad=0.)
-
+print("ode_params", ode_params)
 print("TIME WORKS", (time.time() - start_time)/60)
+plt.title(now_title)
+import pickle
+with open("Output.pickle", "wb") as f:
+    pickle.dump((X_ans, Tres), f)
+
+
 plt.show()
 # time.sleep(1)
 # for k in range(len(Tres)):

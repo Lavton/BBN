@@ -5,3 +5,5 @@ BBNcode/.ipynb_checkpoints/
 BBNcode/*.db
 BBNcode/elements/__pycache__/
 BBNcode/elements/*.db
+BBNcode/output.txt
+BBNcode/Output.pickle

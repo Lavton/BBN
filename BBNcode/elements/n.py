@@ -19,3 +19,5 @@ n.jacob = {
     }
 }
 
+n.backward_rates.append(nTOp.lambda_n__p)
+n.forward_rates.append(nTOp.lambda_p__n)

@@ -64,7 +64,8 @@ def H_2_equ(X, T):
     return X
 
 
-
+H_2.forward_rates.append(H_2_forw_rate)
+H_2.backward_rates.append(H_2_backward_rate)
 
 
 H_2.ode_elem = {
@@ -113,6 +114,7 @@ if __name__ == '__main__':
     plt.legend()
     plt.gca().invert_xaxis()
     plt.show()
+    H_2.show_rates()
     import nTOp
     plt.cla()
     plt.clf()
@@ -122,7 +124,6 @@ if __name__ == '__main__':
     plt.yscale('log')
     plt.xlabel(r'\textbf{tempreture} (MeV)')
     plt.ylabel(r'\textbf{\lambda}')
-
     plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [nTOp.lambda_n__p(T) for T in Ts], 
         linewidth=1.0, label=r'$\lambda_{n\to p}$')
     plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [nTOp.lambda_p__n(T) for T in Ts],
@@ -152,6 +153,8 @@ if __name__ == '__main__':
         return l/constants.less_time(1)
 
     plt.cla()
+    plt.xscale('log')
+    plt.yscale('log')
     plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [pn(T) for T in Ts],
         linewidth=1.0, label=r'$H^2_{forw}(Wag)$')
     plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_2_forw_rate(T) for T in Ts], 
@@ -163,6 +166,8 @@ if __name__ == '__main__':
 
 
     plt.cla()
+    plt.xscale('log')
+    plt.yscale('log')
     plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [lambda_d(T) for T in Ts],
         linewidth=1.0, label=r'$H^2_{back}(Wag)$')
     plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_2_backward_rate(T) for T in Ts], 

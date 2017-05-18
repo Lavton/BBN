@@ -26,3 +26,6 @@ H_1.jacob = {
         "H_1": (lambda X, T: -nTOp.lambda_p__n(T))
     }
 }
+
+H_1.forward_rates.append(nTOp.lambda_n__p)
+H_1.backward_rates.append(nTOp.lambda_p__n)

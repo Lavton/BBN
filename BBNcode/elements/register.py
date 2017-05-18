@@ -18,7 +18,7 @@ class Registrator():
     def __init__(self):
         self.X_0 = []
         self.elements = []
-        self.rev_element_list = {}
+        self.rev_element_list = {} # string -> order number
         self.ode_form = []
 
 
@@ -57,6 +57,7 @@ class Registrator():
             dX.append(sum(map(lambda f: f(X, T), ode_f)) * self.elements[i].A)
             # if X[i] < abs(dX[-1]) and dX[-1] < 0:
                 # dX[-1] = X[i]
+        print("sumdx = ", sum(dX))
         return dX
 
     def jacob(self, X, T):
@@ -92,7 +93,6 @@ registrator.registrate(H_1)
 registrator.registrate(H_2)
 
 registrator.finish_registration()
-
 X_0 = registrator.X_0
 
 if __name__ == '__main__':
