@@ -11,7 +11,7 @@ import scipy
 from scipy import integrate
 from scipy.misc import derivative
 import constants
-
+import sys
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import elements.register as elements
@@ -92,7 +92,8 @@ ode_params = [
     "min_step": 0.0
     }],
     [0.038, {
-    "atoi": 1e-12,
+    "atoi": 1e-9,
+    "rtoi": 1e-8,
     "max_step": 0.002,
     }],
     [0.052, {
@@ -113,11 +114,13 @@ ode_params = [
     [0.2, {
     "rtoi": 1e-8,
     "atoi": 1e-10,
+    # "not_use_jacob": True
     }],
     [0.31, {
     "rtoi": 1e-11,
     "atoi": 1e-12,
-    "max_step": 0.003
+    "max_step": 0.003,
+    # "not_use_jacob": True
     }],
     [10, {
     "rtoi": 1e-9,
@@ -128,35 +131,47 @@ ode_params = [
     }]
 ]
 
+def_params = {
+    "rtoi": 1e-6,
+    "atoi": 1e-12,
+    "max_step": 1.0,
+    "min_step": 1e-10,
+    "last_step": 0.0
+}
 # инициируем программу для решение дифура
 def iter_process(X_0, T0, Ts, i, X_ans, Tres):
+    global def_params
+    print("prestart", sum(X_0)-1.0)
     # выполняем шаги
-    odes = integrate.ode(ode_, jac=jacob)
-    rtoi = 1e-6
-    atoi = 1e-12
-    max_step = 1.0
-    min_step = 1e-10
-    last_step = 0.0
+    # rtoi = 1e-6
+    # atoi = 1e-12
+    # max_step = 1.0
+    # min_step = 1e-10
+    # last_step = 0.0
+    # jac_flag = True
     for param_set in ode_params:
         if Tres[-1] >= param_set[0]:
             if "rtoi" in param_set[1]:
-                rtoi = param_set[1]["rtoi"]
+                def_params["rtoi"] = param_set[1]["rtoi"]
             if "max_step" in param_set[1]:
-                max_step = param_set[1]["max_step"]
+                def_params["max_step"] = param_set[1]["max_step"]
             if "min_step" in param_set[1]:
-                min_step = param_set[1]["min_step"]
+                def_params["min_step"] = param_set[1]["min_step"]
             if "atoi" in param_set[1]:
-                atoi = param_set[1]["atoi"]
+                def_params["atoi"] = param_set[1]["atoi"]
+
     last_step = Tres[-1]
-    print("start", Tres[-1])
+    print("innerstart", Tres[-1])
+    odes = integrate.ode(ode_, jac=jacob)
     odes.set_integrator('vode', method="bdf", with_jacobian=True, nsteps=8000, 
-        min_step=min_step, 
-        rtol=rtoi, 
-        max_step=max_step,
-        atol=atoi
+        min_step=def_params["min_step"],
+        rtol=def_params["rtoi"],
+        max_step=def_params["max_step"],
+        atol=def_params["atoi"]
         )
     odes.set_initial_value(X_0, T0)
     while odes.successful() and odes.t < Ts[-2]:
+        print("inw", sum(X_ans[-1])-1.0)
         for param_set in ode_params:
             if Tres[-1] >= param_set[0]:
                 if param_set[0] >= last_step:
@@ -177,13 +192,20 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
         i+=1
         Tres.append(odes.t+dt)
         flag_was_eq = False
+        print("before_eq",  sum(solu) - 1, solu)
         for element in elements.registrator.elements:
             # во избежание численных ошибок, концентрация элементов изначально считается из
             # закона равновесия, и лишь потом входит в полноценный диффур
             if element.equilibrium:
-                if Tres[-2] >= element.tr_t >= last_step:
+                if Tres[-2] >= last_step >= element.tr_t:
+                    print("noteq")
                     pass
                 else:
+                    print("doeq")
+                    print(element.str_view)
+                    print("Tres", Tres[-2])
+                    print("t_eq", element.tr_t)
+                    print("last_step", last_step)
                     solu = element.equilibrium(solu, Tfromt(odes.t))
         print(solu, "i = {}/{}".format(i, len(Ts)), Tres[-1], "raz", sum(solu[0]) - 1)
         X_ans = np.append(X_ans, solu, axis=0)
@@ -204,6 +226,7 @@ while i != -1:
     X_0 = X_ans[-1]
     # print(ts[i])
     i, X_ans, Tres = iter_process(X_0, ts[i], ts, i, X_ans, Tres)
+    print("after_start", sum(X_ans[-1])-1.0)
 
 # время
 # ts = [constants.to_norm_time(t) for t in  map(tfromT, -np.array(Tres))]
@@ -260,7 +283,7 @@ import pickle
 with open("Output.pickle", "wb") as f:
     pickle.dump((X_ans, Tres), f)
 
-
+sys.stdout.flush()
 plt.show()
 # time.sleep(1)
 # for k in range(len(Tres)):
