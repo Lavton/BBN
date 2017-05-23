@@ -20,8 +20,6 @@ H_2.A = 2
 H_2.mass_excess = constants.less_tempreture(2161062.7, units="eV")
 H_2.tr_T = constants.less_tempreture(2.5*10**9, units="K")
 H_2.tr_t = tempreture.tfromT(H_2.tr_T)
-print(H_2.tr_t)
-# exit()
 
 
 def H_2_forw_rate(T):
@@ -55,7 +53,6 @@ def H_2_backward_rate(T):
 
 def H_2_equ(X, T):
     T9 = constants.to_norm_tempreture(T, units="T9")
-    # print('IN EQ', T9)
     try:
         X_n = 1.440*(10**-5)*(T9**(3./2))*constants.nu_n*math.exp(25.815/T9)*X[0][0]*X[0][1]
     except OverflowError as e:

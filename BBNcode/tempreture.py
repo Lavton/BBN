@@ -12,7 +12,7 @@ from constants import *
 from scipy import integrate
 from scipy.misc import derivative
 import Cacher
-
+import logging
 
 def __s_beaut_integrand_f__(x, y):
     r"""
@@ -112,7 +112,6 @@ def Tfromt(t):
     tm = tfromT(Tm)
     # for _ in range(10):
     i = 0
-    # print("YEEEE",t0, t)
     if t <= t0:
         return T0
     while abs(t-tm)/t > 0.001:
@@ -125,7 +124,8 @@ def Tfromt(t):
         # Tm = (T0+Tn)/2
         Tm = c_Tm(Tn, T0)
         tm = tfromT(Tm)
-    print(t)
+    logging.debug(t)
+
     return Tm
 
 @Cacher.cacher.sql_base_cache

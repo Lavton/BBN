@@ -1,12 +1,15 @@
 """
 "Влияние тяжёлых изотопов гелия на процессы первичного нуклеосинтеза"
 """
+import logging
+logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d, FUNC:%(funcName)s]# %(levelname)-8s  %(message)s', 
+    level=logging.DEBUG,
+    filename=u'mylog.log')
 
 import numpy as np
 import time
 import math
 import pickle
-import logging
 from tempreture import tfromT, Tfromt, derriviate_T_from_t
 from nTOp import lambda_n__p, lambda_p__n
 import scipy
@@ -22,21 +25,19 @@ import os
 now_title = datetime.datetime.now().isoformat()
 
 start_time = time.time()
+
 # начальные массовые доли элементов берём из elements
 X_0 = np.array(elements.X_0)
-
-print(X_0)
 
 # обезразмеренный диапазон температур
 grid = np.logspace(math.log10(9.8*10**10), math.log10(10**7), num=320)
 grid2 = grid
-# grid2 = np.array(sorted(list(set(list(np.logspace(math.log10(grid[100]), math.log10(10**7), num=50))+list(grid))), reverse=True))
 Ts = constants.less_tempreture(grid2, units="K")
 # переводим в отрицательную шкалу, чтобы Ts[i] > Ts[i-1]
 ts = np.array([tfromT(T) for T in Ts])
-print(ts)
-# exit()
-# Ts = -Ts
+
+
+logging.info(("start", constants.ode_params, ts))
 
 def ode_int(X, t):
     """
@@ -46,10 +47,8 @@ def ode_int(X, t):
     тут выполняем технические части. Логика - в @see elements.registrator.sode_int
     вовзвращаем изменения элементов
     """
-    # T = -T
     dx = elements.registrator.sode_int(X=X, T=Tfromt(t))
-    dX = np.array(dx) # * derriviate_T_from_t(T)
-    # T = -T
+    dX = np.array(dx)
     return dX
 
 num = 0
@@ -59,7 +58,7 @@ def ode_(t, X):
     """
     global num
     if num % 100 == 0:
-        print(num)
+        logging.debug(num)
     num += 1
     return ode_int(X, t)
 
@@ -68,10 +67,8 @@ def jacob(t, X):
     """
     вычисляем Якобиан уравнения. Логика спрятана в @elements.registrator.jacob
     """
-    # T = -T
     j = np.array(elements.registrator.jacob(X, Tfromt(t))) # * derriviate_T_from_t(T)
 
-    # T = -T
     return j
 
 
@@ -94,7 +91,6 @@ def technical_stop_cache(i, Tres, X_ans):
 
 # инициируем программу для решение дифура
 def iter_process(X_0, T0, Ts, i, X_ans, Tres):
-    print("prestart", sum(X_0)-1.0)
     # выполняем шаги
     for param_set in constants.ode_params:
         if Tres[-1] >= param_set[0]:
@@ -108,7 +104,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
                 constants.def_params["atoi"] = param_set[1]["atoi"]
 
     last_step = Tres[-1]
-    print("innerstart", Tres[-1])
+    logging.debug("new start iter_process with i = {}, t = {}".format(i, T0))
     odes = integrate.ode(ode_, jac=jacob)
     odes.set_integrator('vode', method="bdf", with_jacobian=True, nsteps=8000, 
         min_step=constants.def_params["min_step"],
@@ -118,12 +114,13 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
         )
     odes.set_initial_value(X_0, T0)
     while odes.successful() and odes.t < Ts[-2]:
-        print("LENGS", i, len(Tres), len(X_ans))
         technical_stop_cache(i, Tres, X_ans)
-        print("inw", sum(X_ans[-1])-1.0)
+        if abs(sum(X_ans[-1])-1.0) >= 1e-6:
+            logging.warning(("X error to big!", abs(sum(X_ans[-1])-1.0)))
         for param_set in constants.ode_params:
             if Tres[-1] >= param_set[0]:
                 if param_set[0] >= last_step:
+                    logging.debug(("exit on param_set", param_set))
                     return (i, X_ans, Tres)
         for element in elements.registrator.elements:
             # во избежание численных ошибок, концентрация элементов изначально считается из
@@ -131,43 +128,35 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
             if element.equilibrium:
                 if Tres[-1] >= element.tr_t:
                     if element.tr_t >= last_step:
-                        print("element", element.str_view)
+                        logging.info(("start ode of element", element.str_view))
                         return (i, X_ans, Tres)
 
         dt = Ts[i+1]-Ts[i]
         step_solu = odes.integrate(odes.t+dt)
-        print(i)
         solu = np.array(list(step_solu)).reshape((1,-1))
         Tres.append(odes.t+dt)
-        print("before_eq",  sum(solu) - 1, solu)
         for element in elements.registrator.elements:
             # во избежание численных ошибок, концентрация элементов изначально считается из
             # закона равновесия, и лишь потом входит в полноценный диффур
             if element.equilibrium:
                 if Tres[-2] >= last_step >= element.tr_t:
-                    print("noteq")
+                    logging.debug("noteq")
                     pass
                 else:
-                    print("doeq")
-                    print(element.str_view)
-                    print("Tres", Tres[-2])
-                    print("t_eq", element.tr_t)
-                    print("last_step", last_step)
+                    logging.debug(("doeq", element.str_view))
                     solu = element.equilibrium(solu, Tfromt(odes.t))
         i+=1
-        print(solu, "i = {}/{}".format(i, len(Ts)), Tres[-1], "raz", sum(solu[0]) - 1)
+        logging.info("i = {}/{}, t = {}".format(i, len(Ts), Tres[-1]))
         X_ans = np.append(X_ans, solu, axis=0)
     return(-1, X_ans, Tres)
 
-# odes = integrate.ode(ode_, jac=jacob)
-# odes.set_integrator('vode', method="bdf", nsteps=2000)
-# odes.set_initial_value(X_0, Ts[0])
 X_ans = X_0.reshape((1,-1))
 i = 0
-# Tres=[Ts[i]]
 Tres = [ts[i]]
 
 def start_from_cache(i, X_ans, Tres):
+    if len(sys.argv) > 1:
+        want_t = eval(sys.argv[1])  # с какого времени начинать
     if constants.smart_caching and os.path.isfile("smart_cache.pickle"):
         with open("smart_cache.pickle", "rb") as f:
             t_i, t_X_ans, t_Tres, t_ode_params = pickle.load(f)
@@ -175,9 +164,11 @@ def start_from_cache(i, X_ans, Tres):
             if t_ode_params[i] != constants.ode_params[i]:
                 break
         for ii in range(t_i):
-            # print("PP", ii, t_i, j, len(Tres), len(constants.ode_params))
             if t_Tres[ii] >= constants.ode_params[j][0]:
                 break
+            if t_Tres[ii]>= want_t:
+                break
+        logging.info("use smart cache. Start from {}".format(ii))
         return (ii, t_X_ans[:ii+1], t_Tres[:ii+1])
     else:
         return (i, X_ans, Tres)
@@ -187,15 +178,11 @@ i, X_ans, Tres = start_from_cache(i, X_ans, Tres)
 try:
     while i != -1:
         X_0 = X_ans[-1]
-        # print(ts[i])
         i, X_ans, Tres = iter_process(X_0, ts[i], ts, i, X_ans, Tres)
-        print("after_start", sum(X_ans[-1])-1.0)    
 except TechnicalCalcExitException as e:
     i, Tres, X_ans = e.i, e.Tres, e.X_ans
-    print("interrupt by user")
+    logging.warning("interrupt by user")
 
-# время
-# ts = [constants.to_norm_time(t) for t in  map(tfromT, -np.array(Tres))]
 
 # рисуем всё, что можно :)
 time.sleep(1)
@@ -243,20 +230,10 @@ plt.ylabel(r'\textbf{\lambda}')
 
 plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
            ncol=2, mode="expand", borderaxespad=0.)
-print("constants.ode_params", constants.ode_params)
-print("TIME WORKS", (time.time() - start_time)/60)
-plt.title(now_title)
-import pickle
+logging.info(("TIME WORKS", (time.time() - start_time)/60))
+# plt.title(now_title)
 with open("Output.pickle", "wb") as f:
     pickle.dump((X_ans, Tres), f)
 
 sys.stdout.flush()
 plt.show()
-# time.sleep(1)
-# for k in range(len(Tres)):
-#     if k:
-#         if my_xn[k] <= my_xn[k-1]:
-#             print("AAAAAAAAAA")
-#     print(Tres[k], my_xn[k])
-
-# print(my_xn)

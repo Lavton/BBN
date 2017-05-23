@@ -200,7 +200,6 @@ if __name__ == '__main__':
     if len(sys.argv)-1:
         T = sys.argv[1]
         T = eval(T)
-        # print("{:.1E}: {:.4E}\n".format(T, tfromT(T, units="K")))
         # exit()
     grid = np.logspace(math.log10(9.8*10**10), math.log10(10**7), num=160)
     grid2 = grid
