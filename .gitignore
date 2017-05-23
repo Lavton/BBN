@@ -6,4 +6,4 @@ BBNcode/*.db
 BBNcode/elements/__pycache__/
 BBNcode/elements/*.db
 BBNcode/*.txt
-BBNcode/Output.pickle
+BBNcode/*.pickle

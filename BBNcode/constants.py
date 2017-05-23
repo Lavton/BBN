@@ -21,6 +21,8 @@ m_d = 2.01355321271 * 1.66053873e-24*29979245800.0*29979245800.0 # масса д
 # технические константы
 sql_enabled = True # разрешить ли кеширование в БД
 sql_enabled = sql_enabled if sql_enabled else False
+smart_caching = True # запускает продолжение кода с момента остановки/изменеия параметров
+
 
 func_name_to_db_name = {
     "tfromT": "TimeFromTempreture",

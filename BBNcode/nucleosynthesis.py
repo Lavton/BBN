@@ -5,6 +5,8 @@
 import numpy as np
 import time
 import math
+import pickle
+import logging
 from tempreture import tfromT, Tfromt, derriviate_T_from_t
 from nTOp import lambda_n__p, lambda_p__n
 import scipy
@@ -82,6 +84,9 @@ class TechnicalCalcExitException(Exception):
 
 
 def technical_stop_cache(i, Tres, X_ans):
+
+    with open("smart_cache.pickle", "wb") as f:
+        pickle.dump((i, X_ans, Tres, constants.ode_params), f)
     if os.path.isfile("exit_now"):
         os.remove("exit_now")
         raise TechnicalCalcExitException(i, Tres, X_ans)
@@ -113,6 +118,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
         )
     odes.set_initial_value(X_0, T0)
     while odes.successful() and odes.t < Ts[-2]:
+        print("LENGS", i, len(Tres), len(X_ans))
         technical_stop_cache(i, Tres, X_ans)
         print("inw", sum(X_ans[-1])-1.0)
         for param_set in constants.ode_params:
@@ -132,9 +138,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
         step_solu = odes.integrate(odes.t+dt)
         print(i)
         solu = np.array(list(step_solu)).reshape((1,-1))
-        i+=1
         Tres.append(odes.t+dt)
-        flag_was_eq = False
         print("before_eq",  sum(solu) - 1, solu)
         for element in elements.registrator.elements:
             # во избежание численных ошибок, концентрация элементов изначально считается из
@@ -150,11 +154,9 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
                     print("t_eq", element.tr_t)
                     print("last_step", last_step)
                     solu = element.equilibrium(solu, Tfromt(odes.t))
+        i+=1
         print(solu, "i = {}/{}".format(i, len(Ts)), Tres[-1], "raz", sum(solu[0]) - 1)
         X_ans = np.append(X_ans, solu, axis=0)
-        if flag_was_eq:
-            print("here")
-            return (i, X_ans, Tres)
     return(-1, X_ans, Tres)
 
 # odes = integrate.ode(ode_, jac=jacob)
@@ -164,6 +166,23 @@ X_ans = X_0.reshape((1,-1))
 i = 0
 # Tres=[Ts[i]]
 Tres = [ts[i]]
+
+def start_from_cache(i, X_ans, Tres):
+    if constants.smart_caching and os.path.isfile("smart_cache.pickle"):
+        with open("smart_cache.pickle", "rb") as f:
+            t_i, t_X_ans, t_Tres, t_ode_params = pickle.load(f)
+        for j in range(min(len(t_ode_params), len(constants.ode_params))):
+            if t_ode_params[i] != constants.ode_params[i]:
+                break
+        for ii in range(t_i):
+            # print("PP", ii, t_i, j, len(Tres), len(constants.ode_params))
+            if t_Tres[ii] >= constants.ode_params[j][0]:
+                break
+        return (ii, t_X_ans[:ii+1], t_Tres[:ii+1])
+    else:
+        return (i, X_ans, Tres)
+        
+i, X_ans, Tres = start_from_cache(i, X_ans, Tres)
 
 try:
     while i != -1:
