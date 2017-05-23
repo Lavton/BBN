@@ -135,6 +135,7 @@ class Registrator():
             num_of_el = len(self.elements)
 
         for i in range(num_of_el):
+            print(i, len(ts), len(X_ans[:,i]))
             plt.plot(ts, X_ans[:,i], 
             linewidth=2.0, label="$"+self.elements[i].str_view+"$")
 

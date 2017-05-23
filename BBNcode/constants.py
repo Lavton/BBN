@@ -31,6 +31,75 @@ func_name_to_db_name = {
     "derriviate_T_from_t": "DerriviateTdtFromTempreture"
 }
 
+
+ode_params = [
+    [-1.0, {
+    "rtoi": 1e-6,
+    "max_step": 1.0,
+    "min_step": 1e-10,
+    }], 
+    [0.004, {
+    "rtoi": 1e-7,
+    }],
+    [0.014, {
+    "rtoi": 1e-11,
+    "max_step": 0.0005
+    ,
+    }],
+    [0.02, {
+    "atoi": 1e-9,
+    "rtoi": 1e-11,
+    "max_step": 0.0001,
+    "min_step": 0.0
+    }],
+    [0.038, {
+    "atoi": 1e-9,
+    "rtoi": 1e-8,
+    "max_step": 0.002,
+    }],
+    [0.052, {
+    "rtoi": 1e-6,
+    "max_step": 0.2,
+    "min_step": 0.0
+    }],
+    [0.055,{
+    "rtoi": 1e-9,
+    "max_step": 0.002,
+    "atoi": 1e-8,
+    }],
+    [0.080,{
+    "rtoi": 1e-7,
+    # "min_step": 1e-8,
+    "max_step": 0.03,
+    }],
+    [0.2, {
+    "rtoi": 1e-8,
+    "atoi": 1e-10,
+    # "not_use_jacob": True
+    }],
+    [0.31, {
+    "rtoi": 1e-11,
+    "atoi": 1e-12,
+    "max_step": 0.003,
+    # "not_use_jacob": True
+    }],
+    [10, {
+    "rtoi": 1e-9,
+    "max_step": 0.0
+    }],
+    [100, {
+    "max_step": 0.0,
+    }]
+]
+
+def_params = {
+    "rtoi": 1e-6,
+    "atoi": 1e-12,
+    "max_step": 1.0,
+    "min_step": 1e-10,
+    "last_step": 0.0
+}
+
 #########################################################
 ##### преобразования в размерную величину ###############
 

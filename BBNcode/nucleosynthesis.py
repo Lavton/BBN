@@ -16,6 +16,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import elements.register as elements
 import datetime
+import os
 now_title = datetime.datetime.now().isoformat()
 
 start_time = time.time()
@@ -71,108 +72,50 @@ def jacob(t, X):
     # T = -T
     return j
 
-ode_params = [
-    [-1.0, {
-    "rtoi": 1e-6,
-    "max_step": 1.0,
-    "min_step": 1e-10,
-    }], 
-    [0.004, {
-    "rtoi": 1e-7,
-    }],
-    [0.014, {
-    "rtoi": 1e-11,
-    "max_step": 0.0005
-    ,
-    }],
-    [0.02, {
-    "atoi": 1e-9,
-    "rtoi": 1e-11,
-    "max_step": 0.0001,
-    "min_step": 0.0
-    }],
-    [0.038, {
-    "atoi": 1e-9,
-    "rtoi": 1e-8,
-    "max_step": 0.002,
-    }],
-    [0.052, {
-    "rtoi": 1e-6,
-    "max_step": 0.2,
-    "min_step": 0.0
-    }],
-    [0.055,{
-    "rtoi": 1e-9,
-    "max_step": 0.002,
-    "atoi": 1e-8,
-    }],
-    [0.080,{
-    "rtoi": 1e-7,
-    # "min_step": 1e-8,
-    "max_step": 0.03,
-    }],
-    [0.2, {
-    "rtoi": 1e-8,
-    "atoi": 1e-10,
-    # "not_use_jacob": True
-    }],
-    [0.31, {
-    "rtoi": 1e-11,
-    "atoi": 1e-12,
-    "max_step": 0.003,
-    # "not_use_jacob": True
-    }],
-    [10, {
-    "rtoi": 1e-9,
-    "max_step": 0.0
-    }],
-    [100, {
-    "max_step": 0.0,
-    }]
-]
 
-def_params = {
-    "rtoi": 1e-6,
-    "atoi": 1e-12,
-    "max_step": 1.0,
-    "min_step": 1e-10,
-    "last_step": 0.0
-}
+class TechnicalCalcExitException(Exception):
+    def __init__(self, i, Tres, X_ans):
+        super(Exception, self).__init__()
+        self.i = i
+        self.Tres = Tres
+        self.X_ans = X_ans
+
+
+def technical_stop_cache(i, Tres, X_ans):
+    if os.path.isfile("exit_now"):
+        os.remove("exit_now")
+        raise TechnicalCalcExitException(i, Tres, X_ans)
+
+
 # инициируем программу для решение дифура
 def iter_process(X_0, T0, Ts, i, X_ans, Tres):
-    global def_params
     print("prestart", sum(X_0)-1.0)
     # выполняем шаги
-    # rtoi = 1e-6
-    # atoi = 1e-12
-    # max_step = 1.0
-    # min_step = 1e-10
-    # last_step = 0.0
-    # jac_flag = True
-    for param_set in ode_params:
+    for param_set in constants.ode_params:
         if Tres[-1] >= param_set[0]:
             if "rtoi" in param_set[1]:
-                def_params["rtoi"] = param_set[1]["rtoi"]
+                constants.def_params["rtoi"] = param_set[1]["rtoi"]
             if "max_step" in param_set[1]:
-                def_params["max_step"] = param_set[1]["max_step"]
+                constants.def_params["max_step"] = param_set[1]["max_step"]
             if "min_step" in param_set[1]:
-                def_params["min_step"] = param_set[1]["min_step"]
+                constants.def_params["min_step"] = param_set[1]["min_step"]
             if "atoi" in param_set[1]:
-                def_params["atoi"] = param_set[1]["atoi"]
+                constants.def_params["atoi"] = param_set[1]["atoi"]
 
     last_step = Tres[-1]
     print("innerstart", Tres[-1])
     odes = integrate.ode(ode_, jac=jacob)
     odes.set_integrator('vode', method="bdf", with_jacobian=True, nsteps=8000, 
-        min_step=def_params["min_step"],
-        rtol=def_params["rtoi"],
-        max_step=def_params["max_step"],
-        atol=def_params["atoi"]
+        min_step=constants.def_params["min_step"],
+        rtol=constants.def_params["rtoi"],
+        max_step=constants.def_params["max_step"],
+        atol=constants.def_params["atoi"]
         )
     odes.set_initial_value(X_0, T0)
     while odes.successful() and odes.t < Ts[-2]:
+        technical_stop_cache(i, Tres, X_ans)
         print("inw", sum(X_ans[-1])-1.0)
-        for param_set in ode_params:
+        for param_set in constants.ode_params:
             if Tres[-1] >= param_set[0]:
                 if param_set[0] >= last_step:
                     return (i, X_ans, Tres)
@@ -222,11 +165,15 @@ i = 0
 # Tres=[Ts[i]]
 Tres = [ts[i]]
 
-while i != -1:
-    X_0 = X_ans[-1]
-    # print(ts[i])
-    i, X_ans, Tres = iter_process(X_0, ts[i], ts, i, X_ans, Tres)
-    print("after_start", sum(X_ans[-1])-1.0)
+try:
+    while i != -1:
+        X_0 = X_ans[-1]
+        # print(ts[i])
+        i, X_ans, Tres = iter_process(X_0, ts[i], ts, i, X_ans, Tres)
+        print("after_start", sum(X_ans[-1])-1.0)    
+except TechnicalCalcExitException as e:
+    i, Tres, X_ans = e.i, e.Tres, e.X_ans
+    print("interrupt by user")
 
 # время
 # ts = [constants.to_norm_time(t) for t in  map(tfromT, -np.array(Tres))]
@@ -243,6 +190,7 @@ plt.xlim([1e-4,1e3])
 ylabel = r"\textbf{X}"
 plt.ylabel(ylabel)
 plt.ylim([1e-30, 1000])
+
 elements.registrator.calc_plot(plt, Tres, X_ans)
 ###################
 import elements._xn_modeling_wai
@@ -276,7 +224,7 @@ plt.ylabel(r'\textbf{\lambda}')
 
 plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
            ncol=2, mode="expand", borderaxespad=0.)
-print("ode_params", ode_params)
+print("constants.ode_params", constants.ode_params)
 print("TIME WORKS", (time.time() - start_time)/60)
 plt.title(now_title)
 import pickle
