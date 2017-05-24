@@ -63,6 +63,12 @@ class Element():
             return func(*args, **kwargs) if args[0] < self.tr_T else 0
         return inner
 
+    def set_mass_excess(self, total_mass, n_N, p_N):
+        m_ns = constants.m_n * n_N
+        m_ps = constants.m_p * p_N
+        m = total_mass * (10**(-6)) * constants.amuToErg * constants.ergToEV 
+        self.mass_excess = constants.less_tempreture(-(m - m_ns - m_ps-constants.m_e*p_N), units="eV")
+
 if __name__ == '__main__':
     h_1 = H_1()
     print(h_1.X_c)
