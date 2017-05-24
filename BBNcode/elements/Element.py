@@ -1,6 +1,7 @@
 import constants
 import math
 import nTOp
+import functools
 
 class Element():
     """
@@ -19,6 +20,8 @@ class Element():
         self.is_ode_state = False # = in equilibrium
         self.forward_rates = []
         self.backward_rates = []
+        self.tr_T = None
+        self.tr_t = None
 
     def show_rates(self):
         import matplotlib as mpl
@@ -51,7 +54,14 @@ class Element():
         plt.cla()
         plt.clf()
 
-
+    def equilib_zeroize(self, func):
+        """
+        Преобразование в 0 до tr
+        """
+        @functools.wraps(func)
+        def inner(*args, **kwargs):
+            return func(*args, **kwargs) if args[0] < self.tr_T else 0
+        return inner
 
 if __name__ == '__main__':
     h_1 = H_1()

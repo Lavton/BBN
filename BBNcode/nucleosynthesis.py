@@ -36,7 +36,8 @@ Ts = constants.less_tempreture(grid2, units="K")
 # переводим в отрицательную шкалу, чтобы Ts[i] > Ts[i-1]
 ts = np.array([tfromT(T) for T in Ts])
 
-
+with open("mylog.log", "wt") as f:
+    f.write("")
 logging.info(("start", constants.ode_params, ts))
 
 def ode_int(X, t):
@@ -104,7 +105,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
                 constants.def_params["atoi"] = param_set[1]["atoi"]
 
     last_step = Tres[-1]
-    logging.debug("new start iter_process with i = {}, t = {}".format(i, T0))
+    logging.debug("new start iter_process with i = {}, t = {}, X = {}".format(i, T0, X_0))
     odes = integrate.ode(ode_, jac=jacob)
     odes.set_integrator('vode', method="bdf", with_jacobian=True, nsteps=8000, 
         min_step=constants.def_params["min_step"],
@@ -146,7 +147,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
                     logging.debug(("doeq", element.str_view))
                     solu = element.equilibrium(solu, Tfromt(odes.t))
         i+=1
-        logging.info("i = {}/{}, t = {}".format(i, len(Ts), Tres[-1]))
+        logging.info("i = {}/{}, t = {}, last X = {}".format(i, len(Ts), Tres[-1], X_ans[-1]))
         X_ans = np.append(X_ans, solu, axis=0)
     return(-1, X_ans, Tres)
 
@@ -155,6 +156,7 @@ i = 0
 Tres = [ts[i]]
 
 def start_from_cache(i, X_ans, Tres):
+    want_t = 1e30 
     if len(sys.argv) > 1:
         want_t = eval(sys.argv[1])  # с какого времени начинать
     if constants.smart_caching and os.path.isfile("smart_cache.pickle"):

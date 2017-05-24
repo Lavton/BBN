@@ -1,6 +1,9 @@
 import constants
 import functools
 import collections
+import logging
+import numpy as np
+
 # sql_enabled, func_name_to_db_name
 class Cacher(object):
     """
@@ -36,6 +39,7 @@ class Cacher(object):
                 )
             res = self.cur.fetchone() # ищем результат в кеше
             if res: # если нашли температуру
+                # logging.debug("cache from SQL")
                 return res[0]
             if not res: # не нашли - вставим
                 res = func(*args, **kwargs)
@@ -51,6 +55,29 @@ class Cacher(object):
                 return res
 
         return inner if constants.sql_enabled else func
+
+    # def np_array_to_list_decor(self, func):
+    #     """
+    # Кеширование
+    #     """
+
+    #     @functools.wraps(func)
+    #     def inner(*args, **kwargs):
+    #         new_args = []
+    #         new_kwargs = dict()
+    #         for i in range(len(args)):
+    #             if isinstance(args[i], np.ndarray):
+    #                 print(tuple(args[i]))
+    #                 new_args.append(tuple(args[i]))
+    #             else:
+    #                 new_args.append(args[i])
+    #         for k, v in kwargs.items():
+    #             if isinstance(v, np.ndarray):
+    #                 new_kwargs[k] = tuple(v)
+    #             else:
+    #                 new_kwargs[k] = v
+    #         return functools.lru_cache(func)(*args, **kwargs)
+    #     return inner
 
 
     def __del__(self):

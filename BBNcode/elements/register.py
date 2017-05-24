@@ -14,6 +14,8 @@ from elements.H_1 import H_1
 from elements.H_2 import H_2
 import tempreture
 import logging
+import functools
+import Cacher
 
 def check_jacob_online(X, T, res_jacob):
     def approx_jacobian(x,func,epsilon,*args):
@@ -83,6 +85,7 @@ class Registrator():
                 for k, v in value.items():
                     self.jacob_funcs[self.rev_element_list[key]][self.rev_element_list[k]].append(v)
 
+    # @Cacher.cacher.np_array_to_list_decor
     def sode_int(self, X, T):
         """
         к этому моменту 
@@ -96,9 +99,10 @@ class Registrator():
         for i in range(len(self.elements)):
             ode_f = self.ode_funcs[i]
             dX.append(sum(map(lambda f: f(X, T), ode_f)) * self.elements[i].A)
-        logging.debug(("in sode_int, T = ", tempreture.tfromT(T)))
+        logging.debug("t = {}, X = {}".format(tempreture.tfromT(T), X))
         return dX
 
+    # @Cacher.cacher.np_array_to_list_decor
     def jacob(self, X, T):
         """
         к этому моменту 
@@ -108,6 +112,7 @@ class Registrator():
         [lambda X, T: [lambda X,T:],[] , lambda X, T: [lambda X,T:],[] ,],
         ]
         """
+
         res_jacob = []
         for i in range(len(self.elements)):
             j = self.jacob_funcs[i]
@@ -115,9 +120,9 @@ class Registrator():
             for J in j:
                 jacob_row.append(sum(map(lambda f: f(X, T), J)) * self.elements[i].A)
             res_jacob.append(jacob_row)
-        if constants.prog_status == "DEBUG":
+        if logging.root.level==logging.DEBUG:
             check_jacob_online(X, T, res_jacob)
-        logging.info(("Jacob is using on t = ", tempreture.tfromT(T)))
+        logging.debug("t = {}, X = {}".format(tempreture.tfromT(T), X))
         return res_jacob
 
     def calc_plot(self, plt, ts, X_ans, num_of_el=0):

@@ -18,10 +18,12 @@ H_2 = Element("H_2", 0.0)
 H_2.A = 2
 # from Audi et all, 2003
 H_2.mass_excess = constants.less_tempreture(2161062.7, units="eV")
-H_2.tr_T = constants.less_tempreture(2.5*10**9, units="K")
-H_2.tr_t = tempreture.tfromT(H_2.tr_T)
+# H_2.tr_T = constants.less_tempreture(2.5*10**9, units="K")
+# H_2.tr_t = tempreture.tfromT(H_2.tr_T)
+H_2.tr_t = 0.005
+H_2.tr_T = tempreture.Tfromt(H_2.tr_t)
 
-
+@H_2.equilib_zeroize
 def H_2_forw_rate(T):
     """
     Smith et all
@@ -37,8 +39,9 @@ def H_2_forw_rate(T):
         )
     ro_b = univ_func.rat_scale(T)
     # base_rate = 0
-    return base_rate * ro_b/(constants.less_time(1)) if T < H_2.tr_T else 0
+    return base_rate * ro_b/(constants.less_time(1)) # if T < H_2.tr_T else 0
 
+@H_2.equilib_zeroize
 def H_2_backward_rate(T):
     """Wagoner, 1966"""
     T9 = constants.to_norm_tempreture(T, units="T9")
@@ -48,7 +51,7 @@ def H_2_backward_rate(T):
     ro_b = univ_func.rat_scale(T)
 
     back = 4.68*10**9 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-H_2.mass_excess/T)
-    return (back /(constants.less_time(1))) if T < H_2.tr_T else 0
+    return (back /(constants.less_time(1))) #if T < H_2.tr_T else 0
 
 
 def H_2_equ(X, T):

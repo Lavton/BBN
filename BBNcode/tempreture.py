@@ -13,6 +13,7 @@ from scipy import integrate
 from scipy.misc import derivative
 import Cacher
 import logging
+import functools
 
 def __s_beaut_integrand_f__(x, y):
     r"""
@@ -90,6 +91,8 @@ def __tfromT__(T):
     return constants.less_time(integ)
 
 __t0__ = __tfromT__(constants.less_tempreture(10**11, units="K"))
+
+@functools.lru_cache(maxsize=8)
 @Cacher.cacher.sql_base_cache
 def tfromT(T):
     r"""
@@ -100,6 +103,7 @@ def tfromT(T):
     """
     return __tfromT__(T) - __t0__
 
+@functools.lru_cache(maxsize=8)
 @Cacher.cacher.sql_base_cache
 def Tfromt(t):
     T0 = constants.less_tempreture(10**11, units="K")
