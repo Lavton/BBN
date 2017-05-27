@@ -13,6 +13,7 @@ from elements.n import n
 from elements.H_1 import H_1
 from elements.H_2 import H_2
 from elements.He_3 import He_3
+from elements.H_3 import H_3
 import tempreture
 import logging
 import functools
@@ -49,12 +50,13 @@ def check_jacob_online(X, T, res_jacob):
         return jac.transpose()
     import numpy as np
     import tempreture
-    apj = approx_jacobian(X, lambda X: np.array(registrator.sode_int(X,T)), 1e-6)
+    apj = approx_jacobian(X, lambda X: np.array(registrator.sode_int(X,T)), 1e-8)
     # print(ap_j)
     total_s = 0
     for i in range(len(res_jacob)):
         total_s += sum([abs(res_jacob[i][j] - apj[i][j])/(1+abs(apj[i][j])) for j in range(len(res_jacob[i]))])
-    if total_s >= 1e-2:
+    total_s /= len(res_jacob)*len(res_jacob)
+    if total_s >= 1e-4:
         logging.error(("BUG JACOB:", total_s, tempreture.tfromT(T), X))
 
 
@@ -140,6 +142,7 @@ registrator.registrate(n)
 registrator.registrate(H_1)
 registrator.registrate(H_2)
 registrator.registrate(He_3)
+registrator.registrate(H_3)
 registrator.finish_registration()
 
 X_0 = registrator.X_0

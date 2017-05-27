@@ -225,6 +225,8 @@ from elements.H_2 import H_2
 plt.axvline(x=H_2.tr_t)
 from elements.He_3 import He_3
 plt.axvline(x=He_3.tr_t)
+from elements.H_3 import H_3
+plt.axvline(x=H_3.tr_t)
 # plt.plot(Tres, [H_2.equilibrium([[X_ans[i][0], X_ans[i][1], 0]], Tfromt(Tres[i]))[0][2] for i in range(len(Tres))])
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
@@ -232,9 +234,9 @@ plt.xscale('log')
 plt.yscale('log')
 plt.xlabel(r'\textbf{time} (s)')
 plt.ylabel(r'\textbf{\lambda}')
-
-plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
-           ncol=2, mode="expand", borderaxespad=0.)
+plt.legend()
+# plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+#            ncol=2, mode="expand", borderaxespad=0.)
 logging.info(("TIME WORKS", (time.time() - start_time)/60))
 # plt.title(now_title)
 with open("Output.pickle", "wb") as f:

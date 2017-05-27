@@ -68,7 +68,7 @@ class Element():
         m_ns = constants.m_n * n_N
         m_ps = constants.m_p * p_N
         m = total_mass * (10**(-6)) * constants.amuToErg * constants.ergToEV 
-        self.mass_excess = constants.less_tempreture(-(m - m_ns - m_ps-constants.m_e*p_N), units="eV")
+        self.mass_excess = constants.less_tempreture(-(m - m_ns - m_ps - constants.m_e*p_N), units="eV")
 
 if __name__ == '__main__':
     h_1 = H_1()

@@ -11,7 +11,7 @@ if __name__ == '__main__':
 import constants
 import math
 from elements.Element import Element
-
+import tempreture
 import univ_func
 
 H_3 = Element("H_3", 0.0)
@@ -20,70 +20,75 @@ H_3.A = 3
 # H_3.mass_excess = constants.less_tempreture(2161062.7, units="eV")
 H_3.set_mass_excess(3016049.2777, n_N=2, p_N=1)
 H_3.tr_t =  0.012
-H_3.tr_T = tempreture.Tfromt(He_3.tr_t)
+H_3.tr_T = tempreture.Tfromt(H_3.tr_t)
 # H_3.tr_T = constants.less_tempreture(2*10**10, units="K")
 
 @H_3.equilib_zeroize
-def H_3_forw_rate(T):
+def nd_tg(T):
     """
-    Smith et all
+    Wagoner
     """
     T9 = constants.to_norm_tempreture(T, units="T9")
-    base_rate = 4.742 * 10**4 * (
-        + 1. 
-        - 0.8540 * T9**(1./2)
-        + 0.4895 * T9
-        - 0.09623 * T9**(3./2)
-        + 8.471*1e-3 * T9**2
-        - 2.80*1e-4 * T9**(5./2)
+    base_rate = (
+        75.5
+        + 1250 * T9
         )
     ro_b = univ_func.rat_scale(T)
-    return base_rate * ro_b/(constants.less_time(1)) if T < H_3.tr_T else 0
+    return base_rate * ro_b/(constants.less_time(1))
 
 @H_3.equilib_zeroize
-def H_3_backward_rate(T):
+def tg_nd(T):
     """Wagoner, 1966"""
     T9 = constants.to_norm_tempreture(T, units="T9")
-    forw = H_3_forw_rate(T) / constants.to_norm_time(1)
+    forw = nd_tg.__wrapped__(T) / constants.to_norm_time(1)
     E = constants.to_norm_tempreture(T, units="MeV")
-    back = forw * math.exp(-H_3.mass_excess/T)
+    # back = forw * math.exp(-H_3.mass_excess/T)
     ro_b = univ_func.rat_scale(T)
 
-    back = 4.68*10**9 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-H_3.mass_excess/T)
-    return (back /(constants.less_time(1))) if T < H_3.tr_T else 0
+    back = 1.63*10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-72.62/T9)
+    return (back /(constants.less_time(1)))
 
 
 def H_3_equ(X, T):
     T9 = constants.to_norm_tempreture(-T, units="T9")
-    X_n = 1.440*(10**-5)*(T9**(3./2))*constants.nu_n*math.exp(25.815/T9)*X[0][0]*X[0][1]
-    X[0][2] = X_n
+    try:
+        # print(T, he3_gp_d.__wrapped__(T))
+        X_h3 = (3./2) * (nd_tg.__wrapped__(T)/tg_nd.__wrapped__(T))*X[0][0]*X[0][2]
+    except OverflowError as e:
+        X_h3 = 0
+    X[0][4] = X_h3
     return X
 
+H_3.forward_rates.append(nd_tg)
+H_3.backward_rates.append(tg_nd)
 
 
-
-
+# 0 - n
+# 1 - H1
+# 2 - H2
+# 3 - He3
+# 4 - H3
 H_3.ode_elem = {
-    "n": (lambda X, T: -X[0]*X[1]*H_3_forw_rate(T) + X[2]*H_3_backward_rate(T)/2),
-    "H_1": (lambda X, T: -X[0]*X[1]*H_3_forw_rate(T) + X[2]*H_3_backward_rate(T)/2),
-    "H_3": (lambda X, T: +X[0]*X[1]*H_3_forw_rate(T) - X[2]*H_3_backward_rate(T)/2)
+    "n": (lambda X, T: -X[0]*(X[2]/2)*nd_tg(T) + (X[4]/3)*tg_nd(T)),
+    "H_2": (lambda X, T:  -X[0]*(X[2]/2)*nd_tg(T) + (X[4]/3)*tg_nd(T)),
+    "H_3": (lambda X, T: X[0]*(X[2]/2)*nd_tg(T) - (X[4]/3)*tg_nd(T))
 }
 
 H_3.jacob = { 
     "n": { #берём первую строку и дифференцируем по каждому
-        "n": (lambda X, T: -X[1]*H_3_forw_rate(T)),
-        "H_1": (lambda X, T: -X[0]*H_3_forw_rate(T)),
-        "H_3": (lambda X, T: +H_3_backward_rate(T)/2)
+        "n": (lambda X, T: -(X[2]/2)*nd_tg(T)),
+        "H_2": (lambda X, T: -X[0]*(1./2)*nd_tg(T)),
+        "H_3": (lambda X, T: (1./3)*tg_nd(T))
     },
-    "H_1": {
-        "n": (lambda X, T:  -X[1]*H_3_forw_rate(T)),
-        "H_1": (lambda X, T: -X[0]*H_3_forw_rate(T)),
-        "H_3": (lambda X, T: +H_3_backward_rate(T)/2)
+    "H_2": {
+        "n": (lambda X, T:  -(X[2]/2)*nd_tg(T)),
+        "H_2": (lambda X, T: -X[0]*(1./2)*nd_tg(T)),
+        "H_3": (lambda X, T: (1./3)*tg_nd(T))
     },
     "H_3": {
-        "n": (lambda X, T: X[1]*H_3_forw_rate(T)),
-        "H_1": (lambda X, T: X[0]*H_3_forw_rate(T)),
-        "H_3": (lambda X, T: - H_3_backward_rate(T)/2)
+        "n": (lambda X, T: +(X[2]/2)*nd_tg(T)),
+        "H_2": (lambda X, T: +X[0]*(1./2)*nd_tg(T)),
+        "H_3": (lambda X, T: -(1./3)*tg_nd(T))
     }
 }
 
