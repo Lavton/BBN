@@ -13,6 +13,7 @@ import math
 from elements.Element import Element
 import tempreture
 import univ_func
+import functools
 
 He_3 = Element("He_3", 0.0)
 He_3.A = 3
@@ -23,6 +24,7 @@ He_3.tr_t =  0.009
 He_3.tr_T = tempreture.Tfromt(He_3.tr_t)
 
 @He_3.equilib_zeroize
+@functools.lru_cache(maxsize=8)
 def d_pg_he3(T):
     """
     Smith et all
@@ -44,6 +46,7 @@ def d_pg_he3(T):
     return base_rate * ro_b/(constants.less_time(1))
 
 @He_3.equilib_zeroize
+@functools.lru_cache(maxsize=8)
 def he3_gp_d(T):
     """
     Vagoner
@@ -70,6 +73,7 @@ def He_3_equ(X, T):
     return X
 
 @He_3.equilib_zeroize
+@functools.lru_cache(maxsize=8)
 def dd_nhe3(T):
     T9 = constants.to_norm_tempreture(T, units="T9")
     forw = d_pg_he3.__wrapped__(T) / constants.to_norm_time(1)
@@ -84,6 +88,7 @@ def dd_nhe3(T):
     return forw * (1./(constants.less_time(1)))
 
 @He_3.equilib_zeroize
+@functools.lru_cache(maxsize=8)
 def nhe3_dd(T):
     T9 = constants.to_norm_tempreture(T, units="T9")
     forw = dd_nhe3.__wrapped__(T) / constants.to_norm_time(1)

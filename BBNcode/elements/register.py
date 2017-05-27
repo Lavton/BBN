@@ -18,6 +18,7 @@ import tempreture
 import logging
 import functools
 import Cacher
+from ode_f_creator_bm import magic_ode, magic_jacob
 
 def check_jacob_online(X, T, res_jacob):
     def approx_jacobian(x,func,epsilon,*args):
@@ -90,39 +91,12 @@ class Registrator():
 
     # @Cacher.cacher.np_array_to_list_decor
     def sode_int(self, X, T):
-        """
-        к этому моменту 
-        self.ode_funcs = [
-        [lambda X, T: ... ,lambda X, T: ... ,lambda X, T: ... ,],
-        [lambda X, T: ... ,lambda X, T: ... ,lambda X, T: ... ,],
-        [lambda X, T: ... ,lambda X, T: ... ,lambda X, T: ... ,]
-        ]
-        """
-        dX = []
-        for i in range(len(self.elements)):
-            ode_f = self.ode_funcs[i]
-            dX.append(sum(map(lambda f: f(X, T), ode_f)) * self.elements[i].A)
-        logging.debug("t = {}, X = {}".format(tempreture.tfromT(T), X))
+        dX = magic_ode(X, T)
         return dX
 
     # @Cacher.cacher.np_array_to_list_decor
     def jacob(self, X, T):
-        """
-        к этому моменту 
-        self.jacob_funcs = [
-        [lambda X, T: [lambda X,T:],[] , lambda X, T: [lambda X,T:],[] ,],
-        [lambda X, T: [lambda X,T:],[] , lambda X, T: [lambda X,T:],[] ,],
-        [lambda X, T: [lambda X,T:],[] , lambda X, T: [lambda X,T:],[] ,],
-        ]
-        """
-
-        res_jacob = []
-        for i in range(len(self.elements)):
-            j = self.jacob_funcs[i]
-            jacob_row = []
-            for J in j:
-                jacob_row.append(sum(map(lambda f: f(X, T), J)) * self.elements[i].A)
-            res_jacob.append(jacob_row)
+        res_jacob = magic_jacob(X, T)
         if logging.root.level==logging.DEBUG:
             check_jacob_online(X, T, res_jacob)
         logging.debug("t = {}, X = {}".format(tempreture.tfromT(T), X))

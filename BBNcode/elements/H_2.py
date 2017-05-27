@@ -11,7 +11,7 @@ import constants
 import math
 import tempreture
 from elements.Element import Element
-
+import functools
 import univ_func
 
 H_2 = Element("H_2", 0.0)
@@ -24,6 +24,7 @@ H_2.tr_t = 0.005
 H_2.tr_T = tempreture.Tfromt(H_2.tr_t)
 
 @H_2.equilib_zeroize
+@functools.lru_cache(maxsize=8)
 def H_2_forw_rate(T):
     """
     Smith et all
@@ -42,6 +43,7 @@ def H_2_forw_rate(T):
     return base_rate * ro_b/(constants.less_time(1)) # if T < H_2.tr_T else 0
 
 @H_2.equilib_zeroize
+@functools.lru_cache(maxsize=8)
 def H_2_backward_rate(T):
     """Wagoner, 1966"""
     T9 = constants.to_norm_tempreture(T, units="T9")

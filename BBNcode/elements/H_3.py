@@ -13,17 +13,19 @@ import math
 from elements.Element import Element
 import tempreture
 import univ_func
+import functools
 
 H_3 = Element("H_3", 0.0)
 H_3.A = 3
 # from Audi et all, 2003
 # H_3.mass_excess = constants.less_tempreture(2161062.7, units="eV")
 H_3.set_mass_excess(3016049.2777, n_N=2, p_N=1)
-H_3.tr_t =  0.012
+H_3.tr_t =  0.0012
 H_3.tr_T = tempreture.Tfromt(H_3.tr_t)
 # H_3.tr_T = constants.less_tempreture(2*10**10, units="K")
 
 @H_3.equilib_zeroize
+@functools.lru_cache(maxsize=8)
 def nd_tg(T):
     """
     Wagoner
@@ -37,6 +39,7 @@ def nd_tg(T):
     return base_rate * ro_b/(constants.less_time(1))
 
 @H_3.equilib_zeroize
+@functools.lru_cache(maxsize=8)
 def tg_nd(T):
     """Wagoner, 1966"""
     T9 = constants.to_norm_tempreture(T, units="T9")
@@ -59,8 +62,38 @@ def H_3_equ(X, T):
     X[0][4] = X_h3
     return X
 
+
+@H_3.equilib_zeroize
+@functools.lru_cache(maxsize=8)
+def nhe3_pt(T):
+    """
+    Wagoner
+    """
+    T9 = constants.to_norm_tempreture(T, units="T9")
+    base_rate = (
+        7.06 * (10**8)
+        )
+    ro_b = univ_func.rat_scale(T)
+    return base_rate * ro_b/(constants.less_time(1))
+
+@H_3.equilib_zeroize
+@functools.lru_cache(maxsize=8)
+def pt_nhe3(T):
+    """Wagoner, 1966"""
+    T9 = constants.to_norm_tempreture(T, units="T9")
+    forw = nhe3_pt.__wrapped__(T) / constants.to_norm_time(1)
+    E = constants.to_norm_tempreture(T, units="MeV")
+    # back = forw * math.exp(-H_3.mass_excess/T)
+    ro_b = univ_func.rat_scale(T)
+
+    back = forw * math.exp(-8.864/T9)
+    return (back /(constants.less_time(1)))
+
+
 H_3.forward_rates.append(nd_tg)
 H_3.backward_rates.append(tg_nd)
+H_3.forward_rates.append(nhe3_pt)
+H_3.backward_rates.append(pt_nhe3)
 
 
 # 0 - n
@@ -69,26 +102,92 @@ H_3.backward_rates.append(tg_nd)
 # 3 - He3
 # 4 - H3
 H_3.ode_elem = {
-    "n": (lambda X, T: -X[0]*(X[2]/2)*nd_tg(T) + (X[4]/3)*tg_nd(T)),
+    "n": (lambda X, T: 
+        -X[0]*(X[2]/2)*nd_tg(T) + (X[4]/3)*tg_nd(T)
+        -X[0]*(X[3]/3)*nhe3_pt(T) + X[1]*(X[4]/3)*pt_nhe3(T)
+        ),
+    "H_1": (lambda X, T:
+        +X[0]*(X[3]/3)*nhe3_pt(T) - X[1]*(X[4]/3)*pt_nhe3(T)
+        ),
     "H_2": (lambda X, T:  -X[0]*(X[2]/2)*nd_tg(T) + (X[4]/3)*tg_nd(T)),
-    "H_3": (lambda X, T: X[0]*(X[2]/2)*nd_tg(T) - (X[4]/3)*tg_nd(T))
+    "He_3": (lambda X, T:
+        -X[0]*(X[3]/3)*nhe3_pt(T) + X[1]*(X[4]/3)*pt_nhe3(T)
+        ),
+    "H_3": (lambda X, T: 
+        X[0]*(X[2]/2)*nd_tg(T) - (X[4]/3)*tg_nd(T)
+        +X[0]*(X[3]/3)*nhe3_pt(T) - X[1]*(X[4]/3)*pt_nhe3(T)
+        )
 }
 
 H_3.jacob = { 
     "n": { #берём первую строку и дифференцируем по каждому
-        "n": (lambda X, T: -(X[2]/2)*nd_tg(T)),
+        "n": (lambda X, T: 
+            -(X[2]/2)*nd_tg(T)
+            -(X[3]/3)*nhe3_pt(T)
+            ),
+        "H_1": (lambda X, T:
+            +(X[4]/3)*pt_nhe3(T)
+            ),
         "H_2": (lambda X, T: -X[0]*(1./2)*nd_tg(T)),
-        "H_3": (lambda X, T: (1./3)*tg_nd(T))
+        "He_3": (lambda X, T: 
+            -X[0]*(1./3)*nhe3_pt(T)
+            ),
+        "H_3": (lambda X, T: 
+            (1./3)*tg_nd(T)
+            +X[1]*(1./3)*pt_nhe3(T)
+            )
+    },
+    "H_1": {
+        "n": (lambda X, T:
+            +(X[3]/3)*nhe3_pt(T)
+            ),
+        "H_1": (lambda X, T:
+            -(X[4]/3)*pt_nhe3(T)
+            ), 
+        "He_3": (lambda X, T: 
+            +X[0]*(1./3)*nhe3_pt(T)
+            ),
+        "H_3": (lambda X, T: 
+            -X[1]*(1./3)*pt_nhe3(T)
+            )
     },
     "H_2": {
         "n": (lambda X, T:  -(X[2]/2)*nd_tg(T)),
         "H_2": (lambda X, T: -X[0]*(1./2)*nd_tg(T)),
         "H_3": (lambda X, T: (1./3)*tg_nd(T))
     },
+    "He_3": {
+        "n": (lambda X, T:
+            -(X[3]/3)*nhe3_pt(T)
+            ),
+        "H_1": (lambda X, T:
+            +(X[4]/3)*pt_nhe3(T)
+            ), 
+        "He_3": (lambda X, T: 
+            -X[0]*(1./3)*nhe3_pt(T)
+            ),
+        "H_3": (lambda X, T: 
+            +X[1]*(1./3)*pt_nhe3(T)
+            )
+    },
+
     "H_3": {
-        "n": (lambda X, T: +(X[2]/2)*nd_tg(T)),
+        "n": (lambda X, T: 
+            +(X[2]/2)*nd_tg(T)
+            +(X[3]/3)*nhe3_pt(T)
+            ),
+        "H_1": (lambda X, T:
+            -(X[4]/3)*pt_nhe3(T)
+            ), 
+        "He_3": (lambda X, T: 
+            +X[0]*(1./3)*nhe3_pt(T)
+            ),
+
         "H_2": (lambda X, T: +X[0]*(1./2)*nd_tg(T)),
-        "H_3": (lambda X, T: -(1./3)*tg_nd(T))
+        "H_3": (lambda X, T: 
+            -(1./3)*tg_nd(T)
+            -X[1]*(1./3)*pt_nhe3(T)
+            )
     }
 }
 

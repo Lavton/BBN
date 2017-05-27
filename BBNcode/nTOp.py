@@ -11,7 +11,7 @@ from constants import *
 from scipy import integrate
 from math import pi, sqrt, exp
 from tempreture import tfromT, TnuFromT
-
+import functools
 
 __lambda0__ = 1.63616
 # __a0__ = (4*g**2)/(pi**3*(c*h*2*pi)**6*(2*pi*h))
@@ -105,6 +105,7 @@ def __lamda_e_n__p_nu(T, max_y=np.inf):
 
 
 @Cacher.cacher.sql_base_cache
+@functools.lru_cache(maxsize=8)
 def lambda_n__p(T):
     r"""
     суммарная скорость перехода нейтронов в протоны, см 3.6а
@@ -186,6 +187,7 @@ def __lamda_p_nu__e_n(T, max_y=np.inf):
 
 
 @Cacher.cacher.sql_base_cache
+@functools.lru_cache(maxsize=8)
 def lambda_p__n(T):
     r"""
     суммарная скорость перехода протонов в нейтроны, см 3.6б
