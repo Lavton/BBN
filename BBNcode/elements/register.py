@@ -12,6 +12,7 @@ import constants
 from elements.n import n 
 from elements.H_1 import H_1
 from elements.H_2 import H_2
+from elements.He_3 import He_3
 import tempreture
 import logging
 import functools
@@ -48,13 +49,13 @@ def check_jacob_online(X, T, res_jacob):
         return jac.transpose()
     import numpy as np
     import tempreture
-    apj = approx_jacobian(X, lambda X: np.array(registrator.sode_int(X,T)), 1e-10)
+    apj = approx_jacobian(X, lambda X: np.array(registrator.sode_int(X,T)), 1e-6)
     # print(ap_j)
     total_s = 0
     for i in range(len(res_jacob)):
         total_s += sum([abs(res_jacob[i][j] - apj[i][j])/(1+abs(apj[i][j])) for j in range(len(res_jacob[i]))])
-    if total_s >= 1e-3:
-        logging.error(("BUG JACOB:", tempreture.tfromT(T), X))
+    if total_s >= 1e-2:
+        logging.error(("BUG JACOB:", total_s, tempreture.tfromT(T), X))
 
 
 class Registrator():
@@ -138,6 +139,7 @@ registrator = Registrator()
 registrator.registrate(n)
 registrator.registrate(H_1)
 registrator.registrate(H_2)
+registrator.registrate(He_3)
 registrator.finish_registration()
 
 X_0 = registrator.X_0
@@ -148,17 +150,21 @@ if __name__ == '__main__':
         from tempreture import Tfromt
         st = "[[  1.33289087e-01   8.66677827e-01   1.45546654e-04]] i = 159/320 0.201898823095 raz 0.000112460505732"
         st = st.replace("]","").split()
-        X = [float(st[1]), float(st[2]), float(st[3])]
+        X = [  1.67386032e-01,   8.32614019e-01,  -5.11260695e-08,-2.21515705e-12]
+         # [float(st[1]), float(st[2]), float(st[3])]
         # X = [1.88997594e-01, 8.11002406e-01, 1.70829884e-12]
         # X = [0.3, 0.3, 0.3]
-        X[0] = 1-X[1]-X[2]
-        t = float(st[7])
-        # t = 0.00387945634351
+        X[0] = 1-X[1]-X[2]-X[3]
+        # t = float(st[7])
+        # 
+        t = 0.011797924341382172
         T = Tfromt(t)
         import numpy as np
         jaaaa = np.array(registrator.jacob(X, T))
         odeeee = registrator.sode_int(X, T)
+        print("analitic")
         print(jaaaa)
+        print("func")
         print(odeeee)
 
         def approx_jacobian(x,func,epsilon,*args):
@@ -195,12 +201,14 @@ if __name__ == '__main__':
                 # print(derivative())
         X = np.array(X)
         ap_j = approx_jacobian(X, lambda X: np.array(registrator.sode_int(X,T)), 1e-10)
+        print("approx")
         print(ap_j)
 
         for i in range(len(jaaaa)):
             print([(jaaaa[i][j] - ap_j[i][j])/(1+abs(ap_j[i][j])) for j in range(len(jaaaa[i]))])
 
     check_jacob()
+    exit()
     import numpy as np
     import math
     import constants

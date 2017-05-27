@@ -50,6 +50,7 @@ class Element():
         for b in self.backward_rates:
             plt.plot(ts, [b(T) for T in Ts], label='back {}'.format(i))
             i += 1
+        plt.legend()
         plt.show()
         plt.cla()
         plt.clf()
@@ -60,7 +61,7 @@ class Element():
         """
         @functools.wraps(func)
         def inner(*args, **kwargs):
-            return func(*args, **kwargs) if args[0] < self.tr_T else 0
+            return func(*args, **kwargs) if args[0] < self.tr_T*1.05 else 0
         return inner
 
     def set_mass_excess(self, total_mass, n_N, p_N):

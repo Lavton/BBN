@@ -19,8 +19,11 @@ H_3.A = 3
 # from Audi et all, 2003
 # H_3.mass_excess = constants.less_tempreture(2161062.7, units="eV")
 H_3.set_mass_excess(3016049.2777, n_N=2, p_N=1)
-H_3.tr_T = constants.less_tempreture(2*10**10, units="K")
+H_3.tr_t =  0.012
+H_3.tr_T = tempreture.Tfromt(He_3.tr_t)
+# H_3.tr_T = constants.less_tempreture(2*10**10, units="K")
 
+@H_3.equilib_zeroize
 def H_3_forw_rate(T):
     """
     Smith et all
@@ -37,6 +40,7 @@ def H_3_forw_rate(T):
     ro_b = univ_func.rat_scale(T)
     return base_rate * ro_b/(constants.less_time(1)) if T < H_3.tr_T else 0
 
+@H_3.equilib_zeroize
 def H_3_backward_rate(T):
     """Wagoner, 1966"""
     T9 = constants.to_norm_tempreture(T, units="T9")

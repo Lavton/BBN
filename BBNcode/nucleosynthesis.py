@@ -117,7 +117,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
     while odes.successful() and odes.t < Ts[-2]:
         technical_stop_cache(i, Tres, X_ans)
         if abs(sum(X_ans[-1])-1.0) >= 1e-6:
-            logging.warning(("X error to big!", abs(sum(X_ans[-1])-1.0)))
+            logging.error(("X error to big!", abs(sum(X_ans[-1])-1.0)))
         for param_set in constants.ode_params:
             if Tres[-1] >= param_set[0]:
                 if param_set[0] >= last_step:
@@ -165,6 +165,7 @@ def start_from_cache(i, X_ans, Tres):
         for j in range(min(len(t_ode_params), len(constants.ode_params))):
             if t_ode_params[i] != constants.ode_params[i]:
                 break
+        ii = 0
         for ii in range(t_i):
             if t_Tres[ii] >= constants.ode_params[j][0]:
                 break
@@ -201,20 +202,20 @@ plt.ylim([1e-30, 1000])
 
 elements.registrator.calc_plot(plt, Tres, X_ans)
 ###################
-import elements._xn_modeling_wai
-Ts_ = []
-Tnus_ = []
-tu = []
-for (T_, Xn_) in elements._xn_modeling_wai.t_xn.items():
-    tu.append((T_, Xn_))
+# import elements._xn_modeling_wai
+# Ts_ = []
+# Tnus_ = []
+# tu = []
+# for (T_, Xn_) in elements._xn_modeling_wai.t_xn.items():
+#     tu.append((T_, Xn_))
 
-tu = sorted(tu, reverse=True)
-tu
-for (T_, Xn_) in tu:
-    Ts_.append(T_)
-    Tnus_.append(Xn_)
+# tu = sorted(tu, reverse=True)
+# tu
+# for (T_, Xn_) in tu:
+#     Ts_.append(T_)
+#     Tnus_.append(Xn_)
     
-plt.plot([tfromT(constants.less_tempreture(T, units="K")) for T in Ts_], Tnus_, label="tabular result")
+# plt.plot([tfromT(constants.less_tempreture(T, units="K")) for T in Ts_], Tnus_, label="tabular result")
 
 
 for t in Tres:
@@ -222,7 +223,9 @@ for t in Tres:
 ##################
 from elements.H_2 import H_2
 plt.axvline(x=H_2.tr_t)
-plt.plot(Tres, [H_2.equilibrium([[X_ans[i][0], X_ans[i][1], 0]], Tfromt(Tres[i]))[0][2] for i in range(len(Tres))])
+from elements.He_3 import He_3
+plt.axvline(x=He_3.tr_t)
+# plt.plot(Tres, [H_2.equilibrium([[X_ans[i][0], X_ans[i][1], 0]], Tfromt(Tres[i]))[0][2] for i in range(len(Tres))])
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.xscale('log')
