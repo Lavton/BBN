@@ -20,7 +20,7 @@ He_3.A = 3
 # from Audi et all, 2003
 He_3.set_mass_excess(3016029.3191, n_N=1, p_N=2)
 # He_3.tr_T = constants.less_tempreture(2*10**7, units="K")
-He_3.tr_t =  0.009
+He_3.tr_t =  0.002
 He_3.tr_T = tempreture.Tfromt(He_3.tr_t)
 
 @He_3.equilib_zeroize
@@ -76,7 +76,6 @@ def He_3_equ(X, T):
 @functools.lru_cache(maxsize=8)
 def dd_nhe3(T):
     T9 = constants.to_norm_tempreture(T, units="T9")
-    forw = d_pg_he3.__wrapped__(T) / constants.to_norm_time(1)
     E = constants.to_norm_tempreture(T, units="MeV")
     ro_b = univ_func.rat_scale(T)
     forw = 3.9*(10**8)*ro_b*(T9**(-2./3)) * math.exp(-4.26*(T9**(-1./3))) * (

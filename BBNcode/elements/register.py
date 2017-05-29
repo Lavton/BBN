@@ -55,7 +55,7 @@ def check_jacob_online(X, T, res_jacob):
     # print(ap_j)
     total_s = 0
     for i in range(len(res_jacob)):
-        total_s += sum([abs(res_jacob[i][j] - apj[i][j])/(1+abs(apj[i][j])) for j in range(len(res_jacob[i]))])
+        total_s += sum([abs(res_jacob[i][j] - apj[i][j])/(max(abs(res_jacob[i][j]), abs(apj[i][j]))+1e-13) for j in range(len(res_jacob[i]))])
     total_s /= len(res_jacob)*len(res_jacob)
     if total_s >= 1e-4:
         logging.error(("BUG JACOB:", total_s, tempreture.tfromT(T), X))
@@ -108,7 +108,7 @@ class Registrator():
 
         for i in range(num_of_el):
             plt.plot(ts, X_ans[:,i], 
-            linewidth=2.0, label="$"+self.elements[i].str_view+"$")
+            linewidth=1.0, label="$"+self.elements[i].str_view+"$")
 
 
 registrator = Registrator()
@@ -127,18 +127,19 @@ if __name__ == '__main__':
         from tempreture import Tfromt
         st = "[[  1.33289087e-01   8.66677827e-01   1.45546654e-04]] i = 159/320 0.201898823095 raz 0.000112460505732"
         st = st.replace("]","").split()
-        X = [  1.67386032e-01,   8.32614019e-01,  -5.11260695e-08,-2.21515705e-12]
+        X = [ 2.12487653e-01,   7.87512347e-01,   8.68469663e-13, -4.06999347e-19,   2.97767158e-16]
          # [float(st[1]), float(st[2]), float(st[3])]
         # X = [1.88997594e-01, 8.11002406e-01, 1.70829884e-12]
         # X = [0.3, 0.3, 0.3]
-        X[0] = 1-X[1]-X[2]-X[3]
+        X[0] = 1-sum(X[1:])
         # t = float(st[7])
         # 
-        t = 0.011797924341382172
+        t = 0.0017
         T = Tfromt(t)
         import numpy as np
         jaaaa = np.array(registrator.jacob(X, T))
         odeeee = registrator.sode_int(X, T)
+        print(X, t, T)
         print("analitic")
         print(jaaaa)
         print("func")
@@ -182,7 +183,7 @@ if __name__ == '__main__':
         print(ap_j)
 
         for i in range(len(jaaaa)):
-            print([(jaaaa[i][j] - ap_j[i][j])/(1+abs(ap_j[i][j])) for j in range(len(jaaaa[i]))])
+            print([(jaaaa[i][j] - ap_j[i][j])/(max(abs(jaaaa[i][j]), abs(ap_j[i][j]))+1e-13) for j in range(len(jaaaa[i]))])
 
     check_jacob()
     exit()

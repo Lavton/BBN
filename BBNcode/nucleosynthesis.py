@@ -118,6 +118,8 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
         technical_stop_cache(i, Tres, X_ans)
         if abs(sum(X_ans[-1])-1.0) >= 1e-6:
             logging.error(("X error to big!", abs(sum(X_ans[-1])-1.0)))
+        if len(list(filter(lambda l: l<0, X_ans[-1]))):
+            logging.error(("ONE X LESS ZERRO", X_ans[-1]))
         for param_set in constants.ode_params:
             if Tres[-1] >= param_set[0]:
                 if param_set[0] >= last_step:
@@ -189,7 +191,6 @@ except TechnicalCalcExitException as e:
 
 # рисуем всё, что можно :)
 time.sleep(1)
-my_xn = list(X_ans[:,2])
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.xscale('log')

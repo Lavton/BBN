@@ -11,6 +11,7 @@ reactions = [
     ],
     [
         "n + D to T, elements.H_3.nd_tg, elements.H_3.tg_nd",
-        "n + He_3 to p + T, elements.H_3.nhe3_pt, elements.H_3.pt_nhe3"
+        "n + He_3 to p + T, elements.H_3.nhe3_pt, elements.H_3.pt_nhe3",
+        "D + D to p + T, elements.H_3.dd_pt, elements.H_3.pt_dd"
     ]
 ]

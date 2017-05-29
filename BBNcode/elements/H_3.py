@@ -90,11 +90,35 @@ def pt_nhe3(T):
     return (back /(constants.less_time(1)))
 
 
+
+@H_3.equilib_zeroize
+@functools.lru_cache(maxsize=8)
+def dd_pt(T):
+    T9 = constants.to_norm_tempreture(T, units="T9")
+    E = constants.to_norm_tempreture(T, units="MeV")
+    ro_b = univ_func.rat_scale(T)
+    forw = 3.9*(10**8)*ro_b*(T9**(-2./3)) * math.exp(-4.26*(T9**(-1./3))) * (
+        + 1
+        + 0.0979 * T9**(1./3)
+        + 0.642 * T9**(2./3)
+        + 0.440 * T9
+        )
+    return forw * (1./(constants.less_time(1)))
+
+@H_3.equilib_zeroize
+@functools.lru_cache(maxsize=8)
+def pt_dd(T):
+    T9 = constants.to_norm_tempreture(T, units="T9")
+    forw = dd_pt.__wrapped__(T) / constants.to_norm_time(1)
+    back = 1.73 * forw * math.exp(-46.80 * (T9**(-1)))
+    return back * (1./(constants.less_time(1)))
+
 H_3.forward_rates.append(nd_tg)
 H_3.backward_rates.append(tg_nd)
 H_3.forward_rates.append(nhe3_pt)
 H_3.backward_rates.append(pt_nhe3)
-
+H_3.forward_rates.append(dd_pt)
+H_3.backward_rates.append(pt_dd)
 
 # 0 - n
 # 1 - H1
@@ -195,6 +219,8 @@ H_3.equilibrium = H_3_equ
 
 
 if __name__ == '__main__':
+    H_3.show_rates()
+    exit()
     import matplotlib as mpl
     import matplotlib.pyplot as plt
     import numpy as np
@@ -206,67 +232,67 @@ if __name__ == '__main__':
     plt.xlabel(r'\textbf{tempreture} (MeV)')
     plt.ylabel(r'\textbf{\univ_func}')
 
-    plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_3_forw_rate(T) for T in Ts], 
-        linewidth=2.0, label=r'$H^2_{forw}$')
-    plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_3_backward_rate(T) for T in Ts], 
-        linewidth=2.0, label=r'$H^2_{back}$')
-    plt.legend()
-    plt.gca().invert_xaxis()
-    plt.show()
-    import nTOp
-    plt.cla()
-    plt.clf()
-    plt.rc('text', usetex=True)
-    plt.rc('font', family='serif')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.xlabel(r'\textbf{tempreture} (MeV)')
-    plt.ylabel(r'\textbf{\lambda}')
+    # plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_3_forw_rate(T) for T in Ts], 
+    #     linewidth=2.0, label=r'$H^2_{forw}$')
+    # plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_3_backward_rate(T) for T in Ts], 
+    #     linewidth=2.0, label=r'$H^2_{back}$')
+    # plt.legend()
+    # plt.gca().invert_xaxis()
+    # plt.show()
+    # import nTOp
+    # plt.cla()
+    # plt.clf()
+    # plt.rc('text', usetex=True)
+    # plt.rc('font', family='serif')
+    # plt.xscale('log')
+    # plt.yscale('log')
+    # plt.xlabel(r'\textbf{tempreture} (MeV)')
+    # plt.ylabel(r'\textbf{\lambda}')
 
-    plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [nTOp.lambda_n__p(T) for T in Ts], 
-        linewidth=1.0, label=r'$\lambda_{n\to p}$')
-    plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [nTOp.lambda_p__n(T) for T in Ts],
-        linewidth=1.0, label=r'$\lambda_{p\to n}$')
-    plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_3_forw_rate(T) for T in Ts], 
-        linewidth=2.0, label=r'$H^2_{forw}$')
-    plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_3_backward_rate(T) for T in Ts], 
-        linewidth=2.0, label=r'$H^2_{back}$')
+    # plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [nTOp.lambda_n__p(T) for T in Ts], 
+    #     linewidth=1.0, label=r'$\lambda_{n\to p}$')
+    # plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [nTOp.lambda_p__n(T) for T in Ts],
+    #     linewidth=1.0, label=r'$\lambda_{p\to n}$')
+    # plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_3_forw_rate(T) for T in Ts], 
+    #     linewidth=2.0, label=r'$H^2_{forw}$')
+    # plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_3_backward_rate(T) for T in Ts], 
+    #     linewidth=2.0, label=r'$H^2_{back}$')
 
-    plt.legend()
-    plt.gca().invert_xaxis()
-    plt.show()
-
-
-    ########## смотрим Wagoner, 1966 для сравнения ###########
-    def pn(T):
-        coef = 2.5*10**4
-        rho_b = univ_func.__proton_mass_density__(T)
-        return rho_b*coef / (constants.less_time(1))
-
-    def lambda_d(T):
-        T9 = constants.to_norm_tempreture(T, "T9")
-        _pn_ = pn(T) / constants.to_norm_time(1)
-        rho_b = univ_func.__proton_mass_density__(T)
-        l = 4.68*10**9 * _pn_ * (rho_b**(-1)) * T9**(3./2) * math.exp(-25.82/T9)
-        #l = math.exp(-25.82/T9) # otladka
-        return l/constants.less_time(1)
-
-    plt.cla()
-    plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [pn(T) for T in Ts],
-        linewidth=1.0, label=r'$H^2_{forw}(Wag)$')
-    plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_3_forw_rate(T) for T in Ts], 
-        linewidth=2.0, label=r'$H^2_{forw}$')
-    plt.legend()
-    plt.gca().invert_xaxis()
-    plt.show()
+    # plt.legend()
+    # plt.gca().invert_xaxis()
+    # plt.show()
 
 
+    # ########## смотрим Wagoner, 1966 для сравнения ###########
+    # def pn(T):
+    #     coef = 2.5*10**4
+    #     rho_b = univ_func.__proton_mass_density__(T)
+    #     return rho_b*coef / (constants.less_time(1))
 
-    plt.cla()
-    plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [lambda_d(T) for T in Ts],
-        linewidth=1.0, label=r'$H^2_{back}(Wag)$')
-    plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_3_backward_rate(T) for T in Ts], 
-        linewidth=2.0, label=r'$H^2_{bacl}$')
-    plt.legend()
-    plt.gca().invert_xaxis()
-    plt.show()
+    # def lambda_d(T):
+    #     T9 = constants.to_norm_tempreture(T, "T9")
+    #     _pn_ = pn(T) / constants.to_norm_time(1)
+    #     rho_b = univ_func.__proton_mass_density__(T)
+    #     l = 4.68*10**9 * _pn_ * (rho_b**(-1)) * T9**(3./2) * math.exp(-25.82/T9)
+    #     #l = math.exp(-25.82/T9) # otladka
+    #     return l/constants.less_time(1)
+
+    # plt.cla()
+    # plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [pn(T) for T in Ts],
+    #     linewidth=1.0, label=r'$H^2_{forw}(Wag)$')
+    # plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_3_forw_rate(T) for T in Ts], 
+    #     linewidth=2.0, label=r'$H^2_{forw}$')
+    # plt.legend()
+    # plt.gca().invert_xaxis()
+    # plt.show()
+
+
+
+    # plt.cla()
+    # plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [lambda_d(T) for T in Ts],
+    #     linewidth=1.0, label=r'$H^2_{back}(Wag)$')
+    # plt.plot(constants.to_norm_tempreture(Ts, units="eV")*1e-6, [H_3_backward_rate(T) for T in Ts], 
+    #     linewidth=2.0, label=r'$H^2_{bacl}$')
+    # plt.legend()
+    # plt.gca().invert_xaxis()
+    # plt.show()
