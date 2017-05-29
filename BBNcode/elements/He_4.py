@@ -20,7 +20,7 @@ He_4.A = 4
 # from Audi et all, 2003
 # He_4.mass_excess = constants.less_tempreture(2161062.7, units="eV")
 He_4.set_mass_excess(4002603.25415, n_N=2, p_N=2)
-He_4.tr_t =  0.0005
+He_4.tr_t =  0.0017
 He_4.tr_T = tempreture.Tfromt(He_4.tr_t)
 # He_4.tr_T = constants.less_tempreture(2*10**10, units="K")
 

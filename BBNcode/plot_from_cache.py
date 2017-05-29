@@ -15,10 +15,10 @@ plt.rc('font', family='serif')
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel(r'$\textbf{t} (s)$')
-plt.xlim([1e-4,1e3])
+plt.xlim([1e-5,1e3])
 ylabel = r"\textbf{X}"
 plt.ylabel(ylabel)
-plt.ylim([1e-30, 1000])
+plt.ylim([1e-40, 1000])
 import elements.register as elements
 elements.registrator.calc_plot(plt, Tres, X_ans)
 
@@ -27,10 +27,16 @@ for t in Tres:
 
 from elements.H_2 import H_2
 plt.axvline(x=H_2.tr_t)
+plt.text(H_2.tr_t, 2e-7, "$H_2$")
 from elements.He_3 import He_3
 plt.axvline(x=He_3.tr_t)
+plt.text(He_3.tr_t, 2e-7, "$He_3$")
 from elements.H_3 import H_3
 plt.axvline(x=H_3.tr_t)
+plt.text(H_3.tr_t, 2e-7, "$H_3$")
+from elements.He_4 import He_4
+plt.axvline(x=He_4.tr_t)
+plt.text(He_4.tr_t, 2e-7, "$He_4$")
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.xscale('log')

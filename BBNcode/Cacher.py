@@ -51,7 +51,10 @@ class Cacher(object):
                             )
                         self.cur.execute(exe_str)
                     self._inner_cache_[tab_name] = dict()
-                    self.db.commit()
+                    try:
+                        self.db.commit()
+                    except sqlite3.OperationalError as e:
+                        logging.error("db is lock")
                 return res
 
         return inner if constants.sql_enabled else func

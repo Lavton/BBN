@@ -199,7 +199,7 @@ plt.xlabel(r'$\textbf{t} (s)$')
 plt.xlim([1e-4,1e3])
 ylabel = r"\textbf{X}"
 plt.ylabel(ylabel)
-plt.ylim([1e-30, 1000])
+plt.ylim([1e-40, 1000])
 
 elements.registrator.calc_plot(plt, Tres, X_ans)
 ###################
@@ -228,6 +228,9 @@ from elements.He_3 import He_3
 plt.axvline(x=He_3.tr_t)
 from elements.H_3 import H_3
 plt.axvline(x=H_3.tr_t)
+from elements.He_4 import He_4
+plt.axvline(x=He_4.tr_t)
+
 # plt.plot(Tres, [H_2.equilibrium([[X_ans[i][0], X_ans[i][1], 0]], Tfromt(Tres[i]))[0][2] for i in range(len(Tres))])
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')

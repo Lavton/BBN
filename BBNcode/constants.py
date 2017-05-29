@@ -42,6 +42,18 @@ ode_params = [
     "max_step": 1.0,
     "min_step": 1e-10,
     }], 
+    # [0.00046, {
+    #     "min_step": 0.0,
+    #     "atoi": 1e-8,
+    #     "rtoi": 1e-8,
+    #     "max_step": 1e-7,
+    # }],
+    # [0.00003, {
+    #     "min_step": 0.0,
+    #     "atoi": 1e-1,
+    #     "rtoi": 1e-1,
+    #     # "max_step": 1e-9,
+    # }],
     [0.0013, {
     "atoi": 1e-8,
     "rtoi": 1e-8,
