@@ -270,6 +270,7 @@ He_4.backward_rates.append(he4d_he3t)
 # 2 - H2
 # 3 - He3
 # 4 - H3
+# 5 - He4
 He_4.ode_elem = {
     # "n": (lambda X, T: 
     #     -X[0]*(X[2]/2)*nd_tg(T) + (X[4]/3)*tg_nd(T)

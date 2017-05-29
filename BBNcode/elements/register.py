@@ -14,6 +14,7 @@ from elements.H_1 import H_1
 from elements.H_2 import H_2
 from elements.He_3 import He_3
 from elements.H_3 import H_3
+from elements.He_4 import He_4
 import tempreture
 import logging
 import functools
@@ -117,6 +118,7 @@ registrator.registrate(H_1)
 registrator.registrate(H_2)
 registrator.registrate(He_3)
 registrator.registrate(H_3)
+registrator.registrate(He_4)
 registrator.finish_registration()
 
 X_0 = registrator.X_0

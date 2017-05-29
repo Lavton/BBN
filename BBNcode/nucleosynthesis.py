@@ -89,9 +89,9 @@ def technical_stop_cache(i, Tres, X_ans):
         os.remove("exit_now")
         raise TechnicalCalcExitException(i, Tres, X_ans)
 
-
 # инициируем программу для решение дифура
 def iter_process(X_0, T0, Ts, i, X_ans, Tres):
+
     # выполняем шаги
     for param_set in constants.ode_params:
         if Tres[-1] >= param_set[0]:
