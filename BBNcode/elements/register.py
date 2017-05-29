@@ -57,7 +57,7 @@ def check_jacob_online(X, T, res_jacob):
     for i in range(len(res_jacob)):
         total_s += sum([abs(res_jacob[i][j] - apj[i][j])/(max(abs(res_jacob[i][j]), abs(apj[i][j]))+1e-13) for j in range(len(res_jacob[i]))])
     total_s /= len(res_jacob)*len(res_jacob)
-    if total_s >= 1e-4:
+    if total_s >= 1e-1:
         logging.error(("BUG JACOB:", total_s, tempreture.tfromT(T), X))
 
 
