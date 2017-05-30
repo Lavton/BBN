@@ -19,11 +19,9 @@ plt.xlim([1e-5,1e3])
 ylabel = r"\textbf{X}"
 plt.ylabel(ylabel)
 plt.ylim([1e-40, 1000])
-import elements.register as elements
-elements.registrator.calc_plot(plt, Tres, X_ans)
 
 for t in Tres:
-  plt.axvline(x=t, linewidth=0.1)
+    plt.axvline(x=t, linewidth=0.1)
 
 from elements.H_2 import H_2
 plt.axvline(x=H_2.tr_t)
@@ -33,10 +31,16 @@ plt.axvline(x=He_3.tr_t)
 plt.text(He_3.tr_t, 2e-7, "$He_3$")
 from elements.H_3 import H_3
 plt.axvline(x=H_3.tr_t)
-plt.text(H_3.tr_t, 2e-7, "$H_3$")
+plt.text(H_3.tr_t, 2e-8, "$H_3$")
 from elements.He_4 import He_4
 plt.axvline(x=He_4.tr_t)
-plt.text(He_4.tr_t, 2e-7, "$He_4$")
+plt.text(He_4.tr_t, 2e-4, "$He_4$")
+for op in ode_params:
+    plt.axvline(x=op[0], linewidth=0.5, color="red")
+
+import elements.register as elements
+elements.registrator.calc_plot(plt, Tres, X_ans)
+
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.xscale('log')

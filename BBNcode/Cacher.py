@@ -51,6 +51,7 @@ class Cacher(object):
                             )
                         self.cur.execute(exe_str)
                     self._inner_cache_[tab_name] = dict()
+                    import sqlite3
                     try:
                         self.db.commit()
                     except sqlite3.OperationalError as e:
