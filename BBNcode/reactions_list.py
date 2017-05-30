@@ -24,5 +24,14 @@ reactions = [
         "T + T to He_4 + n + n, elements.He_4.tt_he4nn, elements.He_4.he4nn_tt",
         "He_3 + T to He_4 + p + n, elements.He_4.he3t_he4pn, elements.He_4.he4pn_he3t",
         "He_3 + T to He_4 + D, elements.He_4.he3t_he4d, elements.He_4.he4d_he3t"
+    ],
+    [
+        "He_3 + He_4 to Be_7, elements.Be_7.he3he4_be7g, elements.Be_7.be7g_he3he4",
+        "n + Be_7 to He_4 + He_4, elements.Be_7.nBe7_He4He4, elements.Be_7.He4He4_nBe7",
+    ],
+    [
+        "T + He_4 to Li_7, elements.Li_7.the4_li7g, elements.Li_7.li7g_the4",
+        "n + Be_7 to p + Li_7, elements.Li_7.nbe7_pli7, elements.Li_7.pli7_nbe7",
+        "p + Li_7 to He_4 + He_4, elements.Li_7.pli7_he4he4, elements.Li_7.he4he4_pli7"
     ]
 ]
