@@ -18,11 +18,9 @@ import functools
 Li_6 = Element("Li_6", 0.0)
 Li_6.A = 7
 # from Audi et all, 2003
-# Li_6.mass_excess = constants.less_tempreture(2161062.7, units="eV")
 Li_6.set_mass_excess(6015122.795, n_N=3, p_N=3)
 Li_6.tr_t = 0.025
 Li_6.tr_T = tempreture.Tfromt(Li_6.tr_t)
-# Li_6.tr_T = constants.less_tempreture(2*10**10, units="K")
 
 @Li_6.equilib_zeroize
 @functools.lru_cache(maxsize=8)
@@ -38,14 +36,14 @@ def he4d_li6g(T):
         + 8.85 * T9 
         - 0.585 * T9**(4./3)
         - 0.584 * T9**(5./3)
-        ) + 8.55 * 10**1 * T9**(-2./3) * math.exp(-8.228/T9)
+        ) + 8.55 * 10**1 * T9**(-3./2) * math.exp(-8.228/T9)
     ro_b = univ_func.rat_scale(T)
     return base_rate * ro_b/(constants.less_time(1))
 
 @Li_6.equilib_zeroize
 @functools.lru_cache(maxsize=8)
 def li6g_he4d(T):
-    """Caughlan, 1988, 1966"""
+    """Caughlan, 1988"""
     T9 = constants.to_norm_tempreture(T, units="T9")
     forw = he4d_li6g.__wrapped__(T) / constants.to_norm_time(1)
     E = constants.to_norm_tempreture(T, units="MeV")
@@ -83,11 +81,10 @@ def he4np_li6g(T):
 @Li_6.equilib_zeroize
 @functools.lru_cache(maxsize=8)
 def li6g_he4np(T):
-    """Caughlan, 1988, 1966"""
+    """Caughlan, 1988"""
     T9 = constants.to_norm_tempreture(T, units="T9")
     forw = he4np_li6g.__wrapped__(T) / constants.to_norm_time(1)
     E = constants.to_norm_tempreture(T, units="MeV")
-    # back = forw * math.exp(-Li_6.mass_excess/T)
     ro_b = univ_func.rat_scale(T)
 
     back = 7.22 * 10**19 * forw * T9**3 * (ro_b**(-2)) * math.exp(-42.933/T9)
@@ -113,11 +110,10 @@ def he4t_li6n(T):
 @Li_6.equilib_zeroize
 @functools.lru_cache(maxsize=8)
 def li6n_he4t(T):
-    """Caughlan, 1988, 1966"""
+    """Caughlan, 1988"""
     T9 = constants.to_norm_tempreture(T, units="T9")
     forw = he4t_li6n.__wrapped__(T) / constants.to_norm_time(1)
     E = constants.to_norm_tempreture(T, units="MeV")
-    # back = forw * math.exp(-Li_6.mass_excess/T)
     ro_b = univ_func.rat_scale(T)
 
     back = 9.35 * 10**(-1) * forw * math.exp(-55.494/T9)
@@ -151,7 +147,6 @@ def be7g_li6p(T):
     T9 = constants.to_norm_tempreture(T, units="T9")
     forw = li6p_be7g.__wrapped__(T) / constants.to_norm_time(1)
     E = constants.to_norm_tempreture(T, units="MeV")
-    # back = forw * math.exp(-Li_6.mass_excess/T)
     ro_b = univ_func.rat_scale(T)
 
     back = 1.19 * 10**(10) * forw * ro_b**(-1) * math.exp(-65.054/T9)
@@ -166,14 +161,14 @@ def li6p_he3he4(T):
     Caughlan, 1988
     """
     T9 = constants.to_norm_tempreture(T, units="T9")
-    base_rate = 3.37 * 10**10 * math.exp(-8.413/T9**(1./3) - (T9/5.50)**2) * (
+    base_rate = 3.37 * 10**10 * T9**(-2./3) * math.exp(-8.413/T9**(1./3) - (T9/5.50)**2) * (
         + 1.0
         + 0.50 * T9**(1./3)
         - 0.061  * T9**(2./3)
         - 0.021 * T9
         + 0.006 * T9**(4./3)
         + 0.005 * T9**(5./3)
-        ) + 1.33 * 10**10*T9**(-3./2) * math.exp(-17.764/T9) + 1.29 * 10**9 * math.exp(-21.820/T9)/T9
+        ) + 1.33 * 10**10 * T9**(-3./2) * math.exp(-17.764/T9) + 1.29 * 10**9 * T9**(-1) * math.exp(-21.820/T9)
     ro_b = univ_func.rat_scale(T)
     return base_rate * ro_b/(constants.less_time(1))
 
@@ -184,7 +179,6 @@ def he3he4_li6p(T):
     T9 = constants.to_norm_tempreture(T, units="T9")
     forw = li6p_he3he4.__wrapped__(T) / constants.to_norm_time(1)
     E = constants.to_norm_tempreture(T, units="MeV")
-    # back = forw * math.exp(-Li_6.mass_excess/T)
     ro_b = univ_func.rat_scale(T)
 
     back = 1.07 * forw * math.exp(-46.631/T9)
@@ -213,14 +207,6 @@ Li_6.backward_rates.append(he3he4_li6p)
 # 6 - Be7
 # 7 - Li7
 # 8 - Li6
-Li_6.ode_elem = {
-}
-
-Li_6.jacob = { 
-}
-
-Li_6.equilibrium = Li_6_equ
-
 
 if __name__ == '__main__':
     Li_6.show_rates()

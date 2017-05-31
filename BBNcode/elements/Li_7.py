@@ -18,11 +18,9 @@ import functools
 Li_7 = Element("Li_7", 0.0)
 Li_7.A = 7
 # from Audi et all, 2003
-# Li_7.mass_excess = constants.less_tempreture(2161062.7, units="eV")
 Li_7.set_mass_excess(7016004.55, n_N=4, p_N=3)
 Li_7.tr_t = 0.020
 Li_7.tr_T = tempreture.Tfromt(Li_7.tr_t)
-# Li_7.tr_T = constants.less_tempreture(2*10**10, units="K")
 
 @Li_7.equilib_zeroize
 @functools.lru_cache(maxsize=8)
@@ -82,7 +80,6 @@ def pli7_nbe7(T):
     T9 = constants.to_norm_tempreture(T, units="T9")
     forw = nbe7_pli7.__wrapped__(T) / constants.to_norm_time(1)
     E = constants.to_norm_tempreture(T, units="MeV")
-    # back = forw * math.exp(-Li_7.mass_excess/T)
     ro_b = univ_func.rat_scale(T)
 
     back = forw * math.exp(-19.07/T9)
@@ -111,7 +108,6 @@ def he4he4_pli7(T):
     T9 = constants.to_norm_tempreture(T, units="T9")
     forw = pli7_he4he4.__wrapped__(T) / constants.to_norm_time(1)
     E = constants.to_norm_tempreture(T, units="MeV")
-    # back = forw * math.exp(-Li_7.mass_excess/T)
     ro_b = univ_func.rat_scale(T)
 
     back = 4.64 * forw * math.exp(-201.3/T9)
@@ -135,14 +131,6 @@ Li_7.backward_rates.append(he4he4_pli7)
 # 5 - He4
 # 6 - Be7
 # 7 - Li7
-Li_7.ode_elem = {
-}
-
-Li_7.jacob = { 
-}
-
-Li_7.equilibrium = Li_7_equ
-
 
 if __name__ == '__main__':
     Li_7.show_rates()
