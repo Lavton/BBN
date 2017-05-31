@@ -149,7 +149,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
                     logging.debug(("doeq", element.str_view))
                     solu = element.equilibrium(solu, Tfromt(odes.t))
         i+=1
-        logging.info("i = {}/{}, t = {}, last X = {}".format(i, len(Ts), Tres[-1], X_ans[-1]))
+        logging.info("i = {}/{}, t = {}, last X = {}".format(i, len(Ts), Tres[-1], X_ans[-1][::-1]))
         X_ans = np.append(X_ans, solu, axis=0)
     return(-1, X_ans, Tres)
 
@@ -196,10 +196,13 @@ plt.rc('font', family='serif')
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel(r'$\textbf{t} (s)$')
-plt.xlim([1e-4,1e3])
+plt.xlim([constants.to_norm_time(1e-4), constants.to_norm_time(1e3)])
 ylabel = r"\textbf{X}"
 plt.ylabel(ylabel)
 plt.ylim([1e-40, 1000])
+
+for i in range(len(Tres)):
+    Tres[i] = constants.to_norm_time(Tres[i])
 
 elements.registrator.calc_plot(plt, Tres, X_ans)
 ###################
@@ -207,7 +210,7 @@ elements.registrator.calc_plot(plt, Tres, X_ans)
 # Ts_ = []
 # Tnus_ = []
 # tu = []
-# for (T_, Xn_) in elements._xn_modeling_wai.t_xn.items():
+# for (T_, Xn_) in eelementslements._xn_modeling_wai.t_xn.items():
 #     tu.append((T_, Xn_))
 
 # tu = sorted(tu, reverse=True)
@@ -222,14 +225,14 @@ elements.registrator.calc_plot(plt, Tres, X_ans)
 for t in Tres:
   plt.axvline(x=t, linewidth=0.1)  
 ##################
-from elements.H_2 import H_2
-plt.axvline(x=H_2.tr_t)
-from elements.He_3 import He_3
-plt.axvline(x=He_3.tr_t)
-from elements.H_3 import H_3
-plt.axvline(x=H_3.tr_t)
-from elements.He_4 import He_4
-plt.axvline(x=He_4.tr_t)
+# from elements.H_2 import H_2
+# plt.axvline(x=H_2.tr_t)
+# from elements.He_3 import He_3
+# plt.axvline(x=He_3.tr_t)
+# from elements.H_3 import H_3
+# plt.axvline(x=H_3.tr_t)
+# from elements.He_4 import He_4
+# plt.axvline(x=He_4.tr_t)
 
 # plt.plot(Tres, [H_2.equilibrium([[X_ans[i][0], X_ans[i][1], 0]], Tfromt(Tres[i]))[0][2] for i in range(len(Tres))])
 plt.rc('text', usetex=True)

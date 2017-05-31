@@ -17,6 +17,7 @@ from elements.H_3 import H_3
 from elements.He_4 import He_4
 from elements.Be_7 import Be_7
 from elements.Li_7 import Li_7
+from elements.Li_6 import Li_6
 import tempreture
 import logging
 import functools
@@ -111,7 +112,7 @@ class Registrator():
 
         for i in range(num_of_el):
             plt.plot(ts, X_ans[:,i], 
-            linewidth=1.0, label="$"+self.elements[i].str_view+"$")
+            linewidth=1.8, label="$"+self.elements[i].str_view+"$")
 
 
 registrator = Registrator()
@@ -123,6 +124,7 @@ registrator.registrate(H_3)
 registrator.registrate(He_4)
 registrator.registrate(Be_7)
 registrator.registrate(Li_7)
+registrator.registrate(Li_6)
 registrator.finish_registration()
 
 X_0 = registrator.X_0

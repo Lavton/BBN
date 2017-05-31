@@ -35,6 +35,16 @@ plt.text(H_3.tr_t, 2e-8, "$H_3$")
 from elements.He_4 import He_4
 plt.axvline(x=He_4.tr_t)
 plt.text(He_4.tr_t, 2e-4, "$He_4$")
+from elements.Be_7 import Be_7
+plt.axvline(x=Be_7.tr_t)
+plt.text(Be_7.tr_t, 2e-4, "$Be_7$")
+from elements.Li_7 import Li_7
+plt.axvline(x=Li_7.tr_t)
+plt.text(Li_7.tr_t, 2e-7, "$Li_7$")
+from elements.Li_6 import Li_6
+plt.axvline(x=Li_6.tr_t)
+plt.text(Li_6.tr_t, 2e-4, "$Li_6$")
+
 for op in ode_params:
     plt.axvline(x=op[0], linewidth=0.5, color="red")
 

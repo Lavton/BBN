@@ -54,10 +54,10 @@ def li7g_the4(T):
 def Li_7_equ(X, T):
     T9 = constants.to_norm_tempreture(-T, units="T9")
     try:
-        X_be7 = (7./(3*4)) * (the4_li7g.__wrapped__(T)/li7g_the4.__wrapped__(T))*X[0][4]*X[0][5]
+        X_li7 = (7./(3*4)) * (the4_li7g.__wrapped__(T)/li7g_the4.__wrapped__(T))*X[0][4]*X[0][5]
     except OverflowError as e:
-        X_be7 = 0
-    X[0][6] = X_be7
+        X_li7 = 0
+    X[0][7] = X_li7
     return X
 
 ####################################
