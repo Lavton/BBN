@@ -19,7 +19,7 @@ H_3 = Element("H_3", 0.0)
 H_3.A = 3
 # from Audi et all, 2003
 H_3.set_mass_excess(3016049.2777, n_N=2, p_N=1)
-H_3.tr_t =  0.0012
+H_3.tr_t =  0.00129
 H_3.tr_T = tempreture.Tfromt(H_3.tr_t)
 
 @H_3.equilib_zeroize
@@ -50,7 +50,7 @@ def tg_nd(T):
 
 
 def H_3_equ(X, T):
-    T9 = constants.to_norm_tempreture(-T, units="T9")
+    T9 = constants.to_norm_tempreture(T, units="T9")
     try:
         # print(T, he3_gp_d.__wrapped__(T))
         X_h3 = (3./2) * (nd_tg.__wrapped__(T)/tg_nd.__wrapped__(T))*X[0][0]*X[0][2]

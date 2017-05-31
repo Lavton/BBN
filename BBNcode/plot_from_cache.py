@@ -16,9 +16,11 @@ plt.xscale('log')
 plt.yscale('log')
 plt.xlabel(r'$\textbf{t} (s)$')
 plt.xlim([1e-5,1e3])
+# plt.xlim([0.001,0.002])
 ylabel = r"\textbf{X}"
 plt.ylabel(ylabel)
-plt.ylim([1e-40, 1000])
+plt.ylim([1e-100, 1000])
+# plt.ylim([8.19e-63, 9.9e-59])
 
 for t in Tres:
     plt.axvline(x=t, linewidth=0.1)

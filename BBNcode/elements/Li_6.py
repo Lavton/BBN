@@ -54,7 +54,7 @@ def li6g_he4d(T):
 ##################################
 
 def Li_6_equ(X, T):
-    T9 = constants.to_norm_tempreture(-T, units="T9")
+    T9 = constants.to_norm_tempreture(T, units="T9")
     try:
         X_li6 = (6./(3*4)) * (he4d_li6g.__wrapped__(T)/li6g_he4d.__wrapped__(T))*X[0][2]*X[0][5]
     except OverflowError as e:
@@ -207,6 +207,7 @@ Li_6.backward_rates.append(he3he4_li6p)
 # 6 - Be7
 # 7 - Li7
 # 8 - Li6
+Li_6.equilibrium = Li_6_equ
 
 if __name__ == '__main__':
     Li_6.show_rates()

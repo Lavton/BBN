@@ -50,7 +50,7 @@ def li7g_the4(T):
 ##################################
 
 def Li_7_equ(X, T):
-    T9 = constants.to_norm_tempreture(-T, units="T9")
+    T9 = constants.to_norm_tempreture(T, units="T9")
     try:
         X_li7 = (7./(3*4)) * (the4_li7g.__wrapped__(T)/li7g_the4.__wrapped__(T))*X[0][4]*X[0][5]
     except OverflowError as e:
@@ -131,6 +131,7 @@ Li_7.backward_rates.append(he4he4_pli7)
 # 5 - He4
 # 6 - Be7
 # 7 - Li7
+Li_7.equilibrium = Li_7_equ
 
 if __name__ == '__main__':
     Li_7.show_rates()

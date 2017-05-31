@@ -19,7 +19,7 @@ Be_7 = Element("Be_7", 0.0)
 Be_7.A = 7
 # from Audi et all, 2003
 Be_7.set_mass_excess(7016929.83, n_N=3, p_N=4)
-Be_7.tr_t = 0.017
+Be_7.tr_t = 0.02
 Be_7.tr_T = tempreture.Tfromt(Be_7.tr_t)
 
 @Be_7.equilib_zeroize
@@ -54,7 +54,7 @@ def be7g_he3he4(T):
 ##################################
 
 def Be_7_equ(X, T):
-    T9 = constants.to_norm_tempreture(-T, units="T9")
+    T9 = constants.to_norm_tempreture(T, units="T9")
     try:
         X_be7 = (7./(3*4)) * (he3he4_be7g.__wrapped__(T)/be7g_he3he4.__wrapped__(T))*X[0][3]*X[0][5]
     except OverflowError as e:

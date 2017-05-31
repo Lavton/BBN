@@ -21,7 +21,7 @@ H_2.mass_excess = constants.less_tempreture(2161062.7, units="eV")
 
 
 # change from equilibrium state
-H_2.tr_t = 0.005
+H_2.tr_t = 0.003
 H_2.tr_T = tempreture.Tfromt(H_2.tr_t)
 
 @H_2.equilib_zeroize
@@ -47,7 +47,7 @@ def H_2_forw_rate(T):
 def H_2_backward_rate(T):
     """Wagoner, 1966"""
     T9 = constants.to_norm_tempreture(T, units="T9")
-    forw = H_2_forw_rate(T) / constants.to_norm_time(1)
+    forw = H_2_forw_rate.__wrapped__(T) / constants.to_norm_time(1)
     E = constants.to_norm_tempreture(T, units="MeV")
     back = forw * math.exp(-H_2.mass_excess/T)
     ro_b = univ_func.rat_scale(T)
@@ -59,7 +59,7 @@ def H_2_backward_rate(T):
 def H_2_equ(X, T):
     T9 = constants.to_norm_tempreture(T, units="T9")
     try:
-        X_n = 1.440*(10**-5)*(T9**(3./2))*constants.nu_n*math.exp(25.815/T9)*X[0][0]*X[0][1]
+        X_n = (2./1) * (H_2_forw_rate.__wrapped__(T)/H_2_backward_rate.__wrapped__(T))*X[0][0]*X[0][1]
     except OverflowError as e:
         X_n = 0
     X[0][2] = X_n
