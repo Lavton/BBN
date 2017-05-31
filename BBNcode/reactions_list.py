@@ -35,10 +35,10 @@ reactions = [
         "p + Li_7 to He_4 + He_4, elements.Li_7.pli7_he4he4, elements.Li_7.he4he4_pli7"
     ],
     [
-        # "He_4 + D to Li_6, elements.Li_6.he4d_li6g, elements.Li_6.li6g_he4d",
-        # "He_4 + n + p to Li_6, elements.Li_6.he4np_li6g, elements.Li_6.li6g_he4np",
-        # "He_4 + T + n to Li_6, elements.Li_6.he4t_li6n, elements.Li_6.be7g_li6p",
-        # "Li_6 + p to Be_7, elements.Li_6.li6p_be7g, elements.Li_6.li6n_he4t",
-        # "Li_6 + p to He_4 + He_3, elements.Li_6.li6p_he3he4, elements.Li_6.he3he4_li6p"
+        "He_4 + D to Li_6, elements.Li_6.he4d_li6g, elements.Li_6.li6g_he4d",
+        "He_4 + n + p to Li_6, elements.Li_6.he4np_li6g, elements.Li_6.li6g_he4np",
+        "He_4 + T + n to Li_6, elements.Li_6.he4t_li6n, elements.Li_6.be7g_li6p",
+        "Li_6 + p to Be_7, elements.Li_6.li6p_be7g, elements.Li_6.li6n_he4t",
+        "Li_6 + p to He_4 + He_3, elements.Li_6.li6p_he3he4, elements.Li_6.he3he4_li6p"
     ]
 ]

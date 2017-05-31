@@ -31,18 +31,22 @@ def d_pg_he3(T):
     table 1 reac 2
     """
     T9 = constants.to_norm_tempreture(T, units="T9")
-    base_rate = 2.65*(10**3)*(T9**(-2./3))*\
-        math.exp(-3.720/(T9**(1./3))) * (
-            +1.
-            + 0.112 * T9**(1./3)
-            + 1.99 * T9**(2./3)
-            + 1.56 * T9
-            + 0.162 * T9**(4./3)
-            + 0.324 * T9**(5./3)
-            )
-
+    # base_rate = 2.65*(10**3)*(T9**(-2./3))*\
+    #     math.exp(-3.720/(T9**(1./3))) * (
+    #         +1.
+    #         + 0.112 * T9**(1./3)
+    #         + 1.99 * T9**(2./3)
+    #         + 1.56 * T9
+    #         + 0.162 * T9**(4./3)
+    #         + 0.324 * T9**(5./3)
+    #         )
+    base_rate = 2.23 * 10**3 * T9**(-2./3) * math.exp(-3.72 * T9**(-1./3)) * (
+        + 1.
+        + 0.112 * T9**(1./3)
+        + 3.38 ** T9**(2./3)
+        + 2.65 * T9
+        )
     ro_b = univ_func.rat_scale(T)
-    # base_rate = 0 # отладка
     return base_rate * ro_b/(constants.less_time(1))
 
 @He_3.equilib_zeroize
@@ -57,7 +61,7 @@ def he3_gp_d(T):
     E = constants.to_norm_tempreture(T, units="MeV")
     ro_b = univ_func.rat_scale(T)
 
-    back = 1.63*10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-He_3.mass_excess/T)
+    back = 1.63*10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-63.75/T9)
     return (back /(constants.less_time(1)))
 
 

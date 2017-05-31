@@ -128,7 +128,7 @@ def dhe3_he4p(T):
     E = constants.to_norm_tempreture(T, units="MeV")
     ro_b = univ_func.rat_scale(T)
     forw = 2.60 * 10**9 * T9**(-3./2) * math.exp(-2.99/T9)
-    return forw * (1./(constants.less_time(1)))
+    return forw * ro_b * (1./(constants.less_time(1)))
 
 @He_4.equilib_zeroize
 @functools.lru_cache(maxsize=8)

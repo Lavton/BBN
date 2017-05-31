@@ -40,7 +40,7 @@ def H_2_forw_rate(T):
         )
     ro_b = univ_func.rat_scale(T)
     # base_rate = 0
-    return base_rate * ro_b/(constants.less_time(1)) # if T < H_2.tr_T else 0
+    return base_rate * ro_b/(constants.less_time(1))
 
 @H_2.equilib_zeroize
 @functools.lru_cache(maxsize=8)
@@ -53,7 +53,7 @@ def H_2_backward_rate(T):
     ro_b = univ_func.rat_scale(T)
 
     back = 4.68*10**9 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-H_2.mass_excess/T)
-    return (back /(constants.less_time(1))) #if T < H_2.tr_T else 0
+    return (back /(constants.less_time(1)))
 
 
 def H_2_equ(X, T):

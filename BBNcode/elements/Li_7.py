@@ -97,8 +97,9 @@ def pli7_he4he4(T):
     Wagoner
     """
     T9 = constants.to_norm_tempreture(T, units="T9")
-    base_rate = (
-        1.2 * 10**7 * T9
+    base_rate = 1.42 * 10**9 * T9**(-2./3) * math.exp(-8.47*T9**(-1./3)) * (
+        + 1.
+        + 0.0493 * T9**(1./3)
         )
     ro_b = univ_func.rat_scale(T)
     return base_rate * ro_b/(constants.less_time(1))
@@ -113,7 +114,7 @@ def he4he4_pli7(T):
     # back = forw * math.exp(-Li_7.mass_excess/T)
     ro_b = univ_func.rat_scale(T)
 
-    back = 4.64 * forw * math.exp(-220.4/T9)
+    back = 4.64 * forw * math.exp(-201.3/T9)
     return (back /(constants.less_time(1)))
 
 #########################################################
