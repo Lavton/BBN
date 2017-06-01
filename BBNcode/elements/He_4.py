@@ -19,7 +19,7 @@ He_4 = Element("He_4", 0.0)
 He_4.A = 4
 # from Audi et all, 2003
 He_4.set_mass_excess(4002603.25415, n_N=2, p_N=2)
-He_4.tr_t =  0.0007
+He_4.tr_t =  0.0007 * 6./4
 He_4.tr_T = tempreture.Tfromt(He_4.tr_t)
 
 @He_4.equilib_zeroize

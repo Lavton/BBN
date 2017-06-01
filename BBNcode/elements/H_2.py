@@ -21,7 +21,7 @@ H_2.mass_excess = constants.less_tempreture(2161062.7, units="eV")
 
 
 # change from equilibrium state
-H_2.tr_t = 0.0015
+H_2.tr_t = 0.0015 * 6./4
 H_2.tr_T = tempreture.Tfromt(H_2.tr_t)
 
 @H_2.equilib_zeroize

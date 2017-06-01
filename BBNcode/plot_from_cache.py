@@ -50,7 +50,7 @@ def print_addition():
     for op in ode_params:
         plt.axvline(x=op[0], linewidth=0.5, color="red")
 
-# print_addition()
+print_addition()
 
 import elements.register as elements
 elements.registrator.calc_plot(plt, Tres, X_ans)
