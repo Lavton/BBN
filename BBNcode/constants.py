@@ -42,91 +42,25 @@ ode_params = [
     "max_step": 1.0,
     "min_step": 1e-10,
     }], 
-    # [0.00046, {
-    #     "min_step": 0.0,
-    #     "atoi": 1e-8,
-    #     "rtoi": 1e-8,
-    #     "max_step": 1e-7,
-    # }],
-    # [0.00003, {
-    #     "min_step": 0.0,
-    #     "atoi": 1e-1,
-    #     "rtoi": 1e-1,
-    #     # "max_step": 1e-9,
-    # }],
-    [0.0008, {
+    [0.00045, {
     "atoi": 1e-10,
     "rtoi": 1e-10,
     "min_step": 0.0,
-
     }
     ],
-    # [0.0016, {
-    # "min_step": 0.0,
-    # "rtoi": 1e-10,
-    # "atoi": 1e-10,
-    # }
-    # ],
-    # [0.004, {
-    # "rtoi": 1e-7,
-    # }],
-    [0.09, {
-    "rtoi": 1e-11,
-    "max_step": 0.0005
-    ,
-    }],
-    [0.02, {
-    "atoi": 1e-9,
-    "rtoi": 1e-11,
-    "max_step": 0.0001,
-    "min_step": 0.0
-    }],
-    [0.038, {
-    "atoi": 1e-9,
-    "rtoi": 1e-8,
-    "max_step": 0.002,
-    }],
-    [0.052, {
-    "rtoi": 1e-6,
-    "max_step": 0.2,
-    "min_step": 0.0
-    }],
-    [0.055,{
-    "rtoi": 1e-9,
-    "max_step": 0.2,
-    "atoi": 1e-8,
-    }],
-    [0.080,{
-    "rtoi": 1e-7,
-    "atoi": 1e-8,
-    # "min_step": 1e-8,
-    "max_step": 0.03,
-    }],
-    [0.2, {
-    "rtoi": 1e-8,
-    "atoi": 1e-10,
-    "max_step": 0.02
-    # "not_use_jacob": True
-    }],
-    [0.31, {
-    "rtoi": 1e-11,
-    "atoi": 1e-12,
-    "max_step": 0.3,
-    # "not_use_jacob": True
-    }],
-    [10, {
-    "rtoi": 1e-9,
-    "max_step": 3.0
-    }],
-    [12, {
-        "max_step": 0.2,
-        "rtoi": 1e-8,
-        "atoi": 1e-8,
+    [1.29, {
+        "max_step": 0.01,
+        "rtoi": 1e-9,
+        "atoi": 1e-9,
     }
     ],
     [300, {
-    "max_step": 0.0,
+    "max_step": 1.0,
+    },
+    [1000, {
+        "max_step": 0.0
     }]
+    ]
 ]
 
 def_params = {

@@ -19,7 +19,7 @@ He_4 = Element("He_4", 0.0)
 He_4.A = 4
 # from Audi et all, 2003
 He_4.set_mass_excess(4002603.25415, n_N=2, p_N=2)
-He_4.tr_t =  0.001143
+He_4.tr_t =  0.0007
 He_4.tr_T = tempreture.Tfromt(He_4.tr_t)
 
 @He_4.equilib_zeroize
@@ -57,7 +57,7 @@ def he4g_pt(T):
 def He_4_equ(X, T):
     T9 = constants.to_norm_tempreture(T, units="T9")
     try:
-        X_he4 = (4./3) * (pt_he4g.__wrapped__(T)/he4g_pt.__wrapped__(T))*X[0][0]*X[0][4]
+        X_he4 =  (4./3) * (pt_he4g.__wrapped__(T)/he4g_pt.__wrapped__(T))*X[0][1]*X[0][4]
     except OverflowError as e:
         X_he4 = 0
     X[0][5] = X_he4
