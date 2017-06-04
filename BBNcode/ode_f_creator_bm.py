@@ -26,25 +26,48 @@ def get_seq(el):
     return "(X[{}]/{}.A)".format(num, elist[num][0])
 
 dXss = defaultdict(list)
+# для всех реакций
 for re in reactions:
     for r in re:
+        # "D + He_3 to He_4 + p, elements.He_4.dhe3_he4p, elements.He_4.he4p_dhe3"
+        # разбивается на:
+        # D + He_3 to He_4 + p
+        # elements.He_4.dhe3_he4p
+        # elements.He_4.he4p_dhe3
         formula, forw, backw = map(lambda s: s.strip(), r.split(","))
+        # D + He_3 to He_4 + p
+        # разбивается на:
+        # D + He_3
+        # He_4 + p
         left, right = map(lambda s: s.strip(), formula.split("to"))
+        # D + He_3
+        # разбивается на:
+        # D
+        # He_3
         lefts = list(map(lambda s: s.strip(), left.split("+")))
+        # аналогично для He_4 + p
         rights = list(map(lambda s: s.strip(), right.split("+")))
+        # считается количество одинаковых элементов для их правильного учёта
+        c_left = Counter(lefts)
+        c_right = Counter(rights)
+
+        # объединяются элементы, ответственные за распад при прямой реакции
         forw_part = []
         for l in lefts:
             forw_part.append(l)
-        forw_part = (forw_part, forw + "(T)")
-        c_left = Counter(lefts)
-        c_right = Counter(rights)
+        forw_part = (forw_part, forw + "(T)/"+str(max(c_left.values())))
+        # объединяются элементы, ответственные за синтез при прямой реакции
         back_part = []
         for l in rights:
             back_part.append(l)
-        back_part = (back_part, backw + "(T)")
+        back_part = (back_part, backw + "(T))/"+str(max(c_right.values())))
+        
+        # для прямой реакции распад идёт со знаком "-"
+        # синтез со знаком "+"
         for left in c_left:
             dXss[get_num(left)].append((" - ", c_left[left], forw_part))
             dXss[get_num(left)].append((" + ", c_left[left], back_part))
+        # для обратной реакции - распад с "+", синтез с "-"
         for right in c_right:
             dXss[get_num(right)].append((" - ", c_right[right], back_part))
             dXss[get_num(right)].append((" + ", c_right[right], forw_part))

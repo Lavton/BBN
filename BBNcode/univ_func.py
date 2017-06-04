@@ -13,7 +13,7 @@ def __photon_density__(T):
 
 def __proton_mass_density__(T):
     """плотность протонов во вселенной"""
-    return (m_p/5.60958835719e+32) * __photon_density__(T) * nu_n
+    return (m_p/5.60958835719e+32) * __photon_density__(T) * constants.nu_n
 
 def rat_scale(T):
     return __proton_mass_density__(T)  

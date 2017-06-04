@@ -109,12 +109,10 @@ def Tfromt(t):
     T0 = constants.less_tempreture(10**11, units="K")
     Tn = constants.less_tempreture(10**6, units="K")
     c_Tm = lambda Tn, T0: (math.sqrt(2./(Tn**(-2)+T0**(-2))))
-    # Tm = (T0+Tn)/2
     Tm = c_Tm(Tn, T0)
     t0 = tfromT(T0)
     tn = tfromT(Tn)
     tm = tfromT(Tm)
-    # for _ in range(10):
     i = 0
     if t <= t0:
         return T0
@@ -125,7 +123,6 @@ def Tfromt(t):
         elif tm < t <= tn:
             T0 = Tm 
             t0 = tfromT(T0)
-        # Tm = (T0+Tn)/2
         Tm = c_Tm(Tn, T0)
         tm = tfromT(Tm)
     logging.debug(t)

@@ -19,7 +19,6 @@ H_2.A = 2
 # from Audi et all, 2003
 H_2.mass_excess = constants.less_tempreture(2161062.7, units="eV")
 
-
 # change from equilibrium state
 H_2.tr_t = 0.0015 * (constants.nu_0/constants.nu_n)
 H_2.tr_T = tempreture.Tfromt(H_2.tr_t)

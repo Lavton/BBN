@@ -19,7 +19,7 @@ plt.xlim([1e-5,1e3])
 # plt.xlim([0.0009, 0.0017])
 ylabel = r"\textbf{X}"
 plt.ylabel(ylabel)
-plt.ylim([1e-40, 1000])
+plt.ylim([1e-100, 1000])
 # plt.ylim([5e-66, 3e-58])
 
 for t in Tres:

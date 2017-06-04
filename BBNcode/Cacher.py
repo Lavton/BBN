@@ -4,7 +4,6 @@ import collections
 import logging
 import numpy as np
 
-# sql_enabled, func_name_to_db_name
 class Cacher(object):
     """
     кешируем в sqlite то, что можем
@@ -32,14 +31,11 @@ class Cacher(object):
         def inner(*args, **kwargs):
             tab_name = constants.func_name_to_db_name[func.__name__]
             coef = 1.0
-            # if kwargs.get("units", "") == "K":
-                # coef = constants.k_b # если температура была дана в Кельвинах, переводин в eV
             cached = self.cur.execute("SELECT * FROM {table} WHERE tempeture={arg};".format(
                 arg=args[0]*coef, table=tab_name)
                 )
             res = self.cur.fetchone() # ищем результат в кеше
             if res: # если нашли температуру
-                # logging.debug("cache from SQL")
                 return res[0]
             if not res: # не нашли - вставим
                 res = func(*args, **kwargs)
@@ -59,30 +55,6 @@ class Cacher(object):
                 return res
 
         return inner if constants.sql_enabled else func
-
-    # def np_array_to_list_decor(self, func):
-    #     """
-    # Кеширование
-    #     """
-
-    #     @functools.wraps(func)
-    #     def inner(*args, **kwargs):
-    #         new_args = []
-    #         new_kwargs = dict()
-    #         for i in range(len(args)):
-    #             if isinstance(args[i], np.ndarray):
-    #                 print(tuple(args[i]))
-    #                 new_args.append(tuple(args[i]))
-    #             else:
-    #                 new_args.append(args[i])
-    #         for k, v in kwargs.items():
-    #             if isinstance(v, np.ndarray):
-    #                 new_kwargs[k] = tuple(v)
-    #             else:
-    #                 new_kwargs[k] = v
-    #         return functools.lru_cache(func)(*args, **kwargs)
-    #     return inner
-
 
     def __del__(self):
         if constants.sql_enabled:

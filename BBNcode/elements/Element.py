@@ -13,11 +13,8 @@ class Element():
         self.X_0 = X_0
         self.str_view = str_view
         self.X_c = X_0
-        self.ode_elem = {}
         self.A = 1
-        self.jacob = {}    
         self.equilibrium = None
-        self.is_ode_state = False # = in equilibrium
         self.forward_rates = []
         self.backward_rates = []
         self.tr_T = None
@@ -30,9 +27,7 @@ class Element():
         from tempreture import tfromT
         grid = np.logspace(math.log10(9.8*10**10), math.log10(10**7), num=320)
         grid2 = grid
-        # grid2 = np.array(sorted(list(set(list(np.logspace(math.log10(grid[100]), math.log10(10**7), num=50))+list(grid))), reverse=True))
         Ts = constants.less_tempreture(grid2, units="K")
-        # переводим в отрицательную шкалу, чтобы Ts[i] > Ts[i-1]
         ts = np.array([tfromT(T) for T in Ts])
         plt.cla()
         plt.clf()

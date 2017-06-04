@@ -18,6 +18,7 @@ from elements.He_4 import He_4
 from elements.Be_7 import Be_7
 from elements.Li_7 import Li_7
 from elements.Li_6 import Li_6
+from elements.He_6 import He_6
 import tempreture
 import logging
 import functools
@@ -26,24 +27,8 @@ from ode_f_creator_bm import magic_ode, magic_jacob
 
 def check_jacob_online(X, T, res_jacob):
     def approx_jacobian(x,func,epsilon,*args):
+        # from StackOverflow
         from numpy import asfarray, zeros
-        """Approximate the Jacobian matrix of callable function func
-
-           * Parameters
-             x       - The state vector at which the Jacobian matrix is
-    desired
-             func    - A vector-valued function of the form f(x,*args)
-             epsilon - The peturbation used to determine the partial derivatives
-             *args   - Additional arguments passed to func
-
-           * Returns
-             An array of dimensions (lenf, lenx) where lenf is the length
-             of the outputs of func, and lenx is the number of
-
-           * Notes
-             The approximation is done using forward differences
-
-        """
         x0 = asfarray(x)
         f0 = func(*((x0,)+args))
         jac = zeros([len(x0),len(f0)])
@@ -56,7 +41,6 @@ def check_jacob_online(X, T, res_jacob):
     import numpy as np
     import tempreture
     apj = approx_jacobian(X, lambda X: np.array(registrator.sode_int(X,T)), 1e-8)
-    # print(ap_j)
     total_s = 0
     for i in range(len(res_jacob)):
         total_s += sum([abs(res_jacob[i][j] - apj[i][j])/(max(abs(res_jacob[i][j]), abs(apj[i][j]))+1e-13) for j in range(len(res_jacob[i]))])
@@ -78,27 +62,11 @@ class Registrator():
         self.elements.append(element)
         self.rev_element_list[element.str_view] = len(self.elements) - 1
 
-    def finish_registration(self):
-        self.ode_funcs = []
-        for i in range(len(self.elements)):
-            element = self.elements[i]
-            self.ode_funcs.append([])
-            for key, value in element.ode_elem.items():
-                self.ode_funcs[self.rev_element_list[key]].append(value)
 
-        self.jacob_funcs = [[[lambda X, T: 0] for _ in self.elements] for _ in self.elements]
-        for i in range(len(self.elements)):
-            element = self.elements[i]
-            for key, value in element.jacob.items():
-                for k, v in value.items():
-                    self.jacob_funcs[self.rev_element_list[key]][self.rev_element_list[k]].append(v)
-
-    # @Cacher.cacher.np_array_to_list_decor
     def sode_int(self, X, T):
         dX = magic_ode(X, T)
         return dX
 
-    # @Cacher.cacher.np_array_to_list_decor
     def jacob(self, X, T):
         res_jacob = magic_jacob(X, T)
         if logging.root.level==logging.DEBUG:
@@ -125,7 +93,7 @@ registrator.registrate(He_4)
 registrator.registrate(Be_7)
 registrator.registrate(Li_7)
 registrator.registrate(Li_6)
-registrator.finish_registration()
+registrator.registrate(He_6)
 
 X_0 = registrator.X_0
 
