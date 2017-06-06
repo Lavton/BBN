@@ -196,26 +196,96 @@ plt.rc('font', family='serif')
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel(r'$\textbf{t} (s)$')
-plt.xlim([constants.to_norm_time(1e-4), constants.to_norm_time(1e3)])
+plt.xlim([constants.to_norm_time(1e-4), constants.to_norm_time(Tres[-1])])
 ylabel = r"\textbf{X}"
 plt.ylabel(ylabel)
 plt.ylim([1e-40, 1000])
 
+new_Tres = np.copy(Tres)
+new_Xans = np.copy(X_ans)
+
 for i in range(len(Tres)):
-    Tres[i] = constants.to_norm_time(Tres[i])
+    new_Tres[i] = constants.to_norm_time(new_Tres[i])
 
-elements.registrator.calc_plot(plt, Tres, X_ans)
 
-for t in Tres:
-  plt.axvline(x=t, linewidth=0.1)  
+elements.registrator.calc_plot(plt, new_Tres, X_ans)
+
+for t in new_Tres:
+    plt.axvline(x=t, linewidth=0.1)  
+
+
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
 plt.xscale('log')
 plt.yscale('log')
-plt.title(r"$\eta$= {}".format(constants.nu_n))
+
+man_aval = {
+    "Li_7": (4.885, False),
+    "He_3": (0.0963, False)
+}
+
+enouth_log_width = 3
+not_distinguishable = 1
+aval_t = [[0, 0, False] for _ in range(len(X_ans[-1]))]
+for i in range(len(Tres) - 10, 0, -1):
+    log_x = np.copy(np.log(X_ans[i]))
+    log_x_s = sorted(log_x)
+    this_up = [0] * len(log_x)
+    this_down = [0] * len(log_x)
+    for j in range(len(log_x)):
+        for k in range(len(log_x_s)):
+            if log_x[j] == log_x_s[k]:
+                break
+        if k == 0:
+            this_down[j] = 1000
+        else:
+            this_down[j] = log_x_s[k] - log_x_s[k-1]
+        if k == len(log_x) - 1:
+            this_up[j] = 1000
+        else:
+            this_up[j] = log_x_s[k+1] - log_x_s[k]
+    
+    for j in range(len(log_x)):
+        for man_pos_el in man_aval:
+            if man_pos_el in constants.elist[j]:
+                if Tres[i] <= man_aval[man_pos_el][0] < Tres[i+1]:
+                    aval_t[j][2] = True
+                    aval_t[j][0] = i 
+                    aval_t[j][1] = X_ans[i][j] * (1.8 if man_aval[man_pos_el][1] else 0.07)
+
+        if X_ans[i][j] < 1e-40:
+            continue
+        if aval_t[j][2] == True:
+            continue
+        if this_down[j] >= not_distinguishable:
+            if this_up[j] >= enouth_log_width:
+                aval_t[j][2] = True
+                aval_t[j][1] = X_ans[i][j]*1.8
+                aval_t[j][0] = i
+            else:
+                if this_up[j] > aval_t[j][1]:
+                    aval_t[j][0] = i
+                    aval_t[j][1] = X_ans[i][j] * 1.8
+            if this_up[j] >= not_distinguishable:
+                if this_down[j] >= 2*enouth_log_width:
+                    aval_t[j][2] = True
+                    aval_t[j][1] = X_ans[i][j] * 0.07
+                    aval_t[j][0] = i
+
+        elif this_up[j] >= not_distinguishable:
+            if this_down[j] >= 2*enouth_log_width:
+                aval_t[j][2] = True
+                aval_t[j][1] = X_ans[i][j] * 0.07
+                aval_t[j][0] = i
+
+for i in range(len(aval_t)):
+    plt.text(new_Tres[aval_t[i][0]], aval_t[i][1], "${}$".format(constants.elist[i][-1]))
+
+
+# plt.title(r"$\eta$= {}".format(constants.nu_n))
 plt.xlabel(r'\textbf{time} (s)')
 plt.ylabel(r'\textbf{$X_i$}')
-plt.legend(bbox_to_anchor=(1.01, 0.9), loc=2, borderaxespad=0.)
+# plt.legend(bbox_to_anchor=(1.01, 0.9), loc=2, borderaxespad=0.)
 # plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
 #            ncol=2, mode="expand", borderaxespad=0.)
 logging.info(("TIME WORKS", (time.time() - start_time)/60))

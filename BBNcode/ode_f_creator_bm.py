@@ -60,7 +60,7 @@ for re in reactions:
         back_part = []
         for l in rights:
             back_part.append(l)
-        back_part = (back_part, backw + "(T))/"+str(max(c_right.values())))
+        back_part = (back_part, backw + "(T)/"+str(max(c_right.values())))
         
         # для прямой реакции распад идёт со знаком "-"
         # синтез со знаком "+"

@@ -93,7 +93,7 @@ registrator.registrate(He_4)
 registrator.registrate(Be_7)
 registrator.registrate(Li_7)
 registrator.registrate(Li_6)
-registrator.registrate(He_6)
+# registrator.registrate(He_6)
 
 X_0 = registrator.X_0
 

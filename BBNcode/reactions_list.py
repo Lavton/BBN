@@ -42,7 +42,7 @@ reactions = [
         "Li_6 + p to He_4 + He_3, elements.Li_6.li6p_he3he4, elements.Li_6.he3he4_li6p"
     ],
     [
-        "He_4 + n + n to He_6, elements.He_6.he4nn_he6_g, elements.He_6.he6g_he4nn",
-        "He_6 to Li_6, elements.He_6.he6_li6, elements.He_6.li6_he6"
+        # "He_4 + n + n to He_6, elements.He_6.he4nn_he6_g, elements.He_6.he6g_he4nn",
+        # "He_6 to Li_6, elements.He_6.he6_li6, elements.He_6.li6_he6"
     ]
 ]

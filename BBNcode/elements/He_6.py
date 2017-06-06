@@ -35,7 +35,6 @@ def he4nn_he6_g(T):
         + 0.138 * T9 
         )
     ro_b = univ_func.rat_scale(T)
-    # return 0
     return base_rate * ro_b*ro_b/(constants.less_time(1))
 
 @He_6.equilib_zeroize
