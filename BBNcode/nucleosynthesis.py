@@ -21,6 +21,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import elements.register as elements
 import datetime
+import tempreture
 import os
 now_title = datetime.datetime.now().isoformat()
 
@@ -118,6 +119,14 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
         technical_stop_cache(i, Tres, X_ans)
         if abs(sum(X_ans[-1])-1.0) >= 1e-6:
             logging.error(("X error to big!", abs(sum(X_ans[-1])-1.0)))
+        if len(X_ans) > 3:
+            for kk in range(len(X_ans[-1])):
+                if X_ans[-2][kk] == 0:
+                    continue
+                ma = max(abs(X_ans[-1][kk]), abs(X_ans[-2][kk]))
+                mi = min(abs(X_ans[-1][kk]), abs(X_ans[-2][kk]))
+                if 4 < ma/mi:
+                    logging.error(("dX to big!", elements.registrator.elements[kk].str_view, X_ans[-1][kk]/X_ans[-2][kk]))
         if len(list(filter(lambda l: l<0, X_ans[-1]))):
             logging.error(("ONE X LESS ZERRO", X_ans[-1]))
         for param_set in constants.ode_params:
@@ -146,10 +155,17 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
                     logging.debug("noteq")
                     pass
                 else:
+                    logging.debug("sum X = {}".format(sum(solu[-1])-1))
                     logging.debug(("doeq", element.str_view))
                     solu = element.equilibrium(solu, Tfromt(odes.t))
         i+=1
-        logging.info("i = {}/{}, t = {}, last X = {}".format(i, len(Ts), Tres[-1], X_ans[-1][::-1]))
+        logging.info("i = {}/{}, t = {}, T9 = {}, last X = {}".format(
+            i, 
+            len(Ts), 
+            Tres[-1], 
+            constants.to_norm_tempreture(tempreture.Tfromt(Tres[-1]), units="T9"),
+            X_ans[-1][::-1])
+        )
         X_ans = np.append(X_ans, solu, axis=0)
     return(-1, X_ans, Tres)
 
@@ -182,6 +198,7 @@ i, X_ans, Tres = start_from_cache(i, X_ans, Tres)
 
 try:
     while i != -1:
+        X_ans[-1][1] = 1.0 - X_ans[-1][0] - sum(X_ans[-1][2:])
         X_0 = X_ans[-1]
         i, X_ans, Tres = iter_process(X_0, ts[i], ts, i, X_ans, Tres)
 except TechnicalCalcExitException as e:

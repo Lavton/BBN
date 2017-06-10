@@ -2,6 +2,8 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import os
 import pickle
+import numpy as np 
+import tempreture
 
 if not os.path.isfile("smart_cache.pickle"):
     exit()
@@ -47,8 +49,23 @@ def print_addition():
     from elements.Li_6 import Li_6
     plt.axvline(x=Li_6.tr_t)
     plt.text(Li_6.tr_t, 5e-6, "$Li_6$")
+    from elements.He_6 import He_6
+    plt.axvline(x=He_6.tr_t)
+    plt.text(He_6.tr_t, 5e-30, "$He_6$")
     for op in ode_params:
         plt.axvline(x=op[0], linewidth=0.5, color="red")
+    # r_he = []
+    # for i in range(len(Tres)):
+    #     print(i, len(Tres))
+    #     he_x = np.copy(X_ans[i])
+    #     try:
+    #         pass
+    #         he_x = He_6.equilibrium([he_x], tempreture.Tfromt(Tres[i]))[0]
+    #         r_he.append(np.copy(he_x)[9])
+    #     except ZeroDivisionError as e:
+    #         print("e")
+    #         r_he.append(0.5)
+    # plt.plot(Tres, r_he, label="eq")
 
 print_addition()
 

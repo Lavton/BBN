@@ -2,6 +2,7 @@ import constants
 import math
 import nTOp
 import functools
+import univ_func
 
 class Element():
     """
@@ -19,6 +20,32 @@ class Element():
         self.backward_rates = []
         self.tr_T = None
         self.tr_t = None
+        self.interpo = {}
+
+    def add_interpo(self, f_name, string_to_parse):
+        lines = string_to_parse.strip().replace("−", "-").split("\n")
+        rates = []
+        for i in range(len(lines)):
+            lines[i] = lines[i].split()
+            rates.append((float(lines[i][0]), float(lines[i][1])))
+            if len(lines[i]) > 6:
+                rates.append((float(lines[i][4+0]), float(lines[i][4+1])))
+        rates.sort()
+        from scipy.interpolate import interp1d
+        import numpy as np
+        xs = []
+        ys = []
+        for r in rates:
+            T_ = constants.less_tempreture(r[0]*10**9, units="K")
+            xs.append(math.log(T_))
+            ys.append(math.log(r[1]))
+        xs = np.array(xs)
+        ys = np.array(ys)
+        cs = interp1d(xs, ys, kind='cubic')
+        self.interpo[f_name] = cs
+
+    def get_inter_val(self, f_name, T):
+        return math.exp(self.interpo[f_name]([math.log(T)])[0])
 
     def show_rates(self):
         import matplotlib as mpl
@@ -57,6 +84,15 @@ class Element():
         @functools.wraps(func)
         def inner(*args, **kwargs):
             return func(*args, **kwargs) if args[0] < self.tr_T else 0
+        return inner
+
+    def nacreII(self, func):
+        """spline"""
+        @functools.wraps(func)
+        def inner(*args, **kwargs):
+            T9 = constants.to_norm_tempreture(args[0], units="T9")
+            ro_b = univ_func.rat_scale(args[0])
+            return func(*args, **kwargs) if T9 > 10 else self.get_inter_val(func.__name__, args[0]) * ro_b/(constants.less_time(1))
         return inner
 
     def set_mass_excess(self, total_mass, n_N, p_N):

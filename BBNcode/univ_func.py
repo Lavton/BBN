@@ -17,3 +17,7 @@ def __proton_mass_density__(T):
 
 def rat_scale(T):
     return __proton_mass_density__(T)  
+
+if __name__ == '__main__':
+	print(h, hbar)
+	print(__photon_density__(constants.less_tempreture(2.72548, units="K")))

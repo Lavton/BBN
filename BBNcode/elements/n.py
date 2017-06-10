@@ -22,5 +22,6 @@ n.jacob = {
     }
 }
 
+n.set_mass_excess(1008664.9157, n_N=1, p_N=0)
 n.backward_rates.append(nTOp.lambda_n__p)
 n.forward_rates.append(nTOp.lambda_p__n)
