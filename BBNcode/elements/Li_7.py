@@ -19,7 +19,7 @@ Li_7 = Element("Li_7", 0.0)
 Li_7.A = 7
 # from Audi et all, 2003
 Li_7.set_mass_excess(7016004.55, n_N=4, p_N=3)
-Li_7.tr_t = 0.020
+Li_7.tr_t = 0.030
 Li_7.tr_T = tempreture.Tfromt(Li_7.tr_t)
 
 # @Li_7.equilib_zeroize
@@ -154,9 +154,20 @@ def Li_7_equ(X, T):
 @Li_7.equilib_zeroize
 @functools.lru_cache(maxsize=8)
 def Be7n_Li7p(T):
-    """Wagoner, 1969"""
+    """Shepiro"""
     T9 = constants.to_norm_tempreture(T, units="T9")
-    base_rate = 9.26 * 10**8 + T9**(-3./2) * 6.54 * 10**9 * math.exp(-3.75/T9)
+    base_rate = (
+        + 6.8423 * 10**9 
+        - 1.4988 * 10**10 * T9**(1./2)
+        + 1.76749 * 10**10 * T9 
+        - 1.05769 * 10**10 * T9**(3./2)
+        + 2.6622 * 10**9 * T9**2
+        + 2.74476 * 10**8 * T9**(5./2)
+        - 3.35616 * 10**8 * T9**3
+        + 7.64252 * 10**7 * T9**(7./2)
+        - 5.93091 * 10**6 * T9**4
+        - 2.28294 * 10**7 * math.exp(-0.0503518/T9) * T9**(-3./2)
+        )
     ro_b = univ_func.rat_scale(T)
     return base_rate * ro_b/(constants.less_time(1))
 
@@ -297,7 +308,7 @@ if __name__ == '__main__':
     ts = np.array([tfromT(T) for T in Ts])
     for T in np.copy(Ts):
         pass
-        print(pli7_he4he4.__wrapped__(T)/Li7p_He4He4.__wrapped__(T))
+        print(Be7n_Li7p.__wrapped__(T)/Be7n_Li7p1.__wrapped__(T))
     import matplotlib as mpl
     import matplotlib.pyplot as plt
     import numpy as np
@@ -310,8 +321,8 @@ if __name__ == '__main__':
     plt.yscale('log')
     plt.xlabel(r'\textbf{tempreture} (MeV)')
     plt.ylabel(r'\textbf{\lambda}')
-    plt.plot(ts, [pli7_he4he4(T) for T in np.copy(Ts)], label='forw1')
-    plt.plot(ts, [Li7p_He4He4(T) for T in np.copy(Ts)], label='forw2')
+    plt.plot(ts, [Be7n_Li7p(T) for T in np.copy(Ts)], label='forw1')
+    plt.plot(ts, [Be7n_Li7p1(T) for T in np.copy(Ts)], label='forw2')
     plt.legend()
     plt.show()
     plt.cla()

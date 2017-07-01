@@ -36,7 +36,7 @@ def print_addition():
     plt.text(He_3.tr_t, 2e-7, "$He_3$")
     from elements.H_3 import H_3
     plt.axvline(x=H_3.tr_t)
-    plt.text(H_3.tr_t, 2e-8, "$H_3$")
+    plt.text(H_3.tr_t, 2e-15, "$H_3$")
     from elements.He_4 import He_4
     plt.axvline(x=He_4.tr_t)
     plt.text(He_4.tr_t, 2e-4, "$He_4$")

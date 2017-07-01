@@ -19,7 +19,7 @@ H_3 = Element("H_3", 0.0)
 H_3.A = 3
 # from Audi et all, 2003
 H_3.set_mass_excess(3016049.2777, n_N=2, p_N=1)
-H_3.tr_t =  0.0008 * (constants.nu_0/constants.nu_n)
+H_3.tr_t =  0.0017 * (constants.nu_0/constants.nu_n)
 H_3.tr_T = tempreture.Tfromt(H_3.tr_t)
 
 # @H_3.equilib_zeroize

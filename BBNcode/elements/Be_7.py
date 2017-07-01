@@ -19,7 +19,7 @@ Be_7 = Element("Be_7", 0.0)
 Be_7.A = 7
 # from Audi et all, 2003
 Be_7.set_mass_excess(7016929.83, n_N=3, p_N=4)
-Be_7.tr_t = 0.02
+Be_7.tr_t = 0.03
 Be_7.tr_T = tempreture.Tfromt(Be_7.tr_t)
 
 # @Be_7.equilib_zeroize

@@ -54,7 +54,19 @@ ode_params = [
         "atoi": 1e-9,
         "rtoi": 1e-9,
     }],
-    [1.29, {
+    [0.8, {
+        "max_step": 0.01,
+        "rtoi": 1e-9,
+        "atoi": 1e-9,
+    }
+    ],
+    [1.17, {
+        "max_step": 0.001,
+        "rtoi": 1e-10,
+        "atoi": 1e-10,
+    }
+    ],
+    [1.66, {
         "max_step": 0.01,
         "rtoi": 1e-9,
         "atoi": 1e-9,

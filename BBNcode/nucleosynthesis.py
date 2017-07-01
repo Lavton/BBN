@@ -125,7 +125,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
                     continue
                 ma = max(abs(X_ans[-1][kk]), abs(X_ans[-2][kk]))
                 mi = min(abs(X_ans[-1][kk]), abs(X_ans[-2][kk]))
-                if 4 < ma/mi:
+                if 20 < ma/mi:
                     logging.error(("dX to big!", elements.registrator.elements[kk].str_view, X_ans[-1][kk]/X_ans[-2][kk]))
         if len(list(filter(lambda l: l<0, X_ans[-1]))):
             logging.error(("ONE X LESS ZERRO", X_ans[-1]))
@@ -232,19 +232,21 @@ for t in new_Tres:
 
 
 plt.rc('text', usetex=True)
-plt.rc('font', family='serif')
+plt.rc('font', family='serif', size=20)
 plt.xscale('log')
 plt.yscale('log')
 
 man_aval = {
     "Li_7": (4.885, False),
-    "He_3": (0.0963, False)
+    "He_3": (0.089, False),
+    "Be_7": (0.0964, False),
+    "n": (0.005, False)
 }
 
 enouth_log_width = 3
 not_distinguishable = 1
 aval_t = [[0, 0, False] for _ in range(len(X_ans[-1]))]
-for i in range(len(Tres) - 10, 0, -1):
+for i in range(len(Tres) - 20, 0, -1):
     log_x = np.copy(np.log(X_ans[i]))
     log_x_s = sorted(log_x)
     this_up = [0] * len(log_x)
@@ -268,7 +270,7 @@ for i in range(len(Tres) - 10, 0, -1):
                 if Tres[i] <= man_aval[man_pos_el][0] < Tres[i+1]:
                     aval_t[j][2] = True
                     aval_t[j][0] = i 
-                    aval_t[j][1] = X_ans[i][j] * (1.8 if man_aval[man_pos_el][1] else 0.07)
+                    aval_t[j][1] = X_ans[i][j] * (1.8 if man_aval[man_pos_el][1] else 0.022)
 
         if X_ans[i][j] < 1e-40:
             continue
@@ -286,13 +288,13 @@ for i in range(len(Tres) - 10, 0, -1):
             if this_up[j] >= not_distinguishable:
                 if this_down[j] >= 2*enouth_log_width:
                     aval_t[j][2] = True
-                    aval_t[j][1] = X_ans[i][j] * 0.07
+                    aval_t[j][1] = X_ans[i][j] * 0.022
                     aval_t[j][0] = i
 
         elif this_up[j] >= not_distinguishable:
             if this_down[j] >= 2*enouth_log_width:
                 aval_t[j][2] = True
-                aval_t[j][1] = X_ans[i][j] * 0.07
+                aval_t[j][1] = X_ans[i][j] * 0.022
                 aval_t[j][0] = i
 
 for i in range(len(aval_t)):
