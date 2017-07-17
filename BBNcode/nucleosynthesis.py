@@ -3,8 +3,9 @@
 """
 import logging
 logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d, FUNC:%(funcName)s]# %(levelname)-8s  %(message)s', 
-    level=logging.DEBUG,
-    filename=u'mylog.log')
+    level=logging.INFO)
+# ,
+    # filename=u'mylog.log')
 
 import numpy as np
 import time

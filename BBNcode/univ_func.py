@@ -18,6 +18,9 @@ def __proton_mass_density__(T):
 def rat_scale(T):
     return __proton_mass_density__(T)  
 
+def universe_speed(T):
+    return ((8*pi/3)*constants.g_grav * __proton_mass_density__(T))**(1./2)
+
 if __name__ == '__main__':
 	print(h, hbar)
 	print(__photon_density__(constants.less_tempreture(2.72548, units="K")))

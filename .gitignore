@@ -8,3 +8,4 @@ BBNcode/elements/*.db
 BBNcode/*.txt
 BBNcode/*.pickle
 BBNcode/*.log
+BBNcode/NIR/
