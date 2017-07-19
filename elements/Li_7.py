@@ -22,31 +22,6 @@ Li_7.set_mass_excess(7016004.55, n_N=4, p_N=3)
 Li_7.tr_t = 0.030
 Li_7.tr_T = tempreture.Tfromt(Li_7.tr_t)
 
-# @Li_7.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def the4_li7g(T):
-#     """
-#     Wagoner
-#     """
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     base_rate = 5.28 * 10**5 * T9**(-2./3) * math.exp(-8.08 * T9**(-1./3)) * (
-#         + 1.0
-#         + 0.0516 * T9**(1./3)
-#         )
-#     ro_b = univ_func.rat_scale(T)
-#     return base_rate * ro_b/(constants.less_time(1))
-
-# @Li_7.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def li7g_the4(T):
-#     """Wagoner, 1966"""
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = the4_li7g.__wrapped__(T) / constants.to_norm_time(1)
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-#     back = 1.12 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-28.63/T9)
-#     return (back /(constants.less_time(1)))
-
 Li_7.add_interpo("H3He4_Li7g", """
 0.002 7.06E−21 6.52E−21 7.88E−21 0.15 6.64E−01 6.18E−01 7.38E−01
 0.003 1.79E−17 1.65E−17 2.00E−17 0.16 8.76E−01 8.15E−01 9.73E−01
@@ -111,6 +86,12 @@ def Li7g_H3He4(T):
         )
     return (back /(constants.less_time(1)))
 
+Li_7.reactions.append((
+    ("T", "He_4"),
+    ("Li_7",),
+    H3He4_Li7g,
+    Li7g_H3He4
+    ))
 
 ##################################
 
@@ -125,31 +106,6 @@ def Li_7_equ(X, T):
     return X
 
 ####################################
-
-# @Li_7.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def nbe7_pli7(T):
-#     """
-#     Wagoner
-#     """
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     base_rate = (
-#         6.74 * 10**9
-#         )
-#     ro_b = univ_func.rat_scale(T)
-#     return base_rate * ro_b/(constants.less_time(1))
-
-# @Li_7.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def pli7_nbe7(T):
-#     """Wagoner, 1966"""
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = nbe7_pli7.__wrapped__(T) / constants.to_norm_time(1)
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-
-#     back = forw * math.exp(-19.07/T9)
-#     return (back /(constants.less_time(1)))
 
 @Li_7.equilib_zeroize
 @functools.lru_cache(maxsize=8)
@@ -181,34 +137,14 @@ def Li7p_Be7n(T):
     back = 9.98 * 10**(-1) * forw * math.exp(-19.81/T9)
     return (back /(constants.less_time(1)))
 
+Li_7.reactions.append((
+    ("n", "Be_7"),
+    ("p", "Li_7"),
+    Be7n_Li7p,
+    Li7p_Be7n
+    ))
 
 #########################################################
-
-# @Li_7.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def pli7_he4he4(T):
-#     """
-#     Wagoner
-#     """
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     base_rate = 1.42 * 10**9 * T9**(-2./3) * math.exp(-8.47*T9**(-1./3)) * (
-#         + 1.
-#         + 0.0493 * T9**(1./3)
-#         )
-#     ro_b = univ_func.rat_scale(T)
-#     return base_rate * ro_b/(constants.less_time(1))
-
-# @Li_7.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he4he4_pli7(T):
-#     """Wagoner, 1966"""
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = pli7_he4he4.__wrapped__(T) / constants.to_norm_time(1)
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-
-#     back = 4.64 * forw * math.exp(-201.3/T9)
-#     return (back /(constants.less_time(1)))
 
 
 Li_7.add_interpo("Li7p_He4He4", """
@@ -277,7 +213,12 @@ def He4He4_Li7p(T):
         )
     return (back /(constants.less_time(1)))
 
-
+Li_7.reactions.append((
+    ("p", "Li_7"),
+    ("He_4", "He_4"),
+    Li7p_He4He4,
+    He4He4_Li7p
+    ))
 #########################################################
 
 
@@ -297,6 +238,7 @@ def He4He4_Li7p(T):
 # 6 - Be7
 # 7 - Li7
 Li_7.equilibrium = Li_7_equ
+Li_7.names = ["Li_7", "^7Li"]
 
 if __name__ == '__main__':
     # Li_7.show_rates()
@@ -329,4 +271,79 @@ if __name__ == '__main__':
     plt.clf()
     
     
-    
+
+# @Li_7.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def the4_li7g(T):
+#     """
+#     Wagoner
+#     """
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     base_rate = 5.28 * 10**5 * T9**(-2./3) * math.exp(-8.08 * T9**(-1./3)) * (
+#         + 1.0
+#         + 0.0516 * T9**(1./3)
+#         )
+#     ro_b = univ_func.rat_scale(T)
+#     return base_rate * ro_b/(constants.less_time(1))
+
+# @Li_7.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def li7g_the4(T):
+#     """Wagoner, 1966"""
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = the4_li7g.__wrapped__(T) / constants.to_norm_time(1)
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+#     back = 1.12 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-28.63/T9)
+#     return (back /(constants.less_time(1)))
+
+# @Li_7.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def nbe7_pli7(T):
+#     """
+#     Wagoner
+#     """
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     base_rate = (
+#         6.74 * 10**9
+#         )
+#     ro_b = univ_func.rat_scale(T)
+#     return base_rate * ro_b/(constants.less_time(1))
+
+# @Li_7.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def pli7_nbe7(T):
+#     """Wagoner, 1966"""
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = nbe7_pli7.__wrapped__(T) / constants.to_norm_time(1)
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+
+#     back = forw * math.exp(-19.07/T9)
+#     return (back /(constants.less_time(1)))
+
+# @Li_7.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def pli7_he4he4(T):
+#     """
+#     Wagoner
+#     """
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     base_rate = 1.42 * 10**9 * T9**(-2./3) * math.exp(-8.47*T9**(-1./3)) * (
+#         + 1.
+#         + 0.0493 * T9**(1./3)
+#         )
+#     ro_b = univ_func.rat_scale(T)
+#     return base_rate * ro_b/(constants.less_time(1))
+
+# @Li_7.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he4he4_pli7(T):
+#     """Wagoner, 1966"""
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = pli7_he4he4.__wrapped__(T) / constants.to_norm_time(1)
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+
+#     back = 4.64 * forw * math.exp(-201.3/T9)
+#     return (back /(constants.less_time(1)))

@@ -22,35 +22,6 @@ Be_7.set_mass_excess(7016929.83, n_N=3, p_N=4)
 Be_7.tr_t = 0.03
 Be_7.tr_T = tempreture.Tfromt(Be_7.tr_t)
 
-# @Be_7.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he3he4_be7g(T):
-#     """
-#     Wagoner
-#     """
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     base_rate = 4.8 * 10**6 * T9**(-2./3) * math.exp(-12.8 * T9**(-1./3)) * (
-#         + 1.0
-#         + 0.0326 * T9**(1./3)
-#         - 0.219 * T9**(2./3)
-#         - 0.0499 * T9
-#         + 0.0258 * T9**(4./3)
-#         + 0.0150 * T9**(5./3)
-#         )
-#     ro_b = univ_func.rat_scale(T)
-#     return base_rate * ro_b/(constants.less_time(1))
-
-# @Be_7.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def be7g_he3he4(T):
-#     """Wagoner, 1966"""
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = he3he4_be7g.__wrapped__(T) / constants.to_norm_time(1)
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-#     back = 1.12 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-18.42/T9)
-#     return (back /(constants.less_time(1)))
-
 Be_7.add_interpo("He3He4_Be7g", """
 0.005 5.14E−25 4.57E−25 5.62E−25 0.16 9.98E−04 8.93E−04 1.08E−03
 0.006 3.79E−23 3.37E−23 4.14E−23 0.18 2.28E−03 2.04E−03 2.47E−03
@@ -115,7 +86,12 @@ def Be7g_He3He4(T):
     back = back_base * forw * (ro_b**(-1)) * T9**(3./2)
     return (back /(constants.less_time(1)))
 
-
+Be_7.reactions.append((
+    ("He_3", "He_4"), 
+    ("Be_7", ),
+    He3He4_Be7g,
+    Be7g_He3He4
+    ))
 ##################################
 
 def Be_7_equ(X, T):
@@ -129,31 +105,6 @@ def Be_7_equ(X, T):
     return X
 
 ####################################
-
-# @Be_7.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def nbe7_He4He4(T):
-#     """
-#     Wagoner
-#     """
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     base_rate = (
-#         1.2 * 10**7 * T9
-#         )
-#     ro_b = univ_func.rat_scale(T)
-#     return base_rate * ro_b/(constants.less_time(1))
-
-# @Be_7.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def He4he4_nBe7(T):
-#     """Wagoner, 1966"""
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = nbe7_He4He4.__wrapped__(T) / constants.to_norm_time(1)
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-
-#     back = 4.64 * forw * math.exp(-220.4/T9)
-#     return (back /(constants.less_time(1)))
 
 @Be_7.equilib_zeroize
 @functools.lru_cache(maxsize=8)
@@ -179,7 +130,12 @@ def He4He4_nBe7(T):
     back = 4.70 * forw * math.exp(-220.39/T9)
     return (back /(constants.less_time(1)))
 
-
+Be_7.reactions.append((
+    ("n", "Be_7"),
+    ("He_4", "He_4"), 
+    nBe7_He4He4, 
+    He4He4_nBe7
+    ))
 #########################################################
 
 # Be_7.forward_rates.append(he3he4_be7g)
@@ -196,7 +152,7 @@ def He4He4_nBe7(T):
 # 6 - Be7
 
 Be_7.equilibrium = Be_7_equ
-
+Be_7.names = ["Be_7", "^7Be"]
 
 if __name__ == '__main__':
     # Be_7.show_rates()
@@ -229,3 +185,58 @@ if __name__ == '__main__':
     plt.clf()
     
     
+
+# @Be_7.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he3he4_be7g(T):
+#     """
+#     Wagoner
+#     """
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     base_rate = 4.8 * 10**6 * T9**(-2./3) * math.exp(-12.8 * T9**(-1./3)) * (
+#         + 1.0
+#         + 0.0326 * T9**(1./3)
+#         - 0.219 * T9**(2./3)
+#         - 0.0499 * T9
+#         + 0.0258 * T9**(4./3)
+#         + 0.0150 * T9**(5./3)
+#         )
+#     ro_b = univ_func.rat_scale(T)
+#     return base_rate * ro_b/(constants.less_time(1))
+
+# @Be_7.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def be7g_he3he4(T):
+#     """Wagoner, 1966"""
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = he3he4_be7g.__wrapped__(T) / constants.to_norm_time(1)
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+#     back = 1.12 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-18.42/T9)
+#     return (back /(constants.less_time(1)))
+#     
+
+# @Be_7.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def nbe7_He4He4(T):
+#     """
+#     Wagoner
+#     """
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     base_rate = (
+#         1.2 * 10**7 * T9
+#         )
+#     ro_b = univ_func.rat_scale(T)
+#     return base_rate * ro_b/(constants.less_time(1))
+
+# @Be_7.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def He4he4_nBe7(T):
+#     """Wagoner, 1966"""
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = nbe7_He4He4.__wrapped__(T) / constants.to_norm_time(1)
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+
+#     back = 4.64 * forw * math.exp(-220.4/T9)
+#     return (back /(constants.less_time(1)))

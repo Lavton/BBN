@@ -49,9 +49,9 @@ def print_addition():
     from elements.Li_6 import Li_6
     plt.axvline(x=Li_6.tr_t)
     plt.text(Li_6.tr_t, 5e-6, "$Li_6$")
-    from elements.He_6 import He_6
-    plt.axvline(x=He_6.tr_t)
-    plt.text(He_6.tr_t, 5e-30, "$He_6$")
+    # from elements.He_6 import He_6
+    # plt.axvline(x=He_6.tr_t)
+    # plt.text(He_6.tr_t, 5e-30, "$He_6$")
     for op in ode_params:
         plt.axvline(x=op[0], linewidth=0.5, color="red")
     # r_he = []
@@ -69,8 +69,8 @@ def print_addition():
 
 print_addition()
 
-import elements.register as elements
-elements.registrator.calc_plot(plt, Tres, X_ans)
+import register
+register.registrator.calc_plot(plt, Tres, X_ans)
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')

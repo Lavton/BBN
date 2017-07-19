@@ -21,6 +21,8 @@ class Element():
         self.tr_T = None
         self.tr_t = None
         self.interpo = {}
+        self.reactions = []
+        self.names = [str_view]
 
     def add_interpo(self, f_name, string_to_parse):
         lines = string_to_parse.strip().replace("−", "-").split("\n")

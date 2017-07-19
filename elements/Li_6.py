@@ -23,35 +23,6 @@ Li_6.set_mass_excess(6015122.795, n_N=3, p_N=3)
 Li_6.tr_t = 0.0077
 Li_6.tr_T = tempreture.Tfromt(Li_6.tr_t)
 
-# @Li_6.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he4d_li6g(T):
-#     """
-#     Caughlan, 1988
-#     """
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     base_rate = 3.01 * 10**1 * T9**(-2./3) * math.exp(-7.423 * T9**(-1./3)) * (
-#         + 1.0
-#         + 0.056 * T9**(1./3)
-#         - 4.85 * T9**(2./3)
-#         + 8.85 * T9 
-#         - 0.585 * T9**(4./3)
-#         - 0.584 * T9**(5./3)
-#         ) + 8.55 * 10**1 * T9**(-3./2) * math.exp(-8.228/T9)
-#     ro_b = univ_func.rat_scale(T)
-#     return base_rate * ro_b/(constants.less_time(1))
-
-# @Li_6.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def li6g_he4d(T):
-#     """Caughlan, 1988"""
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = he4d_li6g.__wrapped__(T) / constants.to_norm_time(1)
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-#     back = 1.53 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-17.118/T9)
-#     return (back /(constants.less_time(1)))
-
 Li_6.add_interpo("He4H2_Li6g", """
 0.002 2.98E−23 1.35E−23 4.26E−23 0.15 1.13E−04 6.29E−05 1.50E−04
 0.003 4.01E−20 1.83E−20 5.72E−20 0.16 1.49E−04 8.40E−05 1.99E−04
@@ -114,6 +85,13 @@ def Li6g_He4H2(T):
         )
     return (back /(constants.less_time(1)))
 
+Li_6.reactions.append((
+    ("He_4", "D"),
+    ("Li_6",),
+    He4H2_Li6g,
+    Li6g_He4H2
+    ))
+
 ##################################
 
 def Li_6_equ(X, T):
@@ -152,6 +130,12 @@ def Li6g_He4np(T):
     back = 7.22 * 10**19 * forw * T9**3 * (ro_b**(-2)) * math.exp(-42.933/T9)
     return (back /(constants.less_time(1)))
 
+Li_6.reactions.append((
+    ("He_4", "n", "p"),
+    ("Li_6",), 
+    He4np_Li6g, 
+    Li6g_He4np
+    ))
 #########################################################
 
 @Li_6.equilib_zeroize
@@ -179,38 +163,13 @@ def Li6n_He4H3(T):
     back = 9.35 * 10**(-1) * forw * math.exp(-55.494/T9)
     return (back /(constants.less_time(1)))
 
+Li_6.reactions.append((
+    ("He_4", "T"), 
+    ("Li_6", "n"),
+    He4H3_Li6n,
+    Li6n_He4H3
+    ))
 #########################################################
-
-# @Li_6.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def li6p_be7g(T):
-#     """
-#     Caughlan, 1988
-#     """
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     T9A = T9/(
-#         + 1.
-#         - 9.69 * 10**(-2) * T9
-#         + 2.84 * 10**(-2) * T9**(5./3) / (
-#             + 1.
-#             - 9.69 * 10**(-2) * T9
-#             )**(2./3)
-#         )
-#     base_rate = 6.69 * 10**5 * (T9A**(5./6)/T9**(3./2)) * math.exp(-8.413/T9A**(1./3))
-#     ro_b = univ_func.rat_scale(T)
-#     return base_rate * ro_b/(constants.less_time(1))
-
-# @Li_6.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def be7g_li6p(T):
-#     """Caughlan, 1988"""
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = li6p_be7g.__wrapped__(T) / constants.to_norm_time(1)
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-
-#     back = 1.19 * 10**(10) * forw * ro_b**(-1) * math.exp(-65.054/T9)
-#     return (back /(constants.less_time(1)))
 
 Li_6.add_interpo("Li6p_Be7g", """
 0.001 2.23E−29 1.89E−29 3.92E−29 0.14 3.07E−01 2.67E−01 4.94E−01
@@ -280,38 +239,13 @@ def Be7g_Li6p(T):
         )
     return (back /(constants.less_time(1)))
 
-
+Li_6.reactions.append((
+    ("Li_6", "p"),
+    ("Be_7",),
+    Li6p_Be7g,
+    Be7g_Li6p
+    ))
 #########################################################
-
-# @Li_6.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def li6p_he3he4(T):
-#     """
-#     Caughlan, 1988
-#     """
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     base_rate = 3.37 * 10**10 * T9**(-2./3) * math.exp(-8.413/T9**(1./3) - (T9/5.50)**2) * (
-#         + 1.0
-#         + 0.50 * T9**(1./3)
-#         - 0.061  * T9**(2./3)
-#         - 0.021 * T9
-#         + 0.006 * T9**(4./3)
-#         + 0.005 * T9**(5./3)
-#         ) + 1.33 * 10**10 * T9**(-3./2) * math.exp(-17.764/T9) + 1.29 * 10**9 * T9**(-1) * math.exp(-21.820/T9)
-#     ro_b = univ_func.rat_scale(T)
-#     return base_rate * ro_b/(constants.less_time(1))
-
-# @Li_6.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he3he4_li6p(T):
-#     """Caughlan, 1988"""
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = li6p_he3he4.__wrapped__(T) / constants.to_norm_time(1)
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-
-#     back = 1.07 * forw * math.exp(-46.631/T9)
-#     return (back /(constants.less_time(1)))
 
 
 Li_6.add_interpo("Li6p_He3He4", """
@@ -378,7 +312,12 @@ def He3He4_Li6p(T):
         )
     return (back /(constants.less_time(1)))
 
-
+Li_6.reactions.append((
+    ("Li_6", "p"),
+    ("He_4", "He_3"),
+    Li6p_He3He4,
+    He3He4_Li6p
+    ))
 #########################################################
 
 
@@ -403,6 +342,7 @@ def He3He4_Li6p(T):
 # 7 - Li7
 # 8 - Li6
 Li_6.equilibrium = Li_6_equ
+Li_6.names = ["Li_6", "^6Li"]
 
 if __name__ == '__main__':
     # Li_6.show_rates()
@@ -434,3 +374,93 @@ if __name__ == '__main__':
     plt.cla()
     plt.clf()
     
+
+# @Li_6.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he4d_li6g(T):
+#     """
+#     Caughlan, 1988
+#     """
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     base_rate = 3.01 * 10**1 * T9**(-2./3) * math.exp(-7.423 * T9**(-1./3)) * (
+#         + 1.0
+#         + 0.056 * T9**(1./3)
+#         - 4.85 * T9**(2./3)
+#         + 8.85 * T9 
+#         - 0.585 * T9**(4./3)
+#         - 0.584 * T9**(5./3)
+#         ) + 8.55 * 10**1 * T9**(-3./2) * math.exp(-8.228/T9)
+#     ro_b = univ_func.rat_scale(T)
+#     return base_rate * ro_b/(constants.less_time(1))
+
+# @Li_6.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def li6g_he4d(T):
+#     """Caughlan, 1988"""
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = he4d_li6g.__wrapped__(T) / constants.to_norm_time(1)
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+#     back = 1.53 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-17.118/T9)
+#     return (back /(constants.less_time(1)))
+
+# @Li_6.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def li6p_be7g(T):
+#     """
+#     Caughlan, 1988
+#     """
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     T9A = T9/(
+#         + 1.
+#         - 9.69 * 10**(-2) * T9
+#         + 2.84 * 10**(-2) * T9**(5./3) / (
+#             + 1.
+#             - 9.69 * 10**(-2) * T9
+#             )**(2./3)
+#         )
+#     base_rate = 6.69 * 10**5 * (T9A**(5./6)/T9**(3./2)) * math.exp(-8.413/T9A**(1./3))
+#     ro_b = univ_func.rat_scale(T)
+#     return base_rate * ro_b/(constants.less_time(1))
+
+# @Li_6.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def be7g_li6p(T):
+#     """Caughlan, 1988"""
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = li6p_be7g.__wrapped__(T) / constants.to_norm_time(1)
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+
+#     back = 1.19 * 10**(10) * forw * ro_b**(-1) * math.exp(-65.054/T9)
+#     return (back /(constants.less_time(1)))
+
+# @Li_6.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def li6p_he3he4(T):
+#     """
+#     Caughlan, 1988
+#     """
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     base_rate = 3.37 * 10**10 * T9**(-2./3) * math.exp(-8.413/T9**(1./3) - (T9/5.50)**2) * (
+#         + 1.0
+#         + 0.50 * T9**(1./3)
+#         - 0.061  * T9**(2./3)
+#         - 0.021 * T9
+#         + 0.006 * T9**(4./3)
+#         + 0.005 * T9**(5./3)
+#         ) + 1.33 * 10**10 * T9**(-3./2) * math.exp(-17.764/T9) + 1.29 * 10**9 * T9**(-1) * math.exp(-21.820/T9)
+#     ro_b = univ_func.rat_scale(T)
+#     return base_rate * ro_b/(constants.less_time(1))
+
+# @Li_6.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he3he4_li6p(T):
+#     """Caughlan, 1988"""
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = li6p_he3he4.__wrapped__(T) / constants.to_norm_time(1)
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+
+#     back = 1.07 * forw * math.exp(-46.631/T9)
+#     return (back /(constants.less_time(1)))

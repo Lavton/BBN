@@ -22,24 +22,6 @@ He_4.set_mass_excess(4002603.25415, n_N=2, p_N=2)
 He_4.tr_t =  0.0016 * max(constants.nu_0/constants.nu_n, 1.0)
 He_4.tr_T = tempreture.Tfromt(He_4.tr_t)
 
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def pt_he4g(T):
-#     """
-#     Wagoner
-#     """
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     base_rate = 2.87 * 10**4 * T9**(-2./3) *math.exp(-3.87*T9**(-1./3)) * (
-#         + 1.
-#         + 0.108 * T9**(1./3)
-#         + 0.466 * T9**(2./3)
-#         + 0.352 * T9 
-#         + 0.300 * T9**(4./3)
-#         + 0.576 * T9**(5./3)
-#         )
-#     ro_b = univ_func.rat_scale(T)
-#     return base_rate * ro_b/(constants.less_time(1))
-
 @He_4.equilib_zeroize
 @functools.lru_cache(maxsize=8)
 def H3p_He4g(T):
@@ -57,18 +39,6 @@ def H3p_He4g(T):
     return base_rate * ro_b/(constants.less_time(1))
 
 
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he4g_pt(T):
-#     """Wagoner, 1966"""
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = pt_he4g.__wrapped__(T) / constants.to_norm_time(1)
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-
-#     back = 2.59 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-229.9/T9)
-#     return (back /(constants.less_time(1)))
-
 @He_4.equilib_zeroize
 @functools.lru_cache(maxsize=8)
 def He4g_H3p(T):
@@ -79,6 +49,13 @@ def He4g_H3p(T):
 
     back = 2.61 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-229.94/T9)
     return (back /(constants.less_time(1)))
+
+He_4.reactions.append((
+    ("p", "T"),
+    ("He_4",), 
+    H3p_He4g, 
+    He4g_H3p
+    ))
 
 ##################################
 
@@ -93,31 +70,6 @@ def He_4_equ(X, T):
     return X
 
 ####################################
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def nhe3_he4g(T):
-#     """
-#     Wagoner
-#     """
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     base_rate = (
-#         6.0 * 10**3 * T9
-#         )
-#     ro_b = univ_func.rat_scale(T)
-#     return base_rate * ro_b/(constants.less_time(1))
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he4g_nhe3(T):
-#     """Wagoner, 1966"""
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = nhe3_he4g.__wrapped__(T) / constants.to_norm_time(1)
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-
-#     back = 2.60 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-238.8/T9)
-#     return (back /(constants.less_time(1)))
 
 @He_4.equilib_zeroize
 @functools.lru_cache(maxsize=8)
@@ -143,30 +95,14 @@ def He4g_He3n(T):
     back = 2.61 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-238.81/T9)
     return (back /(constants.less_time(1)))
 
+He_4.reactions.append((
+    ("n", "He_3"),
+    ("He_4",), 
+    He3n_He4g, 
+    He4g_He3n
+    ))
+
 #####################################
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def dd_he4g(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-#     forw = 24.1 * (T9**(-2./3)) * math.exp(-4.26*(T9**(-1./3))) * (
-#         + T9**(2./3)
-#         + 0.685 * T9
-#         + 0.152 * T9**(4./3)
-#         + 0.265 * T9**(5./3)
-#         )
-#     return forw * ro_b * (1./(constants.less_time(1)))
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he4g_dd(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = dd_he4g.__wrapped__(T) / constants.to_norm_time(1)
-#     ro_b = univ_func.rat_scale(T)
-#     back = 4.50 * 10**10 * forw * ro_b**(-1) * T9**(3./2) * math.exp(-276.7 * (T9**(-1)))
-#     return back * (1./(constants.less_time(1)))
 
 He_4.add_interpo("H2H2_He4g", """
 0.001 1.46E−15 1.08E−15 1.72E−15 0.14 4.57E−02 3.41E−02 5.45E−02
@@ -228,26 +164,14 @@ def He4g_H2H2(T):
     back = 4.53 * 10**10 * forw * ro_b**(-1) * T9**(3./2) * math.exp(-276.74 * (T9**(-1)))
     return back * (1./(constants.less_time(1)))
 
+He_4.reactions.append((
+    ("D", "D"), 
+    ("He_4",), 
+    H2H2_He4g, 
+    He4g_H2H2
+    ))
 
 #########################################
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def dhe3_he4p(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-#     forw = 2.60 * 10**9 * T9**(-3./2) * math.exp(-2.99/T9)
-#     return forw * ro_b * (1./(constants.less_time(1)))
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he4p_dhe3(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = dhe3_he4p.__wrapped__(T) / constants.to_norm_time(1)
-#     ro_b = univ_func.rat_scale(T)
-#     back = 5.50 * forw * math.exp(-213.0/T9)
-#     return back * (1./(constants.less_time(1)))
 
 He_4.add_interpo("He3H2_He4p", """
 0.001 3.54E−19 3.21E−19 3.87E−19 0.14 2.88E+05 2.64E+05 3.15E+05
@@ -290,15 +214,6 @@ def He3H2_He4p(T):
     T9 = constants.to_norm_tempreture(T, units="T9")
     E = constants.to_norm_tempreture(T, units="MeV")
     ro_b = univ_func.rat_scale(T)
-    # base_rate = 6.49 * 10**10 * (
-    #     + 1.0
-    #     - 1.03 * T9**(2./3)
-    #     - 0.42 * T9 
-    #     + 3.02 * T9**(4./3)
-    #     + 3.12 * T9**(5./3)
-    #     ) * T9**(-2./3) * math.exp(-7.18*T9**(-1./3) - (T9/1.95)**2) + T9**(-3./2) * (
-    #         2.59 * 10**9 * math.exp(-3.30/T9)
-    #     )
     base_rate = 5.86 * 10**10 / T9**(2./3) * math.exp(-7.181/T9**(1./3) - (T9/0.315)**2) * (
         + 1.
         + 0.58 * T9**(1./3)
@@ -320,26 +235,14 @@ def He4p_He3H2(T):
     back = 5.54 * forw * math.exp(-212.99/T9)
     return back * (1./(constants.less_time(1)))
 
+He_4.reactions.append((
+    ("D", "He_3"),
+    ("He_4", "p"), 
+    He3H2_He4p, 
+    He4p_He3H2
+    ))
 
 #############################################
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def dt_he4n(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-#     forw = 1.38 * 10**9 * T9**(-3./2) * math.exp(-0.745/T9)
-#     return forw * ro_b * (1./(constants.less_time(1)))
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he4n_dt(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = dt_he4n.__wrapped__(T) / constants.to_norm_time(1)
-#     ro_b = univ_func.rat_scale(T)
-#     back = 5.50 * forw * math.exp(-204.1/T9)
-#     return back * (1./(constants.less_time(1)))
 
 He_4.add_interpo("H3H2_He4n", """
 0.001 1.87E−07 1.67E−07 2.09E−07 0.14 1.05E+08 9.66E+07 1.13E+08
@@ -381,15 +284,6 @@ def H3H2_He4n(T):
     """nacre I and II"""
     T9 = constants.to_norm_tempreture(T, units="T9")
     ro_b = univ_func.rat_scale(T)
-    # base_rate = 8.09 * 10**10 * (
-    #     + 1.0
-    #     + 1.80 * T9**(2./3)
-    #     + 1.16 * T9
-    #     + 10.5 * T9**(4./3)
-    #     + 17.2 * T9**(5./2)
-    #     ) * T9**(-2./3) * math.exp(-4.52*T9**(-1./3) - (T9/0.549)**2) + (
-    #     T9**(-3./2) * 1.21 * 10**9 * math.exp(-0.89/T9)
-    #     )
     base_rate = 8.29 * 10**10 * T9**(-2./3) * math.exp(-4.524*T9**(-1./3) - (T9/0.08)**2) * (
         + 1.0
         + 17.2 * T9 
@@ -408,6 +302,13 @@ def He4n_H3H2(T):
     back = 5.54 * forw * math.exp(-204.12/T9)
     return back * (1./(constants.less_time(1)))
 
+He_4.reactions.append((
+    ("D", "T"),
+    ("He_4", "n"), 
+    H3H2_He4n, 
+    He4n_H3H2
+    ))
+
 #############################################
 
 @He_4.equilib_zeroize
@@ -421,15 +322,6 @@ def he3he3_he4pp(T):
         + 0.0340 * T9**(1./3)
         )
     return forw * ro_b * (1./(constants.less_time(1)))
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he4pp_he3he3(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = he3he3_he4pp.__wrapped__(T) / constants.to_norm_time(1)
-#     ro_b = univ_func.rat_scale(T)
-#     back = 3.37 * 10**(-10) * forw * ro_b * T9**(-3./2) * math.exp(-149.2/T9)
-#     return back * (1./(constants.less_time(1)))
 
 He_4.add_interpo("He3He3_He4pp", """
 0.003 2.80E−25 2.55E−25 3.04E−25 0.15 1.74E+01 1.61E+01 1.92E+01
@@ -490,28 +382,14 @@ def He4pp_He3He3(T):
     back = 3.92 * 10**(-10) * forw * ro_b * T9**(-3./2) * math.exp(-149.23/T9)
     return back * (1./(constants.less_time(1)))
 
+He_4.reactions.append((
+    ("He_3", "He_3"),
+    ("He_4", "p", "p"),
+    He3He3_He4pp,
+    He4pp_He3He3
+    ))
+
 #############################################
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def tt_he4nn(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-#     forw = 1.10 * 10**9 * T9**(-2./3) * math.exp(-4.87*T9**(-1./3)) * (
-#         + 1. 
-#         + 0.0857 * T9**(1./3)
-#         )
-#     return forw * ro_b * (1./(constants.less_time(1)))
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he4nn_tt(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = tt_he4nn.__wrapped__(T) / constants.to_norm_time(1)
-#     ro_b = univ_func.rat_scale(T)
-#     back = 3.37 * 10**(-10) * forw * ro_b * T9**(-3./2) * math.exp(-131.5/T9)
-#     return back * (1./(constants.less_time(1)))
 
 @He_4.equilib_zeroize
 @functools.lru_cache(maxsize=8)
@@ -539,28 +417,14 @@ def He4nn_H3H3(T):
     back = 3.38 * 10**(-10) * forw * ro_b * T9**(-3./2) * math.exp(-131.504/T9)
     return back * (1./(constants.less_time(1)))
 
+He_4.reactions.append((
+    ("T", "T"),
+    ("He_4", "n", "n"),
+    H3H3_He4nn,
+    He4nn_H3H3
+    ))
+
 #############################################
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he3t_he4pn(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-#     forw = 5.60 * 10**9 * T9**(-2./3) * math.exp(-7.72*T9**(-1./3)) * (
-#         + 1.
-#         + 0.0540 * T9**(1./3)
-#         )
-#     return forw * ro_b * (1./(constants.less_time(1)))
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he4pn_he3t(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = he3t_he4pn.__wrapped__(T) / constants.to_norm_time(1)
-#     ro_b = univ_func.rat_scale(T)
-#     back = 3.37 * 10**(-10) * forw * ro_b * T9**(-3./2) * math.exp(-140.4/T9)
-#     return back * (1./(constants.less_time(1)))
 
 @He_4.equilib_zeroize
 @functools.lru_cache(maxsize=8)
@@ -582,29 +446,13 @@ def He4pn_He3H3(T):
     back = 3.39 * 10**(-10) * forw * ro_b * T9**(-3./2) * math.exp(-140.367/T9)
     return back * (1./(constants.less_time(1)))
 
-
+He_4.reactions.append((
+    ("He_3", "T"),
+    ("He_4", "p", "n"),
+    He3H3_He4pn,
+    He4pn_He3H3
+    ))
 #############################################
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he3t_he4d(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-#     forw = 3.88 * 10**9 * T9**(-2./3) * math.exp(-7.72*T9**(-1./3)) * (
-#         +1.
-#         + 0.0540 * T9**(1./3)
-#         )
-#     return forw * ro_b * (1./(constants.less_time(1)))
-
-# @He_4.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def he4d_he3t(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = he3t_he4d.__wrapped__(T) / constants.to_norm_time(1)
-#     ro_b = univ_func.rat_scale(T)
-#     back = 1.59 * forw * math.exp(-166.2/T9)
-#     return back * (1./(constants.less_time(1)))
 
 @He_4.equilib_zeroize
 @functools.lru_cache(maxsize=8)
@@ -627,6 +475,12 @@ def He4H2_He3H2(T):
     back = 1.60 * forw * math.exp(-166.182/T9)
     return back * (1./(constants.less_time(1)))
 
+He_4.reactions.append((
+    ("He_3", "T"),
+    ("He_4", "D"),
+    He3H3_He4H2,
+    He4H2_He3H2
+    ))
 
 #############################################
 
@@ -658,6 +512,7 @@ def He4H2_He3H2(T):
 # 5 - He4
 
 He_4.equilibrium = He_4_equ
+He_4.names = ["He_4", "a", "^4He"]
 
 
 if __name__ == '__main__':
@@ -690,3 +545,190 @@ if __name__ == '__main__':
     plt.cla()
     plt.clf()
     
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def pt_he4g(T):
+#     """
+#     Wagoner
+#     """
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     base_rate = 2.87 * 10**4 * T9**(-2./3) *math.exp(-3.87*T9**(-1./3)) * (
+#         + 1.
+#         + 0.108 * T9**(1./3)
+#         + 0.466 * T9**(2./3)
+#         + 0.352 * T9 
+#         + 0.300 * T9**(4./3)
+#         + 0.576 * T9**(5./3)
+#         )
+#     ro_b = univ_func.rat_scale(T)
+#     return base_rate * ro_b/(constants.less_time(1))
+
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he4g_pt(T):
+#     """Wagoner, 1966"""
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = pt_he4g.__wrapped__(T) / constants.to_norm_time(1)
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+
+#     back = 2.59 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-229.9/T9)
+#     return (back /(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def nhe3_he4g(T):
+#     """
+#     Wagoner
+#     """
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     base_rate = (
+#         6.0 * 10**3 * T9
+#         )
+#     ro_b = univ_func.rat_scale(T)
+#     return base_rate * ro_b/(constants.less_time(1))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he4g_nhe3(T):
+#     """Wagoner, 1966"""
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = nhe3_he4g.__wrapped__(T) / constants.to_norm_time(1)
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+
+#     back = 2.60 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-238.8/T9)
+#     return (back /(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def dd_he4g(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+#     forw = 24.1 * (T9**(-2./3)) * math.exp(-4.26*(T9**(-1./3))) * (
+#         + T9**(2./3)
+#         + 0.685 * T9
+#         + 0.152 * T9**(4./3)
+#         + 0.265 * T9**(5./3)
+#         )
+#     return forw * ro_b * (1./(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he4g_dd(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = dd_he4g.__wrapped__(T) / constants.to_norm_time(1)
+#     ro_b = univ_func.rat_scale(T)
+#     back = 4.50 * 10**10 * forw * ro_b**(-1) * T9**(3./2) * math.exp(-276.7 * (T9**(-1)))
+#     return back * (1./(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def dhe3_he4p(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+#     forw = 2.60 * 10**9 * T9**(-3./2) * math.exp(-2.99/T9)
+#     return forw * ro_b * (1./(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he4p_dhe3(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = dhe3_he4p.__wrapped__(T) / constants.to_norm_time(1)
+#     ro_b = univ_func.rat_scale(T)
+#     back = 5.50 * forw * math.exp(-213.0/T9)
+#     return back * (1./(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def dt_he4n(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+#     forw = 1.38 * 10**9 * T9**(-3./2) * math.exp(-0.745/T9)
+#     return forw * ro_b * (1./(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he4n_dt(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = dt_he4n.__wrapped__(T) / constants.to_norm_time(1)
+#     ro_b = univ_func.rat_scale(T)
+#     back = 5.50 * forw * math.exp(-204.1/T9)
+#     return back * (1./(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he4pp_he3he3(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = he3he3_he4pp.__wrapped__(T) / constants.to_norm_time(1)
+#     ro_b = univ_func.rat_scale(T)
+#     back = 3.37 * 10**(-10) * forw * ro_b * T9**(-3./2) * math.exp(-149.2/T9)
+#     return back * (1./(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def tt_he4nn(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+#     forw = 1.10 * 10**9 * T9**(-2./3) * math.exp(-4.87*T9**(-1./3)) * (
+#         + 1. 
+#         + 0.0857 * T9**(1./3)
+#         )
+#     return forw * ro_b * (1./(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he4nn_tt(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = tt_he4nn.__wrapped__(T) / constants.to_norm_time(1)
+#     ro_b = univ_func.rat_scale(T)
+#     back = 3.37 * 10**(-10) * forw * ro_b * T9**(-3./2) * math.exp(-131.5/T9)
+#     return back * (1./(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he3t_he4pn(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+#     forw = 5.60 * 10**9 * T9**(-2./3) * math.exp(-7.72*T9**(-1./3)) * (
+#         + 1.
+#         + 0.0540 * T9**(1./3)
+#         )
+#     return forw * ro_b * (1./(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he4pn_he3t(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = he3t_he4pn.__wrapped__(T) / constants.to_norm_time(1)
+#     ro_b = univ_func.rat_scale(T)
+#     back = 3.37 * 10**(-10) * forw * ro_b * T9**(-3./2) * math.exp(-140.4/T9)
+#     return back * (1./(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he3t_he4d(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+#     forw = 3.88 * 10**9 * T9**(-2./3) * math.exp(-7.72*T9**(-1./3)) * (
+#         +1.
+#         + 0.0540 * T9**(1./3)
+#         )
+#     return forw * ro_b * (1./(constants.less_time(1)))
+
+# @He_4.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def he4d_he3t(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = he3t_he4d.__wrapped__(T) / constants.to_norm_time(1)
+#     ro_b = univ_func.rat_scale(T)
+#     back = 1.59 * forw * math.exp(-166.2/T9)
+#     return back * (1./(constants.less_time(1)))

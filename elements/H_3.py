@@ -22,20 +22,6 @@ H_3.set_mass_excess(3016049.2777, n_N=2, p_N=1)
 H_3.tr_t =  0.0017 * (constants.nu_0/constants.nu_n)
 H_3.tr_T = tempreture.Tfromt(H_3.tr_t)
 
-# @H_3.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def nd_tg(T):
-#     """
-#     Wagoner
-#     """
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     base_rate = (
-#         75.5
-#         + 1250 * T9
-#         )
-#     ro_b = univ_func.rat_scale(T)
-#     return base_rate * ro_b/(constants.less_time(1))
-
 @H_3.equilib_zeroize
 @functools.lru_cache(maxsize=8)
 def H2n_H3g(T):
@@ -46,18 +32,6 @@ def H2n_H3g(T):
         + 18.9 * T9)
     ro_b = univ_func.rat_scale(T)
     return base_rate * ro_b/(constants.less_time(1))    
-
-# @H_3.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def tg_nd(T):
-#     """Wagoner, 1966"""
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = nd_tg.__wrapped__(T) / constants.to_norm_time(1)
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-
-#     back = 1.63 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-72.62/T9)
-#     return (back /(constants.less_time(1)))
 
 @H_3.equilib_zeroize
 @functools.lru_cache(maxsize=8)
@@ -70,6 +44,13 @@ def H3g_H2n(T):
 
     back = 1.63 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-72.62/T9)
     return (back /(constants.less_time(1)))
+
+H_3.reactions.append((
+    ("n", "D"), 
+    ("T",), 
+    H2n_H3g, 
+    H3g_H2n
+    ))
 
 #############################################
 
@@ -84,31 +65,6 @@ def H_3_equ(X, T):
     return X
 
 #############################################
-
-# @H_3.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def nhe3_pt(T):
-#     """
-#     Wagoner
-#     """
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     base_rate = (
-#         7.06 * (10**8)
-#         )
-#     ro_b = univ_func.rat_scale(T)
-#     return base_rate * ro_b/(constants.less_time(1))
-
-# @H_3.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def pt_nhe3(T):
-#     """Wagoner, 1966"""
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = nhe3_pt.__wrapped__(T) / constants.to_norm_time(1)
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-
-#     back = forw * math.exp(-8.864/T9)
-#     return (back /(constants.less_time(1)))
 
 
 @H_3.equilib_zeroize
@@ -137,31 +93,14 @@ def H2n_H3p(T):
     back = forw * math.exp(-8.864/T9)
     return (back /(constants.less_time(1)))
 
-
+H_3.reactions.append((
+    ("n", "He_3"), 
+    ("p" + "T"), 
+    He3n_H3p, 
+    H2n_H3p
+    ))
 
 #############################################
-
-# @H_3.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def dd_pt(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     ro_b = univ_func.rat_scale(T)
-#     forw = 3.9 * (10**8) * (T9**(-2./3)) * math.exp(-4.26*(T9**(-1./3))) * (
-#         + 1
-#         + 0.0979 * T9**(1./3)
-#         + 0.642 * T9**(2./3)
-#         + 0.440 * T9
-#         )
-#     return forw * ro_b * (1./(constants.less_time(1)))
-
-# @H_3.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def pt_dd(T):
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = dd_pt.__wrapped__(T) / constants.to_norm_time(1)
-#     back = 1.73 * forw * math.exp(-46.80 * (T9**(-1)))
-#     return back * (1./(constants.less_time(1)))
 
 H_3.add_interpo("H2H2_H3p","""0.001 1.45E−08 1.33E−08 1.57E−08 0.14 5.57E+05 5.26E+05 5.91E+05
 0.002 6.02E−05 5.52E−05 6.54E−05 0.15 6.47E+05 6.12E+05 6.87E+05
@@ -218,7 +157,12 @@ def H3p_H2H2(T):
     back = 1.73 * forw * math.exp(-46.799 * (T9**(-1)))
     return back * (1./(constants.less_time(1)))
 
-
+H_3.reactions.append((
+    ("D", "D"),
+    ("p", "T"), 
+    H2H2_H3p, 
+    H3p_H2H2
+    ))
 
 # H_3.forward_rates.append(nd_tg)
 # H_3.backward_rates.append(tg_nd)
@@ -235,7 +179,7 @@ def H3p_H2H2(T):
 
 
 H_3.equilibrium = H_3_equ
-
+H_3.names = ["H_3", "t", "^3H", "T"]
 
 if __name__ == '__main__':
     # H_3.show_rates()
@@ -250,3 +194,76 @@ if __name__ == '__main__':
         # print(dd_pt.__wrapped__(T)/H2H2_H3p.__wrapped__(T))
         # print(H2H2_H3p.__wrapped__(T)/ta.__wrapped__(T))
     # ta()
+
+# @H_3.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def nd_tg(T):
+#     """
+#     Wagoner
+#     """
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     base_rate = (
+#         75.5
+#         + 1250 * T9
+#         )
+#     ro_b = univ_func.rat_scale(T)
+#     return base_rate * ro_b/(constants.less_time(1))
+
+# @H_3.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def tg_nd(T):
+#     """Wagoner, 1966"""
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = nd_tg.__wrapped__(T) / constants.to_norm_time(1)
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+
+#     back = 1.63 * 10**10 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-72.62/T9)
+#     return (back /(constants.less_time(1)))
+
+# @H_3.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def nhe3_pt(T):
+#     """
+#     Wagoner
+#     """
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     base_rate = (
+#         7.06 * (10**8)
+#         )
+#     ro_b = univ_func.rat_scale(T)
+#     return base_rate * ro_b/(constants.less_time(1))
+
+# @H_3.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def pt_nhe3(T):
+#     """Wagoner, 1966"""
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = nhe3_pt.__wrapped__(T) / constants.to_norm_time(1)
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+
+#     back = forw * math.exp(-8.864/T9)
+#     return (back /(constants.less_time(1)))
+
+# @H_3.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def dd_pt(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     ro_b = univ_func.rat_scale(T)
+#     forw = 3.9 * (10**8) * (T9**(-2./3)) * math.exp(-4.26*(T9**(-1./3))) * (
+#         + 1
+#         + 0.0979 * T9**(1./3)
+#         + 0.642 * T9**(2./3)
+#         + 0.440 * T9
+#         )
+#     return forw * ro_b * (1./(constants.less_time(1)))
+
+# @H_3.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def pt_dd(T):
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = dd_pt.__wrapped__(T) / constants.to_norm_time(1)
+#     back = 1.73 * forw * math.exp(-46.80 * (T9**(-1)))
+#     return back * (1./(constants.less_time(1)))

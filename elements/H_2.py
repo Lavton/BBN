@@ -22,36 +22,6 @@ H_2.set_mass_excess(2014101.7778, n_N=1, p_N=1)
 H_2.tr_t = 0.0015 * (constants.nu_0/constants.nu_n)
 H_2.tr_T = tempreture.Tfromt(H_2.tr_t)
 
-# @H_2.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def H_2_forw_rate(T):
-#     """
-#     Smith et all
-#     """
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     base_rate = 4.742 * 10**4 * (
-#         + 1. 
-#         - 0.8540 * T9**(1./2)
-#         + 0.4895 * T9
-#         - 0.09623 * T9**(3./2)
-#         + 8.471*1e-3 * T9**2
-#         - 2.80*1e-4 * T9**(5./2)
-#         )
-#     ro_b = univ_func.rat_scale(T)
-#     return base_rate * ro_b/(constants.less_time(1))
-
-# @H_2.equilib_zeroize
-# @functools.lru_cache(maxsize=8)
-# def H_2_backward_rate(T):
-#     """Wagoner, 1966"""
-#     T9 = constants.to_norm_tempreture(T, units="T9")
-#     forw = H_2_forw_rate.__wrapped__(T) / constants.to_norm_time(1)
-#     E = constants.to_norm_tempreture(T, units="MeV")
-#     back = forw * math.exp(-H_2.mass_excess/T)
-#     ro_b = univ_func.rat_scale(T)
-
-#     back = 4.68*10**9 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-H_2.mass_excess/T)
-#     return (back /(constants.less_time(1)))
 
 @H_2.equilib_zeroize
 @functools.lru_cache(maxsize=8)
@@ -98,12 +68,14 @@ def H_2_equ(X, T):
     X[0][1] -= X_n
     return X
 
-# print(abs(H_2.mass - H_1.mass - n.mass))
-# H_2.forward_rates.append(H_2_forw_rate)
-# H_2.backward_rates.append(H_2_backward_rate)
-
-
 H_2.equilibrium = H_2_equ
+H_2.names = ["H_2", "d", "D"]
+H_2.reactions.append((
+    ("p", "n"),
+    ("D",), 
+    np_H2,
+    H2_np
+    ))
 
 
 if __name__ == '__main__':
@@ -118,3 +90,34 @@ if __name__ == '__main__':
     #     print(H_2_backward_rate.__wrapped__(T)/H2_np.__wrapped__(T))
 
     # H_2.show_rates()
+
+# @H_2.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def H_2_forw_rate(T):
+#     """
+#     Smith et all
+#     """
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     base_rate = 4.742 * 10**4 * (
+#         + 1. 
+#         - 0.8540 * T9**(1./2)
+#         + 0.4895 * T9
+#         - 0.09623 * T9**(3./2)
+#         + 8.471*1e-3 * T9**2
+#         - 2.80*1e-4 * T9**(5./2)
+#         )
+#     ro_b = univ_func.rat_scale(T)
+#     return base_rate * ro_b/(constants.less_time(1))
+
+# @H_2.equilib_zeroize
+# @functools.lru_cache(maxsize=8)
+# def H_2_backward_rate(T):
+#     """Wagoner, 1966"""
+#     T9 = constants.to_norm_tempreture(T, units="T9")
+#     forw = H_2_forw_rate.__wrapped__(T) / constants.to_norm_time(1)
+#     E = constants.to_norm_tempreture(T, units="MeV")
+#     back = forw * math.exp(-H_2.mass_excess/T)
+#     ro_b = univ_func.rat_scale(T)
+
+#     back = 4.68*10**9 * forw * (ro_b**(-1)) * T9**(3./2) * math.exp(-H_2.mass_excess/T)
+#     return (back /(constants.less_time(1)))

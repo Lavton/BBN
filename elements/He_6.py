@@ -48,6 +48,13 @@ def he6g_he4nn(T):
     back = 1.08 * 10**20 * forw * (ro_b**(-2)) * T9**(3) * math.exp(-11.319/T9)
     return (back /(constants.less_time(1)))
 
+He_6.reactions.append((
+    ("He_4", "n", "n"),
+    ("He_6",),
+    he4nn_he6_g,
+    he6g_he4nn
+    ))
+
 ##################################
 
 def He_6_equ(X, T):
@@ -75,6 +82,12 @@ def he6_li6(T):
 def li6_he6(T):
     return (0 /(constants.less_time(1)))
 
+He_6.reactions.append((
+    ("He_6",), 
+    ("Li_6",),
+    he6_li6,
+    li6_he6
+    ))
 #########################################################
 
 He_6.forward_rates.append(he4nn_he6_g)
@@ -93,6 +106,7 @@ He_6.backward_rates.append(li6_he6)
 # 8 - Li6
 # 9 - He6
 He_6.equilibrium = He_6_equ
+He_6.names = ["He_6", "^6He"]
 
 if __name__ == '__main__':
     He_6.show_rates()

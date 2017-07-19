@@ -20,7 +20,7 @@ import constants
 import sys
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import elements.register as elements
+import register
 import datetime
 import tempreture
 import os
@@ -28,8 +28,8 @@ now_title = datetime.datetime.now().isoformat()
 
 start_time = time.time()
 
-# начальные массовые доли элементов берём из elements
-X_0 = np.array(elements.X_0)
+# начальные массовые доли элементов берём из register
+X_0 = np.array(register.X_0)
 
 # обезразмеренный диапазон температур
 grid = np.logspace(math.log10(9.8*10**10), math.log10(10**7), num=320)
@@ -40,17 +40,16 @@ ts = np.array([tfromT(T) for T in Ts])
 
 with open("mylog.log", "wt") as f:
     f.write("")
-logging.info(("start", constants.ode_params, ts))
 
 def ode_int(X, t):
     """
     вычисляем следующий шаг для интегрирования
     X - значения массовых долей элементов на предыдущем шаге, T - температура
 
-    тут выполняем технические части. Логика - в @see elements.registrator.sode_int
+    тут выполняем технические части. Логика - в @see register.registrator.sode_int
     вовзвращаем изменения элементов
     """
-    dx = elements.registrator.sode_int(X=X, T=Tfromt(t))
+    dx = register.registrator.sode_int(X=X, T=Tfromt(t))
     dX = np.array(dx)
     return dX
 
@@ -68,9 +67,9 @@ def ode_(t, X):
 
 def jacob(t, X):
     """
-    вычисляем Якобиан уравнения. Логика спрятана в @elements.registrator.jacob
+    вычисляем Якобиан уравнения. Логика спрятана в @register.registrator.jacob
     """
-    j = np.array(elements.registrator.jacob(X, Tfromt(t))) # * derriviate_T_from_t(T)
+    j = np.array(register.registrator.jacob(X, Tfromt(t))) # * derriviate_T_from_t(T)
 
     return j
 
@@ -84,7 +83,6 @@ class TechnicalCalcExitException(Exception):
 
 
 def technical_stop_cache(i, Tres, X_ans):
-
     with open("smart_cache.pickle", "wb") as f:
         pickle.dump((i, X_ans, Tres, constants.ode_params), f)
     if os.path.isfile("exit_now"):
@@ -93,7 +91,6 @@ def technical_stop_cache(i, Tres, X_ans):
 
 # инициируем программу для решение дифура
 def iter_process(X_0, T0, Ts, i, X_ans, Tres):
-
     # выполняем шаги
     for param_set in constants.ode_params:
         if Tres[-1] >= param_set[0]:
@@ -127,7 +124,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
                 ma = max(abs(X_ans[-1][kk]), abs(X_ans[-2][kk]))
                 mi = min(abs(X_ans[-1][kk]), abs(X_ans[-2][kk]))
                 if 20 < ma/mi:
-                    logging.error(("dX to big!", elements.registrator.elements[kk].str_view, X_ans[-1][kk]/X_ans[-2][kk]))
+                    logging.error(("dX to big!", register.registrator.elements[kk].str_view, X_ans[-1][kk]/X_ans[-2][kk]))
         if len(list(filter(lambda l: l<0, X_ans[-1]))):
             logging.error(("ONE X LESS ZERRO", X_ans[-1]))
         for param_set in constants.ode_params:
@@ -135,7 +132,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
                 if param_set[0] >= last_step:
                     logging.debug(("exit on param_set", param_set))
                     return (i, X_ans, Tres)
-        for element in elements.registrator.elements:
+        for element in register.registrator.elements:
             # во избежание численных ошибок, концентрация элементов изначально считается из
             # закона равновесия, и лишь потом входит в полноценный диффур
             if element.equilibrium:
@@ -148,7 +145,7 @@ def iter_process(X_0, T0, Ts, i, X_ans, Tres):
         step_solu = odes.integrate(odes.t+dt)
         solu = np.array(list(step_solu)).reshape((1,-1))
         Tres.append(odes.t+dt)
-        for element in elements.registrator.elements:
+        for element in register.registrator.elements:
             # во избежание численных ошибок, концентрация элементов изначально считается из
             # закона равновесия, и лишь потом входит в полноценный диффур
             if element.equilibrium:
@@ -226,7 +223,7 @@ for i in range(len(Tres)):
     new_Tres[i] = constants.to_norm_time(new_Tres[i])
 
 
-elements.registrator.calc_plot(plt, new_Tres, X_ans)
+register.registrator.calc_plot(plt, new_Tres, X_ans)
 
 for t in new_Tres:
     plt.axvline(x=t, linewidth=0.1)  
