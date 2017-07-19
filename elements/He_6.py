@@ -23,6 +23,7 @@ He_6.tr_t = 0.002
 He_6.tr_T = tempreture.Tfromt(He_6.tr_t)
 
 he_k = 100000.0
+
 @He_6.equilib_zeroize
 @functools.lru_cache(maxsize=8)
 def he4nn_he6_g(T):
@@ -105,7 +106,7 @@ He_6.backward_rates.append(li6_he6)
 # 7 - Li7
 # 8 - Li6
 # 9 - He6
-He_6.equilibrium = He_6_equ
+# He_6.equilibrium = He_6_equ
 He_6.names = ["He_6", "^6He"]
 
 if __name__ == '__main__':

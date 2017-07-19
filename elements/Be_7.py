@@ -151,7 +151,7 @@ Be_7.reactions.append((
 # 5 - He4
 # 6 - Be7
 
-Be_7.equilibrium = Be_7_equ
+# Be_7.equilibrium = Be_7_equ
 Be_7.names = ["Be_7", "^7Be"]
 
 if __name__ == '__main__':

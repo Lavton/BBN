@@ -201,14 +201,98 @@ self._magic_jacob = _magic_jacob
         exec(jacob_line)
         logging.info(jacob_line)
 
+        ############
+        # и уравнения для статистического равновесия:
+        for i in range(len(dX)):
+            if self.elements[i].A < 2:
+                continue
+            lines = "0"
+            zeros = []
+            ones = []
+            for j in range(len(dX[i])):
+                line = "{sign}{coef}*{seq}*{rate}".format(
+                    sign=dX[i][j][0], 
+                    coef=dX[i][j][1],
+                    seq=self._to_ode(dX[i][j][2][0]),
+                    rate=dX[i][j][2][1]
+                    )
+                lines += line
+                # мы выкидываем все слагаемые, где нужное нам выходит квадратичным
+                # и разбиваем на содержащие
+                # и не содержащие
+                els = [self.get_num_on_name(el) for el in dX[i][j][2][0]]
+                el_c = Counter(els)
+                if el_c[i] == 1:
+                    ones.append(j)
+                if el_c[i] == 0:
+                    zeros.append(j)
+            # теперь мы знаем слагаемые
+            # мысленно уравнение теперь dX_i = (X_i/A_i)*B1 + B2
+            # нам надо вытащить X_i. Оно равно
+            # X_i = -A_i*B2/B1
+            zeros = [dX[i][j] for j in zeros]
+            z_lines = ""
+            for z in zeros:
+                line = "{sign}{coef}*{seq}*{rate}".format(
+                    sign=z[0], 
+                    coef=z[1],
+                    seq=self._to_ode(z[2][0]),
+                    rate=z[2][1]
+                    )
+                z_lines += line
+            ones = [dX[i][j] for j in ones]
+            o_lines = ""
+            for z in ones:
+                line = "{sign}{coef}*{seq}*{rate}".format(
+                    sign=z[0], 
+                    coef=z[1],
+                    seq=self._to_ode(z[2][0], i),
+                    rate=z[2][1]
+                    )
+                o_lines += line
+
+            equation = "-({}.A) * ({}) / ({})".format(
+                self.elements[i].names[0],
+                z_lines,
+                o_lines
+                ).replace("(T)", ".__wrapped__(T)")
+            equ_line = (
+"""
+def equlib(X_all, T):
+    T9 = constants.to_norm_tempreture(T, units="T9")
+    X = X_all[0]
+    try:
+        new_X = {}
+    except OverflowError as e:
+        new_X = 0
+    X_all[0][{}] = new_X
+
+    return X_all
+
+self.elements[{}].equilibrium = equlib
+""".format(
+    equation, i, i
+    ))
+            exec(equ_line)
+            logging.info("add equlibrium formula: \n"+equ_line)
+
+
         logging.info("elements: \n{}".format(
             "\n".join([e.names[0] for e in self.elements])
             ))
         logging.info("reactions: \n{}".format("\n".join(self.string_reactions)))
 
 
-    def _to_ode(self, seq):
-        return "*".join(map(self._get_seq, seq))
+    def _to_ode(self, seq, without=-1):
+        if without == -1:
+            return "*".join(map(self._get_seq, seq))
+        else:
+            l = list(map(self._get_seq, seq))
+            for i in range(len(seq)):
+                s = seq[i]
+                if self.get_num_on_name(s) == without:
+                    l[i] = "1"
+            return "*".join(l)
 
     def _to_jacob(self, seq):
         c_seq = Counter(seq)
@@ -272,7 +356,6 @@ registrator.registrate(Li_6)
 # registrator.registrate(He_6)
 registrator.finish_registration()
 X_0 = registrator.X_0
-
 if __name__ == '__main__':
     def check_jacob():
         from scipy.misc import derivative

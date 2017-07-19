@@ -85,7 +85,7 @@ class TechnicalCalcExitException(Exception):
 
 def technical_stop_cache(i, Tres, X_ans):
     with open("smart_cache.pickle", "wb") as f:
-        pickle.dump((i, X_ans, Tres, constants.ode_params, [el.names for el in register.registrator.elements]), f)
+        pickle.dump((i, X_ans, Tres, constants.ode_params, [(el.names, el.tr_t) for el in register.registrator.elements]), f)
     if os.path.isfile("exit_now"):
         os.remove("exit_now")
         raise TechnicalCalcExitException(i, Tres, X_ans)

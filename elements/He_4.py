@@ -511,7 +511,7 @@ He_4.reactions.append((
 # 4 - H3
 # 5 - He4
 
-He_4.equilibrium = He_4_equ
+# He_4.equilibrium = He_4_equ
 He_4.names = ["He_4", "a", "^4He"]
 
 

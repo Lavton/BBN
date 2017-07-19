@@ -150,6 +150,7 @@ def H2H2_H3p(T):
         )
     return base_rate * ro_b * (1./(constants.less_time(1)))
 
+@H_3.equilib_zeroize
 def H3p_H2H2(T):
     """NACRE II"""
     T9 = constants.to_norm_tempreture(T, units="T9")
@@ -178,7 +179,7 @@ H_3.reactions.append((
 # 4 - H3
 
 
-H_3.equilibrium = H_3_equ
+# H_3.equilibrium = H_3_equ
 H_3.names = ["H_3", "t", "^3H", "T"]
 
 if __name__ == '__main__':

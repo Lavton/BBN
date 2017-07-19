@@ -237,7 +237,7 @@ Li_7.reactions.append((
 # 5 - He4
 # 6 - Be7
 # 7 - Li7
-Li_7.equilibrium = Li_7_equ
+# Li_7.equilibrium = Li_7_equ
 Li_7.names = ["Li_7", "^7Li"]
 
 if __name__ == '__main__':

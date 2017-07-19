@@ -68,11 +68,11 @@ def H_2_equ(X, T):
     X[0][1] -= X_n
     return X
 
-H_2.equilibrium = H_2_equ
+# H_2.equilibrium = H_2_equ
 H_2.names = ["H_2", "d", "D"]
 H_2.reactions.append((
     ("p", "n"),
-    ("D",), 
+    ("D", ), 
     np_H2,
     H2_np
     ))

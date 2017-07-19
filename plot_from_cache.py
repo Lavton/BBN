@@ -10,7 +10,7 @@ if not os.path.isfile("smart_cache.pickle"):
 
 
 with open("smart_cache.pickle", "rb") as f:
-    i, X_ans, Tres, ode_params, elements = pickle.load(f)
+    i, X_ans, Tres, ode_params, element_stuct = pickle.load(f)
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')
@@ -28,44 +28,19 @@ for t in Tres:
     plt.axvline(x=t, linewidth=0.1)
 
 def print_addition():
-    from elements.H_2 import H_2
-    plt.axvline(x=H_2.tr_t)
-    plt.text(H_2.tr_t, 2e-10, "$H_2$")
-    from elements.He_3 import He_3
-    plt.axvline(x=He_3.tr_t)
-    plt.text(He_3.tr_t, 2e-7, "$He_3$")
-    from elements.H_3 import H_3
-    plt.axvline(x=H_3.tr_t)
-    plt.text(H_3.tr_t, 2e-15, "$H_3$")
-    from elements.He_4 import He_4
-    plt.axvline(x=He_4.tr_t)
-    plt.text(He_4.tr_t, 2e-4, "$He_4$")
-    from elements.Be_7 import Be_7
-    plt.axvline(x=Be_7.tr_t)
-    plt.text(Be_7.tr_t, 2e-4, "$Be_7$")
-    from elements.Li_7 import Li_7
-    plt.axvline(x=Li_7.tr_t)
-    plt.text(Li_7.tr_t, 2e-7, "$Li_7$")
-    from elements.Li_6 import Li_6
-    plt.axvline(x=Li_6.tr_t)
-    plt.text(Li_6.tr_t, 5e-6, "$Li_6$")
-    # from elements.He_6 import He_6
-    # plt.axvline(x=He_6.tr_t)
-    # plt.text(He_6.tr_t, 5e-30, "$He_6$")
+    rels = []
+    for el in element_stuct:
+        if el[1]:
+            rels.append((el[1], "${}$".format(el[0][-1])))
+    rels.sort()
+    start = 1e-4
+    step = 1e5
+    for el in rels:
+      plt.axvline(x=el[0])
+      plt.text(el[0], start, el[1])  
+      start /= step
     for op in ode_params:
         plt.axvline(x=op[0], linewidth=0.5, color="red")
-    # r_he = []
-    # for i in range(len(Tres)):
-    #     print(i, len(Tres))
-    #     he_x = np.copy(X_ans[i])
-    #     try:
-    #         pass
-    #         he_x = He_6.equilibrium([he_x], tempreture.Tfromt(Tres[i]))[0]
-    #         r_he.append(np.copy(he_x)[9])
-    #     except ZeroDivisionError as e:
-    #         print("e")
-    #         r_he.append(0.5)
-    # plt.plot(Tres, r_he, label="eq")
 
 print_addition()
 
