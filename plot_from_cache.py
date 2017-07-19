@@ -10,7 +10,7 @@ if not os.path.isfile("smart_cache.pickle"):
 
 
 with open("smart_cache.pickle", "rb") as f:
-    i, X_ans, Tres, ode_params = pickle.load(f)
+    i, X_ans, Tres, ode_params, elements = pickle.load(f)
 
 plt.rc('text', usetex=True)
 plt.rc('font', family='serif')

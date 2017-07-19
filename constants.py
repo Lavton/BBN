@@ -90,21 +90,7 @@ def_params = {
     "last_step": 0.0
 }
 
-prog_status = "DEBUG"
-
-
-elist = [
-    ["n"],
-    ["H_1", "p", "^1H"],
-    ["H_2", "d", "D"],
-    ["He_3", "^3He"],
-    ["H_3", "t", "T"],
-    ["He_4", "^4He"],
-    ["Be_7", "^7Be"],
-    ["Li_7", "^7Li"],
-    ["Li_6", "^6Li"],
-    ["He_6", "^6He"]
-]
+prog_status = "INFO"
 
 
 

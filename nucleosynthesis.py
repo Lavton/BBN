@@ -17,6 +17,7 @@ import scipy
 from scipy import integrate
 from scipy.misc import derivative
 import constants
+import csv
 import sys
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -84,7 +85,7 @@ class TechnicalCalcExitException(Exception):
 
 def technical_stop_cache(i, Tres, X_ans):
     with open("smart_cache.pickle", "wb") as f:
-        pickle.dump((i, X_ans, Tres, constants.ode_params), f)
+        pickle.dump((i, X_ans, Tres, constants.ode_params, [el.names for el in register.registrator.elements]), f)
     if os.path.isfile("exit_now"):
         os.remove("exit_now")
         raise TechnicalCalcExitException(i, Tres, X_ans)
@@ -177,7 +178,7 @@ def start_from_cache(i, X_ans, Tres):
         want_t = eval(sys.argv[1])  # с какого времени начинать
     if constants.smart_caching and os.path.isfile("smart_cache.pickle"):
         with open("smart_cache.pickle", "rb") as f:
-            t_i, t_X_ans, t_Tres, t_ode_params = pickle.load(f)
+            t_i, t_X_ans, t_Tres, t_ode_params, t_elements = pickle.load(f)
         for j in range(min(len(t_ode_params), len(constants.ode_params))):
             if t_ode_params[i] != constants.ode_params[i]:
                 break
@@ -264,7 +265,7 @@ for i in range(len(Tres) - 20, 0, -1):
     
     for j in range(len(log_x)):
         for man_pos_el in man_aval:
-            if man_pos_el in constants.elist[j]:
+            if man_pos_el in register.registrator.elements[j].names:
                 if Tres[i] <= man_aval[man_pos_el][0] < Tres[i+1]:
                     aval_t[j][2] = True
                     aval_t[j][0] = i 
@@ -296,7 +297,7 @@ for i in range(len(Tres) - 20, 0, -1):
                 aval_t[j][0] = i
 
 for i in range(len(aval_t)):
-    plt.text(new_Tres[aval_t[i][0]], aval_t[i][1], "${}$".format(constants.elist[i][-1]))
+    plt.text(new_Tres[aval_t[i][0]], aval_t[i][1], "${}$".format(register.registrator.elements[i].names[-1]))
 
 
 # plt.title(r"$\eta$= {}".format(constants.nu_n))
@@ -311,4 +312,24 @@ with open("Output.pickle", "wb") as f:
     pickle.dump((X_ans, Tres), f)
 
 sys.stdout.flush()
+
+with open('bbn_with_eta{0:.2f}e-10.csv'.format(constants.nu_n*10**10), 'w', newline='') as csvfile:
+    my_len = 7
+    mywriter = csv.writer(csvfile, delimiter=';',
+                            quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    head = ["T9"]+["log10[X({})]".format(el.names[0]) for el in register.registrator.elements]
+    for i in range(len(head)):
+        head[i] = head[i] + " " * (my_len-len(head[i]))
+    mywriter.writerow(head)
+    for i in range(len(Tres)):
+        try:
+            mywriter.writerow(
+                ["{0:.8f}".format(constants.to_norm_tempreture(
+                    tempreture.Tfromt(Tres[i])
+                    , units="T9"))] + 
+                ["{0:.8f}".format(math.log10(el)) for el in X_ans[i]]
+                )
+        except ValueError as e:
+            pass
+
 plt.show()
