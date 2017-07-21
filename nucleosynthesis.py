@@ -2,7 +2,7 @@
 "Влияние тяжёлых изотопов гелия на процессы первичного нуклеосинтеза"
 """
 import logging
-logging.basicConfig(format=u'%(filename)s[LINE:%(lineno)d, FUNC:%(funcName)s]# %(levelname)-8s  %(message)s', 
+logging.basicConfig(format=u'[%(asctime)s] %(filename)s[LINE:%(lineno)d, FUNC:%(funcName)s]# %(levelname)-8s  %(message)s', 
     level=logging.INFO)
 # ,
     # filename=u'mylog.log')
@@ -26,7 +26,7 @@ import datetime
 import tempreture
 import os
 now_title = datetime.datetime.now().isoformat()
-
+# np.seterr(all='warn')
 start_time = time.time()
 
 # начальные массовые доли элементов берём из register
@@ -199,7 +199,11 @@ try:
     while i != -1:
         X_ans[-1][1] = 1.0 - X_ans[-1][0] - sum(X_ans[-1][2:])
         X_0 = X_ans[-1]
-        i, X_ans, Tres = iter_process(X_0, ts[i], ts, i, X_ans, Tres)
+        try:
+            i, X_ans, Tres = iter_process(X_0, ts[i], ts, i, X_ans, Tres)
+        except Warning as e:
+            logging.warning("Get warning!")
+            logging.warning(e)
 except TechnicalCalcExitException as e:
     i, Tres, X_ans = e.i, e.Tres, e.X_ans
     logging.warning("interrupt by user")

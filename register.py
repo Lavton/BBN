@@ -77,7 +77,7 @@ class Registrator():
         if n == 0: 
             return 1
         else: 
-            return self._factorial(n-1)
+            return self._factorial(n-1) * n
 
     def finish_registration(self):
         # элементы, участвующие в реакции, добавляются с помощью регистратора
@@ -163,7 +163,7 @@ self._magic_ode = _magic_ode
     )
 
         exec(ode_line)
-        logging.info(ode_line)
+        logging.debug(ode_line)
 
         ############
         # аналогично для jacob
@@ -199,8 +199,7 @@ self._magic_jacob = _magic_jacob
     )
 
         exec(jacob_line)
-        logging.info(jacob_line)
-
+        logging.debug(jacob_line)
         ############
         # и уравнения для статистического равновесия:
         for i in range(len(dX)):
@@ -274,7 +273,7 @@ self.elements[{}].equilibrium = equlib
     equation, i, i
     ))
             exec(equ_line)
-            logging.info("add equlibrium formula: \n"+equ_line)
+            logging.debug("add equlibrium formula: \n"+equ_line)
 
 
         logging.info("elements: \n{}".format(
@@ -353,6 +352,7 @@ registrator.registrate(He_4)
 registrator.registrate(Be_7)
 registrator.registrate(Li_7)
 registrator.registrate(Li_6)
+
 # registrator.registrate(He_6)
 registrator.finish_registration()
 X_0 = registrator.X_0
@@ -421,7 +421,6 @@ if __name__ == '__main__':
             print([(jaaaa[i][j] - ap_j[i][j])/(max(abs(jaaaa[i][j]), abs(ap_j[i][j]))+1e-13) for j in range(len(jaaaa[i]))])
 
     check_jacob()
-    exit()
     import numpy as np
     import math
     import constants
